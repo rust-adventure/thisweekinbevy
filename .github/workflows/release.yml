@@ -1,0 +1,60 @@
+name: Cut Release
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  release:
+    name: Test, Release [Docker, GH]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly-2024-02-09
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: Swatinem/rust-cache@v2
+        with:
+          # The prefix cache key, this can be changed to start a new cache manually.
+          prefix-key: "v0-rust"
+
+          # A cache key that is used instead of the automatic `job`-based key,
+          # and is stable over multiple jobs.
+          # default: empty
+          # shared-key: ""
+      # - run: cargo install cargo-binstall@^0.22
+      - run: cargo install cargo-leptos@0.2.7 --locked
+      # - run: cargo install --git https://github.com/leptos-rs/cargo-leptos/commit/1a8356ce3e4114d682eccdadc4ca5677e0a7d056
+      - run: cargo leptos test
+      - run: cargo leptos build --release
+      - name: Get current date
+        id: date
+        run: |
+          echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      - name: Publish Docker Image to Fly.io
+        run: flyctl deploy --build-only --push --image-label $IMAGE_LABEL
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          IMAGE_LABEL: gh-${{ env.date }}-${{ github.sha }}
+      - name: Tar static files
+        run: |
+          mkdir static-assets &&
+          cp -R static static-assets/ &&
+          cp -R target/site/pkg static-assets &&
+          cp _redirects static-assets &&
+          tar -czvf static-assets.tar.gz static-assets
+      - name: Publish GitHub Release
+        id: gh-release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: gh-${{ env.date }}-${{ github.sha }}
+          fail_on_unmatched_files: true
+          target_commitish: main
+          tag_name: ${{env.date}}-${{ github.sha }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+          files: |
+            Cargo.toml
+            target/server/release/thisweekinbevy
+            static-assets.tar.gz
+            fly.toml

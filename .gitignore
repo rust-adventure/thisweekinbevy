@@ -13,3 +13,5 @@ end2end/playwright-report/
 playwright/.cache/
 
 .envrc
+# Local Netlify folder
+.netlify
