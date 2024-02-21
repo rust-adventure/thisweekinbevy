@@ -22,6 +22,7 @@ pub fn App() -> impl IntoView {
     // titles, meta tags, etc.
     provide_meta_context();
 
+    let pkg_path: &'static str = std::option_env!("CDN_PKG_PATH").unwrap_or("/pkg");
     view! {
         <Html
             lang="en"
@@ -31,7 +32,7 @@ pub fn App() -> impl IntoView {
         <Body class="flex min-h-full"/>
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href="/pkg/this-week-in-bevy.css"/>
+        <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
         <Link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Archivo%20Black"/>
         // sets the document title
         <Title text="This Week in the Bevy Game Engine"/>

@@ -32,7 +32,7 @@ jobs:
       - run: cargo leptos test
       - run: cargo leptos build --release
         env:
-          CDN_PKG_PATH: https://thisweekinbevy-cdn.netlify.app
+          CDN_PKG_PATH: https://thisweekinbevy-cdn.netlify.app/pkg
       - name: Get current date
         id: date
         run: |
