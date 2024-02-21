@@ -97,11 +97,11 @@ pub fn Home() -> impl IntoView {
           <h1 class="text-2xl font-bold leading-7 text-slate-900">
             Issues
           </h1>
-        </Container>
+      </Container>
         <Suspense fallback=move || view! { <p>"Loading (Suspense Fallback)..."</p> }>
         {move || {
-          issues.read().map(|data| match data {
-            Err(e) => view! {  <div></div> },
+          issues.get().map(|data| match data {
+            Err(_e) => view! {  <div></div> },
             Ok(issues) => view! { 
                 <div class="divide-y divide-slate-100 sm:mt-4 lg:mt-8 lg:border-t lg:border-slate-100">
                 {
@@ -158,7 +158,6 @@ impl From<SqlIssueShort> for IssueShort {
 #[server]
 pub async fn fetch_issues() -> Result<Vec<IssueShort>, ServerFnError> {
     let pool = crate::sql::pool()?;
-    let username = use_context::<Option<crate::Username>>().expect("a user to be logged in").expect("a username to be accessible");
 
     let issues: Vec<SqlIssueShort> = sqlx::query_as!(
         SqlIssueShort,

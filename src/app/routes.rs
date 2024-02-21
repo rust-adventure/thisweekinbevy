@@ -32,8 +32,6 @@ fn PlayIcon(
 
 #[component]
 fn EpisodeEntry(episode: Episode) -> impl IntoView {
-    //   let date = new Date(episode.published)
-    let date = "".to_string();
 
     view! {
       <article

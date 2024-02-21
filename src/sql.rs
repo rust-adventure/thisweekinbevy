@@ -104,7 +104,7 @@ impl From<SqlPullRequestInfo> for ClientPullRequestInfo {
             merged_at_date: value
                 .merged_at_date
                 .expect("a date, because the query was for valid date ranges")
-                .format(&crate::issue_date::issue_date_format)
+                .format(&crate::issue_date::ISSUE_DATE_FORMAT)
                 .expect("a valid format"),
         }
     }
@@ -188,7 +188,7 @@ impl From<SqlOpenedPullRequestInfo>
             gh_created_at: value
                 .gh_created_at
                 .expect("a date, because the query was for valid date ranges")
-                .format(&crate::issue_date::issue_date_format)
+                .format(&crate::issue_date::ISSUE_DATE_FORMAT)
                 .expect("a valid format"),
         }
     }
@@ -268,7 +268,7 @@ impl From<SqlOpenedIssueInfo> for ClientOpenedIssueInfo {
             gh_created_at: value
                 .gh_created_at
                 .expect("a date, because the query was for valid date ranges")
-                .format(&crate::issue_date::issue_date_format)
+                .format(&crate::issue_date::ISSUE_DATE_FORMAT)
                 .expect("a valid format"),
         }
     }

@@ -77,6 +77,8 @@ impl From<SqlIssueData> for IssueData {
 #[server]
 pub async fn fetch_issue(id: String) -> Result<Option<IssueData>, ServerFnError> {
 
+    let id: [u8;16] = id.parse::<rusty_ulid::Ulid>().expect("a valid ulid to be returned from the form").into();
+
     let pool = crate::sql::pool()?;
     let username = crate::sql::with_admin_access()?;
 
@@ -92,7 +94,8 @@ pub async fn fetch_issue(id: String) -> Result<Option<IssueData>, ServerFnError>
             description,
             youtube_id
 FROM issue
-ORDER BY status, issue_date DESC"
+WHERE id = ?",
+id.as_slice()
     )
     .fetch_optional(&pool)
     .await?;

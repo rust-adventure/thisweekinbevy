@@ -121,7 +121,7 @@ struct Contributor;
 
 #[server]
 async fn fetch_issue(
-    date: time::Date
+    _date: time::Date
 ) -> Result<Issue, leptos::ServerFnError> {
     use crate::markdown::compile;
     let crates = vec![CrateRelease {
@@ -184,9 +184,7 @@ pub fn Issue() -> impl IntoView {
             })
         },
         |date| async move {
-            let Some(date) = date else {
-                return None;
-            };
+            let date = date?;
 
             Some(join4(
                 fetch_issue(date),

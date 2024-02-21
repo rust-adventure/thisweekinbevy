@@ -2,7 +2,7 @@ use time::Date;
 use time::macros::format_description;
 use time::format_description::FormatItem;
 
-pub const issue_date_format: &[FormatItem<'_>] = format_description!("[year]-[month]-[day]");
+pub const ISSUE_DATE_FORMAT: &[FormatItem<'_>] = format_description!("[year]-[month]-[day]");
 
 /// takes a "2024-02-12-some-slug" and returns the date portion
 pub fn parse_issue_date_from_slug(input: &str) -> Option<time::Date> {
@@ -11,7 +11,7 @@ pub fn parse_issue_date_from_slug(input: &str) -> Option<time::Date> {
 
 /// takes a "2024-02-12" and returns the date portion
 pub fn parse_issue_date(input: &str) -> Option<time::Date> {
-    Date::parse(input, &issue_date_format).ok()
+    Date::parse(input, &ISSUE_DATE_FORMAT).ok()
 }
 
 #[cfg(test)]

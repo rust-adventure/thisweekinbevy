@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n            id,\n            slug,\n            issue_date,\n            cloudinary_public_id,\n            status,\n            display_name,\n            description,\n            youtube_id\nFROM issue\nORDER BY status, issue_date DESC",
+  "query": "SELECT\n            id,\n            slug,\n            issue_date,\n            cloudinary_public_id,\n            status,\n            display_name,\n            description,\n            youtube_id\nFROM issue\nWHERE id = ?",
   "describe": {
     "columns": [
       {
@@ -85,7 +85,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 1
     },
     "nullable": [
       false,
@@ -98,5 +98,5 @@
       false
     ]
   },
-  "hash": "8c121d41af7e409518a97fa6225ab881d79285a56edf6088739d15ab23e39d66"
+  "hash": "b5df81e42525074417ee0bb71565086e4c8077f4b9deb8424cfe2cd6d0b472b6"
 }

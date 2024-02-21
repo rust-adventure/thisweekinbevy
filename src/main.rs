@@ -15,7 +15,6 @@ use axum_login::{
 use leptos::provide_context;
 use leptos_axum::{
     handle_server_fns_with_context,
-    LeptosRoutes,
 };
 use oauth2::{
     basic::BasicClient, AuthUrl, ClientId, ClientSecret,
