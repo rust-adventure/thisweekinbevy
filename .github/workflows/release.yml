@@ -42,11 +42,7 @@ jobs:
           IMAGE_LABEL: gh-${{ env.date }}-${{ github.sha }}
       - name: Tar static files
         run: |
-          mkdir static-assets &&
-          cp -R static static-assets/ &&
-          cp -R target/site/pkg static-assets &&
-          cp _redirects static-assets &&
-          tar -czvf static-assets.tar.gz static-assets
+          tar -czvf static-assets.tar.gz target/site
       - name: Publish GitHub Release
         id: gh-release
         uses: softprops/action-gh-release@v1
