@@ -42,7 +42,7 @@ impl SessionStore for MySqlStore {
               data = VALUES(data),
               expiry_date = VALUES(expiry_date)
             "#;
-        sqlx::query(&query)
+        sqlx::query(query)
             .bind(&record.id.to_string())
             .bind(rmp_serde::to_vec(&record).map_err(SqlxStoreError::Encode)?)
             .bind(record.expiry_date)

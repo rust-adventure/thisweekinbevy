@@ -7,7 +7,7 @@ pub fn Issue() -> impl IntoView {
     let params = use_params_map();
     let issue = create_resource(
         move || params.with(|p| p.get("id").cloned().unwrap_or_default()),
-        |id| fetch_issue(id)
+        fetch_issue
     );
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">          
@@ -97,7 +97,7 @@ ORDER BY status, issue_date DESC"
     .fetch_optional(&pool)
     .await?;
 
-    Ok(issue.map(|v| IssueData::from(v)))
+    Ok(issue.map(IssueData::from))
 }
 
 #[server]

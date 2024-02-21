@@ -4,10 +4,8 @@ use axum::{
     http::Request,
     response::{IntoResponse, Response},
     routing::get,
-    Router,
 };
 use axum_login::{
-    login_required,
     tower_sessions::{
         cookie::SameSite, Expiry,
         SessionManagerLayer,
@@ -16,21 +14,21 @@ use axum_login::{
 };
 use leptos::provide_context;
 use leptos_axum::{
-    generate_route_list, handle_server_fns_with_context,
+    handle_server_fns_with_context,
     LeptosRoutes,
 };
 use oauth2::{
     basic::BasicClient, AuthUrl, ClientId, ClientSecret,
     TokenUrl,
 };
-use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+use sqlx::{mysql::MySqlPoolOptions};
 use std::env;
 use this_week_in_bevy::{
     app::App, auth, oauth, state::AppState, users::Backend,
 };
 use time::Duration;
 use this_week_in_bevy::{session_store, Username,users::AuthSession};
-use tracing::info;
+
 
 #[tracing::instrument(skip(app_state,auth_session,request))]
 async fn server_fn_handler(

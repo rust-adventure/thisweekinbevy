@@ -11,7 +11,7 @@ pub fn parse_issue_date_from_slug(input: &str) -> Option<time::Date> {
 
 /// takes a "2024-02-12" and returns the date portion
 pub fn parse_issue_date(input: &str) -> Option<time::Date> {
-    Date::parse(&input, &issue_date_format).ok()
+    Date::parse(input, &issue_date_format).ok()
 }
 
 #[cfg(test)]

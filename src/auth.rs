@@ -1,5 +1,4 @@
 use axum::{
-    extract::Query,
     http::StatusCode,
     response::{IntoResponse, Redirect},
     routing::{get, post},

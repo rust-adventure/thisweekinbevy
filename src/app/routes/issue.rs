@@ -1,7 +1,7 @@
 use std::ops::Not;
 
 use crate::{
-    app::components::Container, sql::GetMergedPullRequests,
+    app::components::Container,
 };
 use futures::future::join4;
 use leptos::*;
@@ -157,7 +157,7 @@ and a quote from a contributor
 > Some Quote
 > - [Contributor Person](https://github.com/bevyengine/bevy)"),
         showcases: vec![],
-        crates: crates,
+        crates,
         pull_requests: vec![],
         contributors: vec![],
         educational: vec![],
@@ -189,12 +189,12 @@ pub fn Issue() -> impl IntoView {
             };
 
             Some(join4(
-                fetch_issue(date.clone()),
+                fetch_issue(date),
                 crate::sql::get_merged_pull_requests(
-                    date.clone(),
+                    date,
                 ),
                 crate::sql::get_opened_pull_requests(
-                    date.clone(),
+                    date,
                 ),
                 crate::sql::get_opened_issues(date),
             ).await)

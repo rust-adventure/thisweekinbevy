@@ -1,7 +1,6 @@
 use leptos::*;
 use leptos_router::*;
-#[cfg(feature = "ssr")]
-use crate::state::AppState;
+
 pub mod issues;
 pub mod issue;
 

@@ -9,7 +9,7 @@ use oauth2::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, MySqlPool};
-use tracing::{error, info, instrument};
+use tracing::{error, instrument};
 
 #[derive(Clone, Serialize, Deserialize, FromRow)]
 pub struct User {

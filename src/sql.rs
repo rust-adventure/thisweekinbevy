@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::MySqlPool;
 use std::time::Duration;
-use time::{
-    format_description, macros::format_description, Date,
-};
+
 use crate::Username;
 
 #[cfg(feature = "ssr")]
@@ -77,7 +75,7 @@ ORDER BY merged_at_date DESC",
     // dbg!(results);
     Ok(results
         .into_iter()
-        .map(|v| ClientPullRequestInfo::from(v))
+        .map(ClientPullRequestInfo::from)
         .collect())
 }
 
@@ -159,7 +157,7 @@ ORDER BY gh_created_at DESC",
 
     Ok(results
         .into_iter()
-        .map(|v| ClientOpenedPullRequestInfo::from(v))
+        .map(ClientOpenedPullRequestInfo::from)
         .collect())
 }
 
@@ -241,7 +239,7 @@ ORDER BY gh_created_at DESC",
 
     Ok(results
         .into_iter()
-        .map(|v| ClientOpenedIssueInfo::from(v))
+        .map(ClientOpenedIssueInfo::from)
         .collect())
 }
 

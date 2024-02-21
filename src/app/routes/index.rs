@@ -176,6 +176,6 @@ ORDER BY status, issue_date DESC"
 
     Ok(issues
         .into_iter()
-        .map(|v| IssueShort::from(v))
+        .map(IssueShort::from)
         .collect())
 }
