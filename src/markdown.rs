@@ -2,8 +2,8 @@
 use comrak::plugins::syntect::SyntectAdapterBuilder;
 #[cfg(feature = "ssr")]
 use comrak::{
-    markdown_to_html_with_plugins,
-    ComrakOptions, ComrakPlugins,
+    markdown_to_html_with_plugins, ComrakOptions,
+    ComrakPlugins,
 };
 use leptos::*;
 #[cfg(feature = "ssr")]
@@ -53,10 +53,7 @@ pub fn compile(input: &str) -> String {
     options.extension.front_matter_delimiter = None;
     options.extension.multiline_block_quotes = true;
 
-    
-    markdown_to_html_with_plugins(
-        input, &options, &plugins,
-    )
+    markdown_to_html_with_plugins(input, &options, &plugins)
 }
 
 #[server(MarkdownCompileServer, "/api")]

@@ -31,7 +31,7 @@ pub fn router() -> Router<AppState> {
 }
 
 mod get {
-    use tracing::{instrument};
+    use tracing::instrument;
 
     use super::*;
 

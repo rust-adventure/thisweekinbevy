@@ -1,8 +1,8 @@
 use crate::app::components::Container;
 use leptos::*;
+pub mod admin;
 pub mod index;
 pub mod issue;
-pub mod admin;
 
 #[component]
 fn PauseIcon(
@@ -32,7 +32,6 @@ fn PlayIcon(
 
 #[component]
 fn EpisodeEntry(episode: Episode) -> impl IntoView {
-
     view! {
       <article
         aria-labelledby=format!("episode-{}-title", episode.id)

@@ -1,11 +1,14 @@
 use crate::{
-  Username,
-  app::{
-      components::{TinyWaveFormIcon, AboutSection},
-      routes::{index::Home, issue::Issue, admin::{self, AdminWrapper}},
-  },
-  error_template::{AppError, ErrorTemplate},
-
+    app::{
+        components::{AboutSection, TinyWaveFormIcon},
+        routes::{
+            admin::{self, AdminWrapper},
+            index::Home,
+            issue::Issue,
+        },
+    },
+    error_template::{AppError, ErrorTemplate},
+    Username,
 };
 use leptos::*;
 use leptos_meta::*;
@@ -18,7 +21,6 @@ pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets,
     // titles, meta tags, etc.
     provide_meta_context();
-
 
     view! {
 
@@ -96,8 +98,6 @@ pub fn App() -> impl IntoView {
     }
 }
 
-
-
 #[component]
 fn Login(// Query(NextUrl { next }): Query<NextUrl>,
 ) -> impl IntoView {
@@ -146,8 +146,6 @@ fn RSSIcon(
       </svg>
     }
 }
-
-
 
 /// Renders the home page of your application.
 #[component]

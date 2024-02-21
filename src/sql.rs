@@ -14,12 +14,21 @@ pub fn pool() -> Result<MySqlPool, ServerFnError> {
 }
 
 #[cfg(feature = "ssr")]
-pub fn with_admin_access() -> Result<Username, ServerFnError> {
-    let Some(Username(username)) = use_context::<Option<crate::Username>>().flatten() else {
-        return Err(ServerFnError::ServerError("not allowed to submit via admin panel".to_string()));
+pub fn with_admin_access() -> Result<Username, ServerFnError>
+{
+    let Some(Username(username)) =
+        use_context::<Option<crate::Username>>().flatten()
+    else {
+        return Err(ServerFnError::ServerError(
+            "not allowed to submit via admin panel"
+                .to_string(),
+        ));
     };
     if username != "ChristopherBiscardi" {
-        return Err(ServerFnError::ServerError("not allowed to submit via admin panel".to_string()));
+        return Err(ServerFnError::ServerError(
+            "not allowed to submit via admin panel"
+                .to_string(),
+        ));
     }
     Ok(Username(username))
 }
@@ -41,7 +50,6 @@ struct LabelInfo {
     name: String,
     color: String,
 }
-
 
 #[server]
 pub async fn get_merged_pull_requests(
@@ -93,7 +101,6 @@ pub struct ClientPullRequestInfo {
 #[cfg(feature = "ssr")]
 impl From<SqlPullRequestInfo> for ClientPullRequestInfo {
     fn from(value: SqlPullRequestInfo) -> Self {
-
         ClientPullRequestInfo {
             github_id: value.github_id,
             url: value.url,
@@ -177,7 +184,6 @@ impl From<SqlOpenedPullRequestInfo>
     for ClientOpenedPullRequestInfo
 {
     fn from(value: SqlOpenedPullRequestInfo) -> Self {
-
         ClientOpenedPullRequestInfo {
             github_id: value.github_id,
             url: value.url,
@@ -257,7 +263,6 @@ pub struct ClientOpenedIssueInfo {
 #[cfg(feature = "ssr")]
 impl From<SqlOpenedIssueInfo> for ClientOpenedIssueInfo {
     fn from(value: SqlOpenedIssueInfo) -> Self {
-
         ClientOpenedIssueInfo {
             github_id: value.github_id,
             url: value.url,

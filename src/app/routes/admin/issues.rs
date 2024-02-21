@@ -1,11 +1,13 @@
 use leptos::*;
 use leptos_router::*;
-use serde::{Serialize,Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[component]
 pub fn Issues() -> impl IntoView {
-    let create_draft_issue = create_server_action::<CreateDraftIssue>();
-    let issues = create_resource(move || {}, |_| fetch_issues());
+    let create_draft_issue =
+        create_server_action::<CreateDraftIssue>();
+    let issues =
+        create_resource(move || {}, |_| fetch_issues());
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="bg-white shadow sm:rounded-lg">
@@ -57,15 +59,15 @@ pub fn Issues() -> impl IntoView {
                 .collect_view(),
           })
         }
-      
+
       }  </ul>
     </Suspense>
         </div>
     }
 }
 
-#[cfg(feature="ssr")]
-#[derive(Debug,sqlx::FromRow)]
+#[cfg(feature = "ssr")]
+#[derive(Debug, sqlx::FromRow)]
 struct SqlIssueShort {
     id: Vec<u8>,
     display_name: String,
@@ -79,21 +81,27 @@ pub struct IssueShort {
     pub status: String,
 }
 
-#[cfg(feature="ssr")]
+#[cfg(feature = "ssr")]
 impl From<SqlIssueShort> for IssueShort {
     fn from(value: SqlIssueShort) -> Self {
-        // let id: [u8; 16] = rusty_ulid::generate_ulid_bytes();
-        let id_str = rusty_ulid::Ulid::try_from(value.id.as_slice()).expect("expect valid ids from the database");
-        IssueShort{
+        // let id: [u8; 16] =
+        // rusty_ulid::generate_ulid_bytes();
+        let id_str =
+            rusty_ulid::Ulid::try_from(value.id.as_slice())
+                .expect(
+                    "expect valid ids from the database",
+                );
+        IssueShort {
             id: id_str.to_string(),
             display_name: value.display_name,
-            status: value.status
+            status: value.status,
         }
     }
 }
 
 #[server]
-pub async fn fetch_issues() -> Result<Vec<IssueShort>, ServerFnError> {
+pub async fn fetch_issues(
+) -> Result<Vec<IssueShort>, ServerFnError> {
     let pool = crate::sql::pool()?;
     let username = crate::sql::with_admin_access()?;
 
@@ -109,24 +117,21 @@ ORDER BY status, issue_date DESC"
     .fetch_all(&pool)
     .await?;
 
-    Ok(issues
-        .into_iter()
-        .map(IssueShort::from)
-        .collect())
+    Ok(issues.into_iter().map(IssueShort::from).collect())
 }
 
 #[server]
 pub async fn create_draft_issue(
     issue_date: String,
 ) -> Result<(), ServerFnError> {
-    let pool = use_context::<sqlx::MySqlPool>().expect("to be able to access app_state");
+    let pool = use_context::<sqlx::MySqlPool>()
+        .expect("to be able to access app_state");
     let username = crate::sql::with_admin_access()?;
 
     // https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/
-        
-    let id: [u8; 16] =
-    rusty_ulid::generate_ulid_bytes();
-    
+
+    let id: [u8; 16] = rusty_ulid::generate_ulid_bytes();
+
     let slug = format!("{issue_date}-todo");
     // default id for opengraph image
     let cloudinary_public_id = "thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.avif";

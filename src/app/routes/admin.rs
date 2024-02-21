@@ -1,8 +1,8 @@
 use leptos::*;
 use leptos_router::*;
 
-pub mod issues;
 pub mod issue;
+pub mod issues;
 
 #[component]
 pub fn AdminHomepage() -> impl IntoView {
@@ -139,11 +139,11 @@ pub async fn add_showcase(
     description: String,
     posted_date: String,
 ) -> Result<(), ServerFnError> {
-    let pool = use_context::<sqlx::MySqlPool>().expect("to be able to access app_state");
+    let pool = use_context::<sqlx::MySqlPool>()
+        .expect("to be able to access app_state");
     let username = crate::sql::with_admin_access()?;
 
-    let id: [u8; 16] =
-    rusty_ulid::generate_ulid_bytes();
+    let id: [u8; 16] = rusty_ulid::generate_ulid_bytes();
 
     sqlx::query!(
         r#"
@@ -166,7 +166,8 @@ pub async fn add_showcase(
 
 #[component]
 pub fn Showcase() -> impl IntoView {
-    let add_showcase = create_server_action::<AddShowcase>();
+    let add_showcase =
+        create_server_action::<AddShowcase>();
 
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">

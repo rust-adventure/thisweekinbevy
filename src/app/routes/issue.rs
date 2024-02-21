@@ -1,8 +1,6 @@
 use std::ops::Not;
 
-use crate::{
-    app::components::Container,
-};
+use crate::app::components::Container;
 use futures::future::join4;
 use leptos::*;
 use leptos_router::*;
@@ -121,7 +119,7 @@ struct Contributor;
 
 #[server]
 async fn fetch_issue(
-    _date: time::Date
+    _date: time::Date,
 ) -> Result<Issue, leptos::ServerFnError> {
     use crate::markdown::compile;
     let crates = vec![CrateRelease {
@@ -166,8 +164,6 @@ and a quote from a contributor
     })
 }
 
-
-
 #[component]
 pub fn Issue() -> impl IntoView {
     let params = use_params_map();
@@ -186,18 +182,20 @@ pub fn Issue() -> impl IntoView {
         |date| async move {
             let date = date?;
 
-            Some(join4(
-                fetch_issue(date),
-                crate::sql::get_merged_pull_requests(
-                    date,
-                ),
-                crate::sql::get_opened_pull_requests(
-                    date,
-                ),
-                crate::sql::get_opened_issues(date),
-            ).await)
-
-        }
+            Some(
+                join4(
+                    fetch_issue(date),
+                    crate::sql::get_merged_pull_requests(
+                        date,
+                    ),
+                    crate::sql::get_opened_pull_requests(
+                        date,
+                    ),
+                    crate::sql::get_opened_issues(date),
+                )
+                .await,
+            )
+        },
     );
     view! {
         <Suspense

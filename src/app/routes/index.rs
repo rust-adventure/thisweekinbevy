@@ -1,6 +1,6 @@
 use crate::app::components::Container;
 use leptos::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[component]
 fn PauseIcon(
@@ -30,7 +30,6 @@ fn PlayIcon(
 
 #[component]
 fn IssueEntry(issue: IssueShort) -> impl IntoView {
-
     view! {
       <article
         aria-labelledby=format!("issue-{}-title", issue.id)
@@ -89,7 +88,8 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let issues = create_resource(move || {}, |_| fetch_issues());
+    let issues =
+        create_resource(move || {}, |_| fetch_issues());
 
     view! {
       <div class="pb-12 pt-16 sm:pb-4 lg:pt-12">
@@ -102,7 +102,7 @@ pub fn Home() -> impl IntoView {
         {move || {
           issues.get().map(|data| match data {
             Err(_e) => view! {  <div></div> },
-            Ok(issues) => view! { 
+            Ok(issues) => view! {
                 <div class="divide-y divide-slate-100 sm:mt-4 lg:mt-8 lg:border-t lg:border-slate-100">
                 {
                   issues
@@ -120,15 +120,14 @@ pub fn Home() -> impl IntoView {
     }
 }
 
-
-#[cfg(feature="ssr")]
-#[derive(Debug,sqlx::FromRow)]
+#[cfg(feature = "ssr")]
+#[derive(Debug, sqlx::FromRow)]
 struct SqlIssueShort {
     pub id: Vec<u8>,
     pub slug: String,
     pub issue_date: Option<time::Date>,
     pub display_name: String,
-    pub description: String
+    pub description: String,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -137,15 +136,20 @@ pub struct IssueShort {
     pub slug: String,
     pub issue_date: Option<time::Date>,
     pub display_name: String,
-    pub description: String
+    pub description: String,
 }
 
-#[cfg(feature="ssr")]
+#[cfg(feature = "ssr")]
 impl From<SqlIssueShort> for IssueShort {
     fn from(value: SqlIssueShort) -> Self {
-        // let id: [u8; 16] = rusty_ulid::generate_ulid_bytes();
-        let id_str = rusty_ulid::Ulid::try_from(value.id.as_slice()).expect("expect valid ids from the database");
-        IssueShort{
+        // let id: [u8; 16] =
+        // rusty_ulid::generate_ulid_bytes();
+        let id_str =
+            rusty_ulid::Ulid::try_from(value.id.as_slice())
+                .expect(
+                    "expect valid ids from the database",
+                );
+        IssueShort {
             id: id_str.to_string(),
             slug: value.slug,
             issue_date: value.issue_date,
@@ -156,7 +160,8 @@ impl From<SqlIssueShort> for IssueShort {
 }
 
 #[server]
-pub async fn fetch_issues() -> Result<Vec<IssueShort>, ServerFnError> {
+pub async fn fetch_issues(
+) -> Result<Vec<IssueShort>, ServerFnError> {
     let pool = crate::sql::pool()?;
 
     let issues: Vec<SqlIssueShort> = sqlx::query_as!(
@@ -173,8 +178,5 @@ ORDER BY status, issue_date DESC"
     .fetch_all(&pool)
     .await?;
 
-    Ok(issues
-        .into_iter()
-        .map(IssueShort::from)
-        .collect())
+    Ok(issues.into_iter().map(IssueShort::from).collect())
 }

@@ -1,29 +1,37 @@
-use time::Date;
-use time::macros::format_description;
 use time::format_description::FormatItem;
+use time::macros::format_description;
+use time::Date;
 
-pub const ISSUE_DATE_FORMAT: &[FormatItem<'_>] = format_description!("[year]-[month]-[day]");
+pub const ISSUE_DATE_FORMAT: &[FormatItem<'_>] =
+    format_description!("[year]-[month]-[day]");
 
-/// takes a "2024-02-12-some-slug" and returns the date portion
-pub fn parse_issue_date_from_slug(input: &str) -> Option<time::Date> {
+/// takes a "2024-02-12-some-slug" and returns the
+/// date portion
+pub fn parse_issue_date_from_slug(
+    input: &str,
+) -> Option<time::Date> {
     input.get(0..10).and_then(parse_issue_date)
 }
 
-/// takes a "2024-02-12" and returns the date portion
+/// takes a "2024-02-12" and returns the date
+/// portion
 pub fn parse_issue_date(input: &str) -> Option<time::Date> {
     Date::parse(input, &ISSUE_DATE_FORMAT).ok()
 }
 
 #[cfg(test)]
 mod tests {
-    
+
     use super::*;
     use time::macros::date;
 
     #[test]
     fn can_parse_date_from_slug() {
         let slug = "2024-02-12-some-slug";
-        assert_eq!(Some(date!(2024-02-12)), parse_issue_date_from_slug(slug));
+        assert_eq!(
+            Some(date!(2024 - 02 - 12)),
+            parse_issue_date_from_slug(slug)
+        );
     }
 
     #[test]
@@ -35,7 +43,10 @@ mod tests {
     #[test]
     fn can_parse_date() {
         let slug = "2024-02-12";
-        assert_eq!(Some(date!(2024-02-12)), parse_issue_date(slug));
+        assert_eq!(
+            Some(date!(2024 - 02 - 12)),
+            parse_issue_date(slug)
+        );
     }
 
     #[test]

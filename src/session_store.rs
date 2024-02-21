@@ -14,15 +14,15 @@ pub struct MySqlStore {
 
 impl MySqlStore {
     pub fn new(pool: MySqlPool) -> Self {
-        Self {
-            pool,
-        }
+        Self { pool }
     }
 }
 
 #[async_trait]
 impl ExpiredDeletion for MySqlStore {
-    async fn delete_expired(&self) -> session_store::Result<()> {
+    async fn delete_expired(
+        &self,
+    ) -> session_store::Result<()> {
         sqlx::query("DELETE FROM session WHERE expiry_date < utc_timestamp()")
             .execute(&self.pool)
             .await
@@ -33,9 +33,11 @@ impl ExpiredDeletion for MySqlStore {
 
 #[async_trait]
 impl SessionStore for MySqlStore {
-    async fn save(&self, record: &Record) -> session_store::Result<()> {
-        let query = 
-            r#"
+    async fn save(
+        &self,
+        record: &Record,
+    ) -> session_store::Result<()> {
+        let query = r#"
             INSERT INTO session
               (id, data, expiry_date) VALUES (?, ?, ?)
             ON DUPLICATE KEY UPDATE
@@ -44,7 +46,10 @@ impl SessionStore for MySqlStore {
             "#;
         sqlx::query(query)
             .bind(&record.id.to_string())
-            .bind(rmp_serde::to_vec(&record).map_err(SqlxStoreError::Encode)?)
+            .bind(
+                rmp_serde::to_vec(&record)
+                    .map_err(SqlxStoreError::Encode)?,
+            )
             .bind(record.expiry_date)
             .execute(&self.pool)
             .await
@@ -53,7 +58,10 @@ impl SessionStore for MySqlStore {
         Ok(())
     }
 
-    async fn load(&self, session_id: &Id) -> session_store::Result<Option<Record>> {
+    async fn load(
+        &self,
+        session_id: &Id,
+    ) -> session_store::Result<Option<Record>> {
         let data: Option<(Vec<u8>,)> = sqlx::query_as(
             r#"SELECT data FROM session WHERE id = ? AND expiry_date > ?"#
         )
@@ -65,14 +73,18 @@ impl SessionStore for MySqlStore {
 
         if let Some((data,)) = data {
             Ok(Some(
-                rmp_serde::from_slice(&data).map_err(SqlxStoreError::Decode)?,
+                rmp_serde::from_slice(&data)
+                    .map_err(SqlxStoreError::Decode)?,
             ))
         } else {
             Ok(None)
         }
     }
 
-    async fn delete(&self, session_id: &Id) -> session_store::Result<()> {
+    async fn delete(
+        &self,
+        session_id: &Id,
+    ) -> session_store::Result<()> {
         sqlx::query(r#"delete from session where id = ?"#)
             .bind(&session_id.to_string())
             .execute(&self.pool)
@@ -92,11 +104,13 @@ pub enum SqlxStoreError {
     #[error(transparent)]
     Sqlx(#[from] sqlx::Error),
 
-    /// A variant to map `rmp_serde` encode errors.
+    /// A variant to map `rmp_serde` encode
+    /// errors.
     #[error(transparent)]
     Encode(#[from] rmp_serde::encode::Error),
 
-    /// A variant to map `rmp_serde` decode errors.
+    /// A variant to map `rmp_serde` decode
+    /// errors.
     #[error(transparent)]
     Decode(#[from] rmp_serde::decode::Error),
 }
@@ -104,9 +118,21 @@ pub enum SqlxStoreError {
 impl From<SqlxStoreError> for session_store::Error {
     fn from(err: SqlxStoreError) -> Self {
         match err {
-            SqlxStoreError::Sqlx(inner) => session_store::Error::Backend(inner.to_string()),
-            SqlxStoreError::Decode(inner) => session_store::Error::Decode(inner.to_string()),
-            SqlxStoreError::Encode(inner) => session_store::Error::Encode(inner.to_string()),
+            SqlxStoreError::Sqlx(inner) => {
+                session_store::Error::Backend(
+                    inner.to_string(),
+                )
+            }
+            SqlxStoreError::Decode(inner) => {
+                session_store::Error::Decode(
+                    inner.to_string(),
+                )
+            }
+            SqlxStoreError::Encode(inner) => {
+                session_store::Error::Encode(
+                    inner.to_string(),
+                )
+            }
         }
     }
 }

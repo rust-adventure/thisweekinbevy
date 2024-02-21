@@ -7,29 +7,31 @@ use axum::{
 };
 use axum_login::{
     tower_sessions::{
-        cookie::SameSite, Expiry,
-        SessionManagerLayer,
+        cookie::SameSite, Expiry, SessionManagerLayer,
     },
     AuthManagerLayerBuilder,
 };
 use leptos::provide_context;
-use leptos_axum::{
-    handle_server_fns_with_context,
-};
+use leptos_axum::handle_server_fns_with_context;
 use oauth2::{
     basic::BasicClient, AuthUrl, ClientId, ClientSecret,
     TokenUrl,
 };
-use sqlx::{mysql::MySqlPoolOptions};
+use sqlx::mysql::MySqlPoolOptions;
 use std::env;
 use this_week_in_bevy::{
     app::App, auth, oauth, state::AppState, users::Backend,
 };
+use this_week_in_bevy::{
+    session_store, users::AuthSession, Username,
+};
 use time::Duration;
-use this_week_in_bevy::{session_store, Username,users::AuthSession};
 
-
-#[tracing::instrument(skip(app_state,auth_session,request))]
+#[tracing::instrument(skip(
+    app_state,
+    auth_session,
+    request
+))]
 async fn server_fn_handler(
     State(app_state): State<AppState>,
     path: Path<String>,
@@ -40,9 +42,9 @@ async fn server_fn_handler(
         move || {
             provide_context(app_state.pool.clone());
             provide_context(
-                auth_session
-                  .user.as_ref()
-                  .map(|user| Username(user.username.clone()))
+                auth_session.user.as_ref().map(|user| {
+                    Username(user.username.clone())
+                }),
             );
         },
         request,
@@ -61,9 +63,9 @@ async fn leptos_routes_handler(
         move || {
             provide_context(app_state.pool.clone());
             provide_context(
-                auth_session
-                  .user.as_ref()
-                  .map(|user| Username(user.username.clone()))
+                auth_session.user.as_ref().map(|user| {
+                    Username(user.username.clone())
+                }),
             );
         },
         App,
@@ -119,12 +121,13 @@ async fn main() {
     // This uses `tower-sessions` to establish a layer
     // that will provide the session as a request
     // extension.
-    let session_store = session_store::MySqlStore::new(pool.clone());
+    let session_store =
+        session_store::MySqlStore::new(pool.clone());
     // a memory store would be instantiated like this
     // let session_store = MemoryStore::default();
 
-    // migrations happen in `bin/migrate-sessions` as we
-    // don't do "live migrations".
+    // migrations happen in `bin/migrate-sessions` as
+    // we don't do "live migrations".
     // session_store.migrate().await?;
 
     let session_layer =
@@ -148,7 +151,6 @@ async fn main() {
         session_layer,
     )
     .build();
-
 
     // Setting get_configuration(None) means we'll be
     // using cargo-leptos's env values
