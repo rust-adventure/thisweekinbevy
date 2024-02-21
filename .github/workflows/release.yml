@@ -54,6 +54,6 @@ jobs:
           token: ${{ secrets.RELEASE_TOKEN }}
           files: |
             Cargo.toml
-            target/server/release/thisweekinbevy
+            target/release/this-week-in-bevy
             static-assets.tar.gz
             fly.toml
