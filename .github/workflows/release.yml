@@ -13,6 +13,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@nightly
         with:
           toolchain: nightly-2024-02-09
+          targets: "wasm32-unknown-unknown"
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - uses: Swatinem/rust-cache@v2
         with:
