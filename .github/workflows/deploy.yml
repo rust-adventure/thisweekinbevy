@@ -16,12 +16,12 @@ jobs:
       - uses: dsaltares/fetch-gh-release-asset@master
         with:
           file: "static-assets.tar.gz"
-      - name: Un-tar static-assets
+      - name: Un-tar static assets
         run: tar -xzvf static-assets.tar.gz
       - name: Publish to Netlify
         uses: netlify/actions/cli@master
         with:
-          args: deploy --dir=static-assets --prod
+          args: deploy --dir=target/site --prod
         env:
           NETLIFY_SITE_ID: 92571a12-b93f-4e77-bf4e-744c8ccec4e5
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

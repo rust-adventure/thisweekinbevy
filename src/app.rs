@@ -162,7 +162,7 @@ fn Wrapper(children: Children) -> impl IntoView {
                     >
                         <img
                             class="w-full"
-                            src="/this-week-in-bevylight.png"
+                            src="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevylight_uddwes.avif"
                             alt=""
                             sizes="(min-width: 1024px) 20rem, (min-width: 640px) 16rem, 12rem"
                             priority
