@@ -11,57 +11,77 @@ pub fn Issues() -> impl IntoView {
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="bg-white shadow sm:rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-base font-semibold leading-6 text-gray-900">Create New Issue</h3>
-            <div class="mt-2 max-w-xl text-sm text-gray-500">
-                <p>Creates a new draft issue that content can be attached to. Pick a Monday for the issue date.</p>
-            </div>
-            <ActionForm
-              class="mt-5 sm:flex sm:items-center"
-              action=create_draft_issue
-            >
-                <div class="w-full sm:max-w-xs">
-                <label for="issue_date" class="sr-only">issue_date</label>
-                <input type="date" name="issue_date" id="issue_date" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-base font-semibold leading-6 text-gray-900">
+                        Create New Issue
+                    </h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <p>
+                            Creates a new draft issue that content can be attached to. Pick a Monday for the issue date.
+                        </p>
+                    </div>
+                    <ActionForm class="mt-5 sm:flex sm:items-center" action=create_draft_issue>
+                        <div class="w-full sm:max-w-xs">
+                            <label for="issue_date" class="sr-only">
+                                issue_date
+                            </label>
+                            <input
+                                type="date"
+                                name="issue_date"
+                                id="issue_date"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            class="mt-3 inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:ml-3 sm:mt-0 sm:w-auto"
+                        >
+                            Save
+                        </button>
+                    </ActionForm>
                 </div>
-                <button type="submit" class="mt-3 inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:ml-3 sm:mt-0 sm:w-auto">Save</button>
-            </ActionForm>
             </div>
-        </div>
             <Suspense fallback=move || view! { <p>"Loading (Suspense Fallback)..."</p> }>
-            <ul role="list" class="divide-y divide-gray-100">
-            {move || {
-          issues.read().map(|data| match data {
-            Err(e) => view! {  <pre>{e.to_string()}</pre> }.into_view(),
-            Ok(issues) => issues
-                .iter()
-                .map(|issue| {
-                    view! {
-                        <li class="flex gap-x-4 py-5">
-                            <div class="flex-none rounded-full p-1 text-green-400 bg-green-400/10">
-                                <div class="h-2 w-2 rounded-full bg-current"></div>
-                            </div>
-                          <div class="flex-auto">
-                            <div class="flex items-baseline justify-between gap-x-4">
-                              <a
-                                href=format!("/admin/issue/{}", &issue.id)
-                                class="text-sm font-semibold leading-6 text-gray-900"
-                              >{&issue.display_name}</a>
-                              <p class="flex-none text-xs text-gray-600">
-                                // <time datetime={&issue.issue_date}>{&issue.issue_date}</time>
-                              </p>
-                            </div>
-                            <p class="mt-1 line-clamp-2 text-sm leading-6 text-gray-600">"trimmed description without markdown render"</p>
-                          </div>
-                        </li>
-                    }
-                })
-                .collect_view(),
-          })
-        }
+                <ul role="list" class="divide-y divide-gray-100">
+                    {move || {
+                        issues
+                            .read()
+                            .map(|data| match data {
+                                Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                                Ok(issues) => {
+                                    issues
+                                        .iter()
+                                        .map(|issue| {
+                                            view! {
+                                                <li class="flex gap-x-4 py-5">
+                                                    <div class="flex-none rounded-full p-1 text-green-400 bg-green-400/10">
+                                                        <div class="h-2 w-2 rounded-full bg-current"></div>
+                                                    </div>
+                                                    <div class="flex-auto">
+                                                        <div class="flex items-baseline justify-between gap-x-4">
+                                                            <a
+                                                                href=format!("/admin/issue/{}", &issue.id)
+                                                                class="text-sm font-semibold leading-6 text-gray-900"
+                                                            >
+                                                                {&issue.display_name}
+                                                            </a>
+                                                            <p class="flex-none text-xs text-gray-600">// <time datetime={&issue.issue_date}>{&issue.issue_date}</time>
+                                                            </p>
+                                                        </div>
+                                                        <p class="mt-1 line-clamp-2 text-sm leading-6 text-gray-600">
+                                                            "trimmed description without markdown render"
+                                                        </p>
+                                                    </div>
+                                                </li>
+                                            }
+                                        })
+                                        .collect_view()
+                                }
+                            })
+                    }}
 
-      }  </ul>
-    </Suspense>
+                </ul>
+            </Suspense>
         </div>
     }
 }
