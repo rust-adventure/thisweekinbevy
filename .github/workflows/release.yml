@@ -31,7 +31,8 @@ jobs:
       # - run: cargo install --git https://github.com/leptos-rs/cargo-leptos/commit/1a8356ce3e4114d682eccdadc4ca5677e0a7d056
       - run: cargo leptos test
       - run: cargo leptos build --release
-        env: https://thisweekinbevy-cdn.netlify.app
+        env:
+          CDN_PKG_PATH: https://thisweekinbevy-cdn.netlify.app
       - name: Get current date
         id: date
         run: |
