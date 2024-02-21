@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO showcase ( id, title, url, discord_url, posted_date, description, submitted_by )\n    VALUES ( ?, ?, ?, ?, ?, ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "52fd90958f1b2e6612dec13de314d06b75dd46ba21cf815137cd1b5fa6d306b0"
+}

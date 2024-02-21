@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO issue ( id, issue_date, slug, cloudinary_public_id, display_name )\n    VALUES ( ?, ?, ?, ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "69351827b7de922c0919b9f5c5c7df10bb4c5cfb57e9cbd96adb978b29d82245"
+}

@@ -1,0 +1,91 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n        github_id,\n        url,\n        title,\n        author,\n        author_url,\n        labels,\n        gh_created_at\nFROM new_pull_request\nWHERE gh_created_at BETWEEN ? AND ?\nORDER BY gh_created_at DESC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "github_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 40
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "url",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "author",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 200
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "author_url",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "labels",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "gh_created_at",
+        "type_info": {
+          "type": "Date",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 10
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "9630fb7d0510dcb5131e7282a281a99fd8e75aea9c0ddee352ef78668c41ee3a"
+}

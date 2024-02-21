@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    UPDATE issue \n    SET\n        display_name = ?,\n        slug = ?,\n        cloudinary_public_id = ?,\n        youtube_id = ?,\n        description = ?\n    WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "92cce4a4c5339d60f57d846e6b2c731924b1c77a9e0ac11dd29b2ed98ad144f4"
+}
