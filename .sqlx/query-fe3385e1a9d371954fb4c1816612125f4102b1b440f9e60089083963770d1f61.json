@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO issue__showcase ( issue_id, showcase_id )\n    VALUES ( ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "fe3385e1a9d371954fb4c1816612125f4102b1b440f9e60089083963770d1f61"
+}

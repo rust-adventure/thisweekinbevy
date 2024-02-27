@@ -1,0 +1,58 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n        showcase.id,\n        showcase.title,\n        showcase.posted_date,\n        si.image_count\nFROM issue__showcase\nINNER JOIN showcase\n  ON showcase.id = issue__showcase.showcase_id\nLEFT JOIN (\n    SELECT showcase__image.showcase_id, COUNT(*) as image_count\n    FROM showcase__image\n    GROUP BY showcase__image.showcase_id\n) AS si ON si.showcase_id = showcase.id\nWHERE issue__showcase.issue_id = ?\nORDER BY showcase.posted_date",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "posted_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "BINARY",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "image_count",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NUM",
+          "char_set": 63,
+          "max_size": 21
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "b2a1c56822c134f0b9894288d593c10dee3760970bd59909be3ae9f159ef513e"
+}

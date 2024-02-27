@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    DELETE FROM showcase__image\n    WHERE image_id = ?\n    AND showcase_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "16f2de5d28484260179bfaadf84bcf1b929503daf42784d4d54deb232e3faadc"
+}

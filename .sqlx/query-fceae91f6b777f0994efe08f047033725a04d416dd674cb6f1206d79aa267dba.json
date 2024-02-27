@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n        github_id,\n        url,\n        title,\n        author,\n        author_url,\n        labels,\n        gh_created_at\nFROM new_pull_request\nWHERE gh_created_at BETWEEN ? AND ?\nORDER BY gh_created_at DESC",
+  "query": "SELECT\n        github_id,\n        url,\n        title,\n        author,\n        author_url,\n        labels,\n        merged_at_date\nFROM merged_pull_request\nWHERE merged_at_date BETWEEN ? AND ?\nORDER BY merged_at_date DESC",
   "describe": {
     "columns": [
       {
@@ -65,10 +65,10 @@
       },
       {
         "ordinal": 6,
-        "name": "gh_created_at",
+        "name": "merged_at_date",
         "type_info": {
           "type": "Date",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "flags": "BINARY",
           "char_set": 63,
           "max_size": 10
         }
@@ -84,8 +84,8 @@
       false,
       false,
       true,
-      false
+      true
     ]
   },
-  "hash": "9630fb7d0510dcb5131e7282a281a99fd8e75aea9c0ddee352ef78668c41ee3a"
+  "hash": "fceae91f6b777f0994efe08f047033725a04d416dd674cb6f1206d79aa267dba"
 }

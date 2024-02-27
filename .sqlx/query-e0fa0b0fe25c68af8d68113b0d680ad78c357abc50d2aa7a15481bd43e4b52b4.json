@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO image ( id, cloudinary_public_id, description )\n    VALUES ( ?, ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "e0fa0b0fe25c68af8d68113b0d680ad78c357abc50d2aa7a15481bd43e4b52b4"
+}

@@ -1,0 +1,47 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    id,\n    cloudinary_public_id,\n    description\nFROM image\nORDER BY created_at DESC\nlimit 5",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "cloudinary_public_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 800
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "68bb47f9051939fa1296d9874b9a1190aa58ad748298c865e3e095a07c3269f0"
+}
