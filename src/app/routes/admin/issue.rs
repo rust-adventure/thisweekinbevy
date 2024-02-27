@@ -35,8 +35,8 @@ pub fn Issue() -> impl IntoView {
                 }}
 
             </Suspense>
-            <Divider title="Showcases" />
-            <Showcases />
+            <Divider title="Showcases"/>
+            <Showcases/>
         </div>
     }
 }
@@ -295,20 +295,30 @@ fn Showcases() -> impl IntoView {
     );
            
     view! {
-        <ul role="list" class="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
-        <Suspense fallback=move || {
-            view! { <p>"Loading (Suspense Fallback)..."</p> }
-        }>
-            {move || {
-                showcases.read().map(|data| match data {
-                    Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
-                    Ok(showcases) => showcases
-                      .iter()
-                      .map(|showcase| view! { <ShowcaseLi showcase=showcase.clone()/> })
-                      .collect_view()
-                })
-            }}
-        </Suspense>
+        <ul
+            role="list"
+            class="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
+        >
+            <Suspense fallback=move || {
+                view! { <p>"Loading (Suspense Fallback)..."</p> }
+            }>
+                {move || {
+                    showcases
+                        .read()
+                        .map(|data| match data {
+                            Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                            Ok(showcases) => {
+                                showcases
+                                    .iter()
+                                    .map(|showcase| {
+                                        view! { <ShowcaseLi showcase=showcase.clone()/> }
+                                    })
+                                    .collect_view()
+                            }
+                        })
+                }}
+
+            </Suspense>
         </ul>
     }
 }
@@ -317,35 +327,48 @@ fn Showcases() -> impl IntoView {
 fn ShowcaseLi(showcase: ShowcaseData) -> impl IntoView {
     view! {
         <li class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
-        <div class="flex min-w-0 gap-x-4">
-          <div class="min-w-0 flex-auto">
-            <p class="text-sm font-semibold leading-6 text-gray-900">
-              <a href=format!("/admin/showcase/{}",showcase.id)>
-                <span class="absolute inset-x-0 -top-px bottom-0"></span>
-                {showcase.title}
-              </a>
-            </p>
-            {showcase.posted_date.map(|posted_date| view! { 
-                <p class="mt-1 flex text-xs leading-5 text-gray-500">
-                <span>"posted at"</span>
-                <time
-                  datetime={posted_date.to_string()}
-                  class="ml-1"
-                >{posted_date.to_string()}</time>
-                </p>
-            })}
-          </div>
-        </div>
-        <div class="flex shrink-0 items-center gap-x-4">
-        <div class="hidden sm:flex sm:flex-col sm:items-end">
-        <p class="text-sm leading-6 text-gray-900">{showcase.image_count} images</p>
-        // <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p>
-      </div>
-          <svg class="h-5 w-5 flex-none text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-          </svg>
-        </div>
-      </li>
+            <div class="flex min-w-0 gap-x-4">
+                <div class="min-w-0 flex-auto">
+                    <p class="text-sm font-semibold leading-6 text-gray-900">
+                        <a href=format!("/admin/showcase/{}", showcase.id)>
+                            <span class="absolute inset-x-0 -top-px bottom-0"></span>
+                            {showcase.title}
+                        </a>
+                    </p>
+                    {showcase
+                        .posted_date
+                        .map(|posted_date| {
+                            view! {
+                                <p class="mt-1 flex text-xs leading-5 text-gray-500">
+                                    <span>"posted at"</span>
+                                    <time datetime=posted_date.to_string() class="ml-1">
+                                        {posted_date.to_string()}
+                                    </time>
+                                </p>
+                            }
+                        })}
+
+                </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-x-4">
+                <div class="hidden sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm leading-6 text-gray-900">{showcase.image_count} images</p>
+                // <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p>
+                </div>
+                <svg
+                    class="h-5 w-5 flex-none text-gray-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                        clip-rule="evenodd"
+                    ></path>
+                </svg>
+            </div>
+        </li>
     }
 }
 

@@ -65,8 +65,8 @@ pub fn Issues() -> impl IntoView {
                                                             >
                                                                 {&issue.display_name}
                                                             </a>
-                                                            <p class="flex-none text-xs text-gray-600">// <time datetime={&issue.issue_date}>{&issue.issue_date}</time>
-                                                            </p>
+                                                            // <time datetime={&issue.issue_date}>{&issue.issue_date}</time>
+                                                            <p class="flex-none text-xs text-gray-600"></p>
                                                         </div>
                                                         <p class="mt-1 line-clamp-2 text-sm leading-6 text-gray-600">
                                                             "trimmed description without markdown render"

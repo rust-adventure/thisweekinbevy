@@ -317,9 +317,8 @@ pub fn Issue() -> impl IntoView {
                                             <h1 class="mt-2 text-4xl font-bold text-slate-900">
                                                 {issue.title.clone()}
                                             </h1>
-                                            <p
-                                            class="order-first font-mono text-sm leading-7 text-slate-500">
-                                            {issue.issue_date.to_string()}
+                                            <p class="order-first font-mono text-sm leading-7 text-slate-500">
+                                                {issue.issue_date.to_string()}
                                             </p>
                                         </div>
                                     </div>
@@ -339,11 +338,7 @@ pub fn Issue() -> impl IntoView {
                                     .showcases
                                     .into_iter()
                                     .map(|showcase| {
-                                        view! {
-                                            <ShowcaseView
-                                                showcase=showcase
-                                            />
-                                        }
+                                        view! { <ShowcaseView showcase=showcase/> }
                                     })
                                     .collect::<Vec<_>>()}
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">Crates</h2>
@@ -370,25 +365,25 @@ pub fn Issue() -> impl IntoView {
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">Education</h2>
                                 // <Divider title="Fixes and Features"/>
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">
-                                //     Pull Requests Merged this week
+                                // Pull Requests Merged this week
                                 // </h2>
                                 <Divider title="Pull Requests Merged This Week"/>
                                 // <ul role="list" class="space-y-6 mt-6">
 
-                                //     {merged_pull_requests
-                                //         .expect("")
-                                //         .iter()
-                                //         .map(|pull_request| {
-                                //             view! {
-                                //                 <ActivityListItem
-                                //                     date=&pull_request.merged_at_date
-                                //                     url=&pull_request.url
-                                //                     title=&pull_request.title
-                                //                     author=&pull_request.author
-                                //                 />
-                                //             }
-                                //         })
-                                //         .collect::<Vec<_>>()}
+                                // {merged_pull_requests
+                                // .expect("")
+                                // .iter()
+                                // .map(|pull_request| {
+                                // view! {
+                                // <ActivityListItem
+                                // date=&pull_request.merged_at_date
+                                // url=&pull_request.url
+                                // title=&pull_request.title
+                                // author=&pull_request.author
+                                // />
+                                // }
+                                // })
+                                // .collect::<Vec<_>>()}
 
                                 // </ul>
                                 <Divider title="Contributing"/>
@@ -408,42 +403,40 @@ pub fn Issue() -> impl IntoView {
                                     Pull Requests Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
-
-                                    // {opened_pull_requests
-                                    //     .expect("")
-                                    //     .iter()
-                                    //     .map(|pull_request| {
-                                    //         view! {
-                                    //             <ActivityListItem
-                                    //                 date=&pull_request.gh_created_at
-                                    //                 url=&pull_request.url
-                                    //                 title=&pull_request.title
-                                    //                 author=&pull_request.author
-                                    //             />
-                                    //         }
-                                    //     })
-                                    //     .collect::<Vec<_>>()}
+                                // {opened_pull_requests
+                                // .expect("")
+                                // .iter()
+                                // .map(|pull_request| {
+                                // view! {
+                                // <ActivityListItem
+                                // date=&pull_request.gh_created_at
+                                // url=&pull_request.url
+                                // title=&pull_request.title
+                                // author=&pull_request.author
+                                // />
+                                // }
+                                // })
+                                // .collect::<Vec<_>>()}
 
                                 </ul>
                                 <h2 class="mt-6 text-2xl font-bold text-slate-900">
                                     Issues Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
-
-                                    // {opened_issues
-                                    //     .expect("")
-                                    //     .iter()
-                                    //     .map(|issue| {
-                                    //         view! {
-                                    //             <ActivityListItem
-                                    //                 date=&issue.gh_created_at
-                                    //                 url=&issue.url
-                                    //                 title=&issue.title
-                                    //                 author=&issue.author
-                                    //             />
-                                    //         }
-                                    //     })
-                                    //     .collect::<Vec<_>>()}
+                                // {opened_issues
+                                // .expect("")
+                                // .iter()
+                                // .map(|issue| {
+                                // view! {
+                                // <ActivityListItem
+                                // date=&issue.gh_created_at
+                                // url=&issue.url
+                                // title=&issue.title
+                                // author=&issue.author
+                                // />
+                                // }
+                                // })
+                                // .collect::<Vec<_>>()}
 
                                 </ul>
                             </Container>
@@ -608,13 +601,15 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
     let mut it = showcase.images.iter();
     let first_image = it.next();
     view! {
-        {first_image.map(|image| {
-            view!{
-                <a href=&showcase.url>
-                    <img class="mt-12" src=&image.url alt=&image.description/>
-                </a>
-            }
-        })}
+        {first_image
+            .map(|image| {
+                view! {
+                    <a href=&showcase.url>
+                        <img class="mt-12" src=&image.url alt=&image.description/>
+                    </a>
+                }
+            })}
+
         <ul
             role="list"
             class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
@@ -641,16 +636,35 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
 
         </ul>
         <div class="flex">
-        <h3 class="mt-2 text-xl font-bold text-slate-900">{showcase.title}</h3>
-        {showcase.discord_url.is_empty().not().then_some(view!{
-            <a href=&showcase.discord_url class="text-indigo-700 hover:text-indigo-400 flex items-end ml-4">
-            <span>discord</span>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-</svg>
-</a>
-}
-)}
+            <h3 class="mt-2 text-xl font-bold text-slate-900">{showcase.title}</h3>
+            {showcase
+                .discord_url
+                .is_empty()
+                .not()
+                .then_some(
+                    view! {
+                        <a
+                            href=&showcase.discord_url
+                            class="text-indigo-700 hover:text-indigo-400 flex items-end ml-4"
+                        >
+                            <span>discord</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="w-6 h-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
+                                ></path>
+                            </svg>
+                        </a>
+                    },
+                )}
 
         </div>
         <div

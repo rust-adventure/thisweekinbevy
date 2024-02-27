@@ -66,110 +66,152 @@ pub fn Showcase() -> impl IntoView {
 
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <Suspense fallback=move || view! { <p>"Loading Showcase"</p> }>
-        {showcase.get().map(|data| match data {
-            Err(e) => view!{ <div><div>{e.to_string()}</div></div> },
-            Ok(None) => view!{ <div><div>{"Unable to find Showcase".to_string()}</div></div> },
-            Ok(Some(showcase)) => {
-                let showcase_id = showcase.id.clone();
-                view! {
-                    <div>
-            <ActionForm class="isolate -space-y-px rounded-md shadow-sm" action=update_showcase>
-                <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="title" class="block text-xs font-medium text-gray-900">
-                        Title
-                    </label>
-                    <input
-                      type="hidden"
-                      name="showcase_id"
-                      id="showcase_id"
-                      value=showcase.id
-                    />
-                    <input
-                        required
-                        type="text"
-                        name="title"
-                        id="title"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        value=showcase.title
-                    />
-                </div>
-                <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="url" class="block text-xs font-medium text-gray-900">
-                        URL
-                    </label>
-                    <input
-                        required
-                        type="text"
-                        name="url"
-                        id="url"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        value=showcase.url
-                    />
-                </div>
-                <div class="relative rounded-md rounded-t-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="discord_url" class="block text-xs font-medium text-gray-900">
-                        Discord URL
-                    </label>
-                    <input
-                        type="text"
-                        name="discord_url"
-                        id="discord_url"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        value=showcase.discord_url
-                    />
-                </div>
-                <label
-                    required
-                    for="posted_date"
-                    class="block text-sm font-medium leading-6 text-gray-900"
-                >
-                    Posted At
-                </label>
-                <div class="mt-2">
-                    <input type="date" id="posted_date" name="posted_date" min="2024-01-01" value=showcase.posted_date.unwrap().to_string()/>
-                </div>
-                <label
-                    required
-                    for="description"
-                    class="block text-sm font-medium leading-6 text-gray-900"
-                >
-                    Add your description (markdown compatible)
-                </label>
-                <div class="mt-2">
-                    <textarea
-                        rows="4"
-                        name="description"
-                        id="description"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    >{showcase.description}</textarea>
-                </div>
-                <button
-                    type="submit"
-                    class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                    Update Showcase
-                </button>
-            </ActionForm>
-            <Divider title="Showcase Images"/>
-            <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                <For
-                    each=move || showcase.images.clone()
-                    key=|image| image.id.clone()
-                    let:image
-                >
-                    <ShowcaseImageLi showcase_id=showcase_id.clone() id=image.id url=image.url/>
-                </For>
-            </ul>
-            </div>
-                    }}
-                })
-            }
+            <Suspense fallback=move || {
+                view! { <p>"Loading Showcase"</p> }
+            }>
+                {showcase
+                    .get()
+                    .map(|data| match data {
+                        Err(e) => {
+                            view! {
+                                <div>
+                                    <div>{e.to_string()}</div>
+                                </div>
+                            }
+                        }
+                        Ok(None) => {
+                            view! {
+                                <div>
+                                    <div>{"Unable to find Showcase".to_string()}</div>
+                                </div>
+                            }
+                        }
+                        Ok(Some(showcase)) => {
+                            let showcase_id = showcase.id.clone();
+                            view! {
+                                <div>
+                                    <ActionForm
+                                        class="isolate -space-y-px rounded-md shadow-sm"
+                                        action=update_showcase
+                                    >
+                                        <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                                            <label
+                                                for="title"
+                                                class="block text-xs font-medium text-gray-900"
+                                            >
+                                                Title
+                                            </label>
+                                            <input
+                                                type="hidden"
+                                                name="showcase_id"
+                                                id="showcase_id"
+                                                value=showcase.id
+                                            />
+                                            <input
+                                                required
+                                                type="text"
+                                                name="title"
+                                                id="title"
+                                                class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                value=showcase.title
+                                            />
+                                        </div>
+                                        <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                                            <label
+                                                for="url"
+                                                class="block text-xs font-medium text-gray-900"
+                                            >
+                                                URL
+                                            </label>
+                                            <input
+                                                required
+                                                type="text"
+                                                name="url"
+                                                id="url"
+                                                class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                value=showcase.url
+                                            />
+                                        </div>
+                                        <div class="relative rounded-md rounded-t-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                                            <label
+                                                for="discord_url"
+                                                class="block text-xs font-medium text-gray-900"
+                                            >
+                                                Discord URL
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="discord_url"
+                                                id="discord_url"
+                                                class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                value=showcase.discord_url
+                                            />
+                                        </div>
+                                        <label
+                                            required
+                                            for="posted_date"
+                                            class="block text-sm font-medium leading-6 text-gray-900"
+                                        >
+                                            Posted At
+                                        </label>
+                                        <div class="mt-2">
+                                            <input
+                                                type="date"
+                                                id="posted_date"
+                                                name="posted_date"
+                                                min="2024-01-01"
+                                                value=showcase.posted_date.unwrap().to_string()
+                                            />
+                                        </div>
+                                        <label
+                                            required
+                                            for="description"
+                                            class="block text-sm font-medium leading-6 text-gray-900"
+                                        >
+                                            Add your description (markdown compatible)
+                                        </label>
+                                        <div class="mt-2">
+                                            <textarea
+                                                rows="4"
+                                                name="description"
+                                                id="description"
+                                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                            >
+                                                {showcase.description}
+                                            </textarea>
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                        >
+                                            Update Showcase
+                                        </button>
+                                    </ActionForm>
+                                    <Divider title="Showcase Images"/>
+                                    <ul
+                                        role="list"
+                                        class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+                                    >
+                                        <For
+                                            each=move || showcase.images.clone()
+                                            key=|image| image.id.clone()
+                                            let:image
+                                        >
+                                            <ShowcaseImageLi
+                                                showcase_id=showcase_id.clone()
+                                                id=image.id
+                                                url=image.url
+                                            />
+                                        </For>
+                                    </ul>
+                                </div>
+                            }
+                        }
+                    })}
+
             </Suspense>
             <Divider title="All Images"/>
-            <Images showcase_id=params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })/>
+            <Images showcase_id=params.with(|p| { p.get("id").cloned().unwrap_or_default() })/>
         </div>
     }
 }
@@ -378,27 +420,41 @@ fn Images(showcase_id: String) -> impl IntoView {
     let images = create_resource(move || {}, |_| fetch_images());
 
     view! {
-        <Suspense fallback=move || view! { <p>"Loading (Suspense Fallback)..."</p> }>
-        {
-            let showcase_id = showcase_id.clone();
-            
-            images.get().map(move |data| match (showcase_id, data) {
-            (_, Err(e)) => view!{ <div>{e.to_string()}</div> }.into_view(),
-            (showcase_id, Ok(images)) => {
-                view! {
-                    <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                        <For
-                            each=move || images.clone()
-                            key=|image| image.id.clone()
-                            let:image
-                        >
-                            <ImageLi showcase_id=showcase_id.clone() id=image.id url=image.url description=image.description/>
-                        </For>
-                    </ul>
-                    }.into_view()
-                }
-            })
+        <Suspense fallback=move || {
+            view! { <p>"Loading (Suspense Fallback)..."</p> }
+        }>
+
+            {
+                let showcase_id = showcase_id.clone();
+                images
+                    .get()
+                    .map(move |data| match (showcase_id, data) {
+                        (_, Err(e)) => view! { <div>{e.to_string()}</div> }.into_view(),
+                        (showcase_id, Ok(images)) => {
+                            view! {
+                                <ul
+                                    role="list"
+                                    class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+                                >
+                                    <For
+                                        each=move || images.clone()
+                                        key=|image| image.id.clone()
+                                        let:image
+                                    >
+                                        <ImageLi
+                                            showcase_id=showcase_id.clone()
+                                            id=image.id
+                                            url=image.url
+                                            description=image.description
+                                        />
+                                    </For>
+                                </ul>
+                            }
+                                .into_view()
+                        }
+                    })
             }
+
         </Suspense>
     }
 }
@@ -410,21 +466,29 @@ fn ShowcaseImageLi(showcase_id: String, id: String, url: String) -> impl IntoVie
     view! {
         <li class="relative">
             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-            <img src=url alt="" class="pointer-events-none object-cover group-hover:opacity-75"/>
-            <button type="submit" class="absolute inset-0 focus:outline-none">
-                <span class="sr-only">View details</span>
-            </button>
+                <img
+                    src=url
+                    alt=""
+                    class="pointer-events-none object-cover group-hover:opacity-75"
+                />
+                <button type="submit" class="absolute inset-0 focus:outline-none">
+                    <span class="sr-only">View details</span>
+                </button>
             </div>
-            <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">{&id}</p>
+            <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+                {&id}
+            </p>
             // <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
-          <ActionForm action=remove_image_from_showcase>
-            <input type="hidden" name="showcase_id" value=showcase_id/>
-            <input type="hidden" name="image_id" value=id/>
-            <button
-              type="submit"
-              class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >Remove from Showcase</button>
-          </ActionForm>
+            <ActionForm action=remove_image_from_showcase>
+                <input type="hidden" name="showcase_id" value=showcase_id/>
+                <input type="hidden" name="image_id" value=id/>
+                <button
+                    type="submit"
+                    class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                    Remove from Showcase
+                </button>
+            </ActionForm>
         </li>
     }
 }
@@ -436,21 +500,29 @@ fn ImageLi(showcase_id: String, id: String, url: String, description: String) ->
     view! {
         <li class="relative">
             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-            <img src=url alt="" class="pointer-events-none object-cover group-hover:opacity-75"/>
-            <button type="submit" class="absolute inset-0 focus:outline-none">
-                <span class="sr-only">View details</span>
-            </button>
+                <img
+                    src=url
+                    alt=""
+                    class="pointer-events-none object-cover group-hover:opacity-75"
+                />
+                <button type="submit" class="absolute inset-0 focus:outline-none">
+                    <span class="sr-only">View details</span>
+                </button>
             </div>
-            <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">{&id}</p>
+            <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+                {&id}
+            </p>
             <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
-          <ActionForm action=associate_image_with_showcase>
-            <input type="hidden" name="showcase_id" value=showcase_id/>
-            <input type="hidden" name="image_id" value=id/>
-            <button
-              type="submit"
-              class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >Add To Showcase</button>
-          </ActionForm>
+            <ActionForm action=associate_image_with_showcase>
+                <input type="hidden" name="showcase_id" value=showcase_id/>
+                <input type="hidden" name="image_id" value=id/>
+                <button
+                    type="submit"
+                    class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                    Add To Showcase
+                </button>
+            </ActionForm>
         </li>
     }
 }
