@@ -4,7 +4,8 @@ use crate::{
         routes::{
             admin::{self, AdminWrapper},
             index::Home,
-            issue::Issue,
+            issue,
+            custom,
         },
     },
     error_template::{AppError, ErrorTemplate},
@@ -46,8 +47,8 @@ pub fn App() -> impl IntoView {
             <Wrapper>
                 <Routes>
                     <Route path="" view=Home/>
-                    <Route path="/issue/:slug" view=Issue/>
-                    <Route path="/draft/:slug" view=Issue/>
+                    <Route path="/issue/:slug" view=issue::Issue/>
+                    <Route path="/custom/:slug" view=custom::Issue/>
                     <Route path="/login" view=Login/>
                     <ProtectedRoute
                         path="/admin"
@@ -62,10 +63,12 @@ pub fn App() -> impl IntoView {
                         <Route path="/" view=admin::AdminHomepage/>
                         <Route path="/issue" view=admin::issues::Issues/>
                         <Route path="/issue/:id" view=admin::issue::Issue/>
-                        <Route path="/showcase" view=admin::Showcase/>
-                        <Route path="/crate_release" view=admin::CrateRelease/>
-                        <Route path="/devlog" view=admin::Devlog/>
-                        <Route path="/educational" view=admin::Educational/>
+                        <Route path="/showcase" view=admin::showcase::Showcase/>
+                        <Route path="/showcase/:id" view=admin::showcase::id::Showcase/>
+                        <Route path="/crate_release" view=admin::crate_release::CrateRelease/>
+                        <Route path="/devlog" view=admin::devlog::Devlog/>
+                        <Route path="/educational" view=admin::educational::Educational/>
+                        <Route path="/images" view=admin::image::Image/>
                     </ProtectedRoute>
                 </Routes>
             </Wrapper>

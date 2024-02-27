@@ -81,3 +81,19 @@ pub fn TinyWaveFormIcon(
         </svg>
     }
 }
+
+#[component]
+pub fn Divider(#[prop(into)] title: String) -> impl IntoView {
+    view! {
+        <div class="relative mt-12 mb-6">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center">
+                <span class="bg-white px-3 text-base font-semibold leading-6 text-gray-900">
+                    {title}
+                </span>
+            </div>
+        </div>
+    }
+}

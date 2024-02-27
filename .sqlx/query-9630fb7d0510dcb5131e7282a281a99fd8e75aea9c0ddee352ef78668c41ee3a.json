@@ -65,10 +65,10 @@
       },
       {
         "ordinal": 6,
-        "name": "gh_created_at",
+        "name": "merged_at_date",
         "type_info": {
           "type": "Date",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "flags": "BINARY",
           "char_set": 63,
           "max_size": 10
         }
@@ -84,7 +84,7 @@
       false,
       false,
       true,
-      false
+      true
     ]
   },
   "hash": "9630fb7d0510dcb5131e7282a281a99fd8e75aea9c0ddee352ef78668c41ee3a"

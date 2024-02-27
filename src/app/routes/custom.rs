@@ -5,8 +5,6 @@ use futures::future::join4;
 use leptos::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "ssr")]
-use sqlx::types::Json;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {
@@ -15,7 +13,6 @@ pub struct Issue {
     /// is a human-readable string that goes in
     /// the email subject line and slug url
     pub title: String,
-    pub issue_date: time::Date,
     /// What is this issue about? Is there
     /// anything notable worth mentioning or
     /// making sure people are aware of?
@@ -100,14 +97,8 @@ struct Educational {
     images: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Showcase {
-    title: String,
-url: String,
-discord_url: String,
-description: String,
-images: Vec<ImgDataTransformed>
-}
+#[derive(Clone, Serialize, Deserialize)]
+struct Showcase;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -126,148 +117,51 @@ struct PullRequestAuthor {
 #[derive(Clone, Serialize, Deserialize)]
 struct Contributor;
 
-// struct SqlPr {
-//     gh_id
-//     title
-// }
-#[cfg(feature = "ssr")]
-#[derive(Debug, sqlx::FromRow)]
-struct SqlIssueData {
-    id: Vec<u8>,
-    slug: String,
-    issue_date: time::Date,
-    cloudinary_public_id: String,
-    display_name: String,
-    description: String,
-    youtube_id: String,
-    // prs: Vec<SqlPr>,
-
-}
-#[cfg(feature = "ssr")]
-#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
-struct SqlShowcaseData {
-    slug: String,
-    issue_date: time::Date,
-    cloudinary_public_id: String,
-    display_name: String,
-    description: String,
-    youtube_id: String,
-    showcases: Option<sqlx::types::Json<Vec<ShowcaseData2>>>
-}
-
-#[cfg(feature = "ssr")]
-#[derive(Debug, serde::Deserialize, serde::Serialize, sqlx::FromRow)]
-struct ShowcaseData2 {
-    title: String,
-    url: String,
-    discord_url: String,
-    description: String,
-    images: Option<Vec<ImgData>>,
-}
-
-#[cfg(feature = "ssr")]
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-struct ImgData {
-    id: String,
-    description: String,
-    cloudinary_public_id: String
-}
-
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-struct ImgDataTransformed {
-    id: String,
-    description: String,
-    url: String
-}
-
 #[server]
 async fn fetch_issue(
-    date: time::Date,
-) -> Result<Option<Issue>, leptos::ServerFnError> {
+    _date: time::Date,
+) -> Result<Issue, leptos::ServerFnError> {
     use crate::markdown::compile;
-    use data_encoding::BASE64;
-    use cloudinary::transformation::{
-        Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage, aspect_ratio::AspectRatio
-    };
+    let crates = vec![CrateRelease {
+            title: "Hexx 0.13.0".to_string(),
+            description: compile("hexx is an hexagonal utility library made with bevy integration in mind
 
-    let pool = crate::sql::pool()?;
+What's new:
+* A new sprite sheet example
+* A lot of improvements in mesh generation, especially with procedural UV coordinates
+* Quality of life improvements
+* Fixes !"),
+            url: "https://discord.com/channels/691052431525675048/918591326096850974/1202285063358648350".to_string(),
+            images: vec!["/test_one.png".to_string(), "/test_two.png".to_string(), "/test_three.png".to_string()],
+        },
+        CrateRelease{
+            title: "bevy_smooth_pixel_camera".to_string(),
+            description: "bugfix release".to_string(),
+            url: "".to_string(),
+            images: vec![]
+        }];
+    Ok(Issue {
+        title: "The one before Bevy 0.13!".to_string(),
+        description: compile("It's a new year and there's another month or two until the 0.13 release.
 
-//     let issue = sqlx::query_as!(
-//         SqlIssueData,
-//         r#"SELECT
-//             id,
-//             slug,
-//             issue_date,
-//             cloudinary_public_id,
-//             display_name,
-//             description,
-//             youtube_id
-// FROM issue
-// WHERE issue_date = ?"#,
-// // AND status != "draft"
-//         date
-//     )
-//     .fetch_optional(&pool)
-//     .await?;
+There are three things in this to pay attention to
 
+* Thing A
+* Thing B
+* Thing C
 
-let showcase_issue = sqlx::query_file_as!(
-    SqlShowcaseData,
-    "src/app/routes/issue__showcase.sql",
-    date
-).fetch_optional(&pool)
-.await
-// .inspect(|v| {tracing::info!(?v);})
-.inspect_err(|e| {tracing::error!(?e);})
-?;
+and a quote from a contributor
 
-    Ok(showcase_issue.map(|issue| {
-        
-        let showcases = issue.showcases
-.map(|json| json.0)
-.unwrap_or(vec![])
-.into_iter().map(|showcase_data_2| {
-    Showcase {
-        title: showcase_data_2.title,
-        url: showcase_data_2.url,
-        discord_url: showcase_data_2.discord_url,
-        description: compile(&showcase_data_2.description),
-        images: showcase_data_2.images.unwrap_or(vec![]).into_iter()
-        .map(|img_data| {
- 
-            
-            let base_id = BASE64.decode(&img_data.id.as_bytes()).expect("a valid id in base64 format");
-            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
-            .expect(
-                "expect valid ids from the database",
-            );
-            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
-                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
-            ImgDataTransformed {
-                id: img_ulid.to_string(),
-                description: img_data.description,
-                url: image.to_string()
-            }
-        })
-        .collect()
-    }
-}).collect::<Vec<Showcase>>();
-
-        Issue {
-        title: issue.display_name,
-        issue_date: issue.issue_date,
-        description: compile(&issue.description),
-        showcases,
-        crates: vec![],
+> Some Quote
+> - [Contributor Person](https://github.com/bevyengine/bevy)"),
+        showcases: vec![],
+        crates,
         pull_requests: vec![],
         contributors: vec![],
         educational: vec![],
         new_pull_requests: vec![],
         new_issues: vec![],
-        }
-    }))
-
+    })
 }
 
 #[component]
@@ -288,7 +182,19 @@ pub fn Issue() -> impl IntoView {
         |date| async move {
             let date = date?;
 
-            fetch_issue(date).await.ok().flatten()
+            Some(
+                join4(
+                    fetch_issue(date),
+                    crate::sql::get_merged_pull_requests(
+                        date,
+                    ),
+                    crate::sql::get_opened_pull_requests(
+                        date,
+                    ),
+                    crate::sql::get_opened_issues(date),
+                )
+                .await,
+            )
         },
     );
     view! {
@@ -297,7 +203,7 @@ pub fn Issue() -> impl IntoView {
         }>
             {move || match issue.get() {
                 None | Some(None) => view! { <article>"404"</article> },
-                Some(Some(issue)) => {
+                Some(Some((issue, merged_pull_requests, opened_pull_requests, opened_issues))) => {
                     view! {
                         <article class="py-16 lg:py-36">
                             <Container>
@@ -315,11 +221,13 @@ pub fn Issue() -> impl IntoView {
                                         // />
                                         <div class="flex flex-col">
                                             <h1 class="mt-2 text-4xl font-bold text-slate-900">
-                                                {issue.title.clone()}
+                                                {issue.as_ref().unwrap().title.clone()}
                                             </h1>
-                                            <p
+                                            <p // <FormattedDate
+                                            // date={date}
                                             class="order-first font-mono text-sm leading-7 text-slate-500">
-                                            {issue.issue_date.to_string()}
+                                                // />
+                                                "2024-02-11"
                                             </p>
                                         </div>
                                     </div>
@@ -328,28 +236,18 @@ pub fn Issue() -> impl IntoView {
                                     // </p>
                                     <div
                                         class=r#"mt-3 leading-8 text-slate-700 prose [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
-                                        inner_html=issue.description.clone()
+                                        inner_html=issue.as_ref().unwrap().description.clone()
                                     ></div>
                                 </header>
-                                <Divider title="Showcase"/>
+                                <Divider title="Community Showcase"/>
                                 <div class=r#"prose prose-slate mt-14 [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#></div>
                                 // dangerouslySetInnerHTML={{ __html: episode.content }}
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Showcase</h2>
-                                {issue
-                                    .showcases
-                                    .into_iter()
-                                    .map(|showcase| {
-                                        view! {
-                                            <ShowcaseView
-                                                showcase=showcase
-                                            />
-                                        }
-                                    })
-                                    .collect::<Vec<_>>()}
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Crates</h2>
-                                <Divider title="Crates"/>
+                                <h2 class="mt-2 text-2xl font-bold text-slate-900">Showcase</h2>
+                                <h2 class="mt-2 text-2xl font-bold text-slate-900">Crates</h2>
 
                                 {issue
+                                    .as_ref()
+                                    .unwrap()
                                     .crates
                                     .iter()
                                     .map(|crate_release| {
@@ -364,33 +262,30 @@ pub fn Issue() -> impl IntoView {
                                     })
                                     .collect::<Vec<_>>()}
 
-                                <Divider title="Devlogs"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Devlogs</h2>
-                                <Divider title="Educational"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Education</h2>
-                                // <Divider title="Fixes and Features"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">
-                                //     Pull Requests Merged this week
-                                // </h2>
-                                <Divider title="Pull Requests Merged This Week"/>
-                                // <ul role="list" class="space-y-6 mt-6">
+                                <h2 class="mt-2 text-2xl font-bold text-slate-900">Devlogs</h2>
+                                <h2 class="mt-2 text-2xl font-bold text-slate-900">Education</h2>
+                                <Divider title="Fixes and Features"/>
+                                <h2 class="mt-2 text-2xl font-bold text-slate-900">
+                                    Pull Requests Merged this week
+                                </h2>
+                                <ul role="list" class="space-y-6 mt-6">
 
-                                //     {merged_pull_requests
-                                //         .expect("")
-                                //         .iter()
-                                //         .map(|pull_request| {
-                                //             view! {
-                                //                 <ActivityListItem
-                                //                     date=&pull_request.merged_at_date
-                                //                     url=&pull_request.url
-                                //                     title=&pull_request.title
-                                //                     author=&pull_request.author
-                                //                 />
-                                //             }
-                                //         })
-                                //         .collect::<Vec<_>>()}
+                                    {merged_pull_requests
+                                        .expect("")
+                                        .iter()
+                                        .map(|pull_request| {
+                                            view! {
+                                                <ActivityListItem
+                                                    date=&pull_request.merged_at_date
+                                                    url=&pull_request.url
+                                                    title=&pull_request.title
+                                                    author=&pull_request.author
+                                                />
+                                            }
+                                        })
+                                        .collect::<Vec<_>>()}
 
-                                // </ul>
+                                </ul>
                                 <Divider title="Contributing"/>
                                 <CalloutInfo
                                     r#type=CalloutType::Info
@@ -409,20 +304,20 @@ pub fn Issue() -> impl IntoView {
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
 
-                                    // {opened_pull_requests
-                                    //     .expect("")
-                                    //     .iter()
-                                    //     .map(|pull_request| {
-                                    //         view! {
-                                    //             <ActivityListItem
-                                    //                 date=&pull_request.gh_created_at
-                                    //                 url=&pull_request.url
-                                    //                 title=&pull_request.title
-                                    //                 author=&pull_request.author
-                                    //             />
-                                    //         }
-                                    //     })
-                                    //     .collect::<Vec<_>>()}
+                                    {opened_pull_requests
+                                        .expect("")
+                                        .iter()
+                                        .map(|pull_request| {
+                                            view! {
+                                                <ActivityListItem
+                                                    date=&pull_request.gh_created_at
+                                                    url=&pull_request.url
+                                                    title=&pull_request.title
+                                                    author=&pull_request.author
+                                                />
+                                            }
+                                        })
+                                        .collect::<Vec<_>>()}
 
                                 </ul>
                                 <h2 class="mt-6 text-2xl font-bold text-slate-900">
@@ -430,20 +325,20 @@ pub fn Issue() -> impl IntoView {
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
 
-                                    // {opened_issues
-                                    //     .expect("")
-                                    //     .iter()
-                                    //     .map(|issue| {
-                                    //         view! {
-                                    //             <ActivityListItem
-                                    //                 date=&issue.gh_created_at
-                                    //                 url=&issue.url
-                                    //                 title=&issue.title
-                                    //                 author=&issue.author
-                                    //             />
-                                    //         }
-                                    //     })
-                                    //     .collect::<Vec<_>>()}
+                                    {opened_issues
+                                        .expect("")
+                                        .iter()
+                                        .map(|issue| {
+                                            view! {
+                                                <ActivityListItem
+                                                    date=&issue.gh_created_at
+                                                    url=&issue.url
+                                                    title=&issue.title
+                                                    author=&issue.author
+                                                />
+                                            }
+                                        })
+                                        .collect::<Vec<_>>()}
 
                                 </ul>
                             </Container>
@@ -599,63 +494,6 @@ fn CrateRelease(
         <div
             class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
             inner_html=description
-        ></div>
-    }
-}
-
-#[component]
-fn ShowcaseView(showcase: Showcase) -> impl IntoView {
-    let mut it = showcase.images.iter();
-    let first_image = it.next();
-    view! {
-        {first_image.map(|image| {
-            view!{
-                <a href=&showcase.url>
-                    <img class="mt-12" src=&image.url alt=&image.description/>
-                </a>
-            }
-        })}
-        <ul
-            role="list"
-            class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
-        >
-
-            {it
-                .map(|image| {
-                    view! {
-                        <li class="relative">
-                            <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                                <img
-                                    src=&image.url
-                                    alt=&image.description
-                                    class="pointer-events-none object-cover group-hover:opacity-75"
-                                />
-                                <button type="button" class="absolute inset-0 focus:outline-none">
-                                    <span class="sr-only">View details for IMG_4985</span>
-                                </button>
-                            </div>
-                        </li>
-                    }
-                })
-                .collect::<Vec<_>>()}
-
-        </ul>
-        <div class="flex">
-        <h3 class="mt-2 text-xl font-bold text-slate-900">{showcase.title}</h3>
-        {showcase.discord_url.is_empty().not().then_some(view!{
-            <a href=&showcase.discord_url class="text-indigo-700 hover:text-indigo-400 flex items-end ml-4">
-            <span>discord</span>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-</svg>
-</a>
-}
-)}
-
-        </div>
-        <div
-            class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
-            inner_html=showcase.description
         ></div>
     }
 }

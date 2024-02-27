@@ -1,6 +1,7 @@
 use leptos::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
+use crate::app::components::{Divider};
 
 #[component]
 pub fn Issue() -> impl IntoView {
@@ -34,6 +35,8 @@ pub fn Issue() -> impl IntoView {
                 }}
 
             </Suspense>
+            <Divider title="Showcases" />
+            <Showcases />
         </div>
     }
 }
@@ -66,8 +69,6 @@ pub struct IssueData {
 #[cfg(feature = "ssr")]
 impl From<SqlIssueData> for IssueData {
     fn from(value: SqlIssueData) -> Self {
-        // let id: [u8; 16] =
-        // rusty_ulid::generate_ulid_bytes();
         let id_str =
             rusty_ulid::Ulid::try_from(value.id.as_slice())
                 .expect(
@@ -164,62 +165,12 @@ pub async fn update_issue_metadata(
     Ok(())
 }
 
-// #[server]
-// pub async fn create_draft_issue(
-//     issue_date: String,
-// ) -> Result<(), ServerFnError> {
-//     let pool =
-// use_context::<sqlx::MySqlPool>().expect("to be
-// able to access app_state");     let username =
-// use_context::<Option<crate::Username>>().
-// expect("a user to be logged in").expect("a
-// username to be accessible");
-
-//     // https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/
-
-//     let id: [u8; 16] =
-//     rusty_ulid::generate_ulid_bytes();
-
-//     let slug = format!("{issue_date}-todo");
-//     // default id for opengraph image
-//     let cloudinary_public_id =
-// "thisweekinbevy/
-// this-week-in-bevyopengraph-light_zwqzqz.avif";
-//     let display_name = format!("Draft for
-// {issue_date}");
-
-//     sqlx::query!(
-//         r#"
-//     INSERT INTO issue ( id, issue_date, slug,
-// cloudinary_public_id, display_name )     VALUES
-// ( ?, ?, ?, ?, ? )         "#,
-//         id.as_slice(),
-//         issue_date,
-//         slug,
-//         cloudinary_public_id,
-//         display_name
-//     )
-//     .execute(&pool)
-//     .await
-//     .expect("successful insert");
-//     Ok(())
-// }
-
 #[component]
 fn IssueForm(issue: IssueData) -> impl IntoView {
     let update_issue_metadata =
         create_server_action::<UpdateIssueMetadata>();
     view! {
         <div class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
-            <div
-                class="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]"
-                aria-hidden="true"
-            >
-                <div
-                    class="relative left-1/2 -z-10 aspect-[1155/678] w-[36.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]"
-                    style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
-                ></div>
-            </div>
             <div class="mx-auto max-w-2xl text-center">
                 <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                     {&issue.issue_date.to_string()}
@@ -328,4 +279,144 @@ fn IssueForm(issue: IssueData) -> impl IntoView {
             </ActionForm>
         </div>
     }
+}
+
+#[component]
+fn Showcases() -> impl IntoView {
+    let params = use_params_map();
+
+    let showcases = create_resource(
+        move || {
+            params.with(|p| {
+                p.get("id").cloned().unwrap_or_default()
+            })
+        },
+        fetch_showcases_for_issue_id,
+    );
+           
+    view! {
+        <ul role="list" class="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+        <Suspense fallback=move || {
+            view! { <p>"Loading (Suspense Fallback)..."</p> }
+        }>
+            {move || {
+                showcases.read().map(|data| match data {
+                    Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                    Ok(showcases) => showcases
+                      .iter()
+                      .map(|showcase| view! { <ShowcaseLi showcase=showcase.clone()/> })
+                      .collect_view()
+                })
+            }}
+        </Suspense>
+        </ul>
+    }
+}
+
+#[component]
+fn ShowcaseLi(showcase: ShowcaseData) -> impl IntoView {
+    view! {
+        <li class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
+        <div class="flex min-w-0 gap-x-4">
+          <div class="min-w-0 flex-auto">
+            <p class="text-sm font-semibold leading-6 text-gray-900">
+              <a href=format!("/admin/showcase/{}",showcase.id)>
+                <span class="absolute inset-x-0 -top-px bottom-0"></span>
+                {showcase.title}
+              </a>
+            </p>
+            {showcase.posted_date.map(|posted_date| view! { 
+                <p class="mt-1 flex text-xs leading-5 text-gray-500">
+                <span>"posted at"</span>
+                <time
+                  datetime={posted_date.to_string()}
+                  class="ml-1"
+                >{posted_date.to_string()}</time>
+                </p>
+            })}
+          </div>
+        </div>
+        <div class="flex shrink-0 items-center gap-x-4">
+        <div class="hidden sm:flex sm:flex-col sm:items-end">
+        <p class="text-sm leading-6 text-gray-900">{showcase.image_count} images</p>
+        // <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p>
+      </div>
+          <svg class="h-5 w-5 flex-none text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </li>
+    }
+}
+
+
+#[cfg(feature = "ssr")]
+#[derive(Debug, sqlx::FromRow)]
+struct SqlShowcaseData {
+    id: Vec<u8>,
+    title: String,
+    posted_date: Option<time::Date>,
+    image_count: Option<i64>
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct ShowcaseData {
+    pub id: String,
+    pub title: String,
+    pub posted_date: Option<time::Date>,
+    pub image_count: u32
+}
+
+#[cfg(feature = "ssr")]
+impl From<SqlShowcaseData> for ShowcaseData {
+    fn from(value: SqlShowcaseData) -> Self {
+        let id_str =
+            rusty_ulid::Ulid::try_from(value.id.as_slice())
+                .expect(
+                    "expect valid ids from the database",
+                );
+        ShowcaseData {
+            id: id_str.to_string(),
+            title: value.title,
+            posted_date: value.posted_date,
+            image_count: value.image_count.unwrap_or_default() as u32
+        }
+    }
+}
+
+#[server]
+pub async fn fetch_showcases_for_issue_id(
+    issue_id: String
+) -> Result<Vec<ShowcaseData>, ServerFnError> {
+    let pool = crate::sql::pool()?;
+    let _username = crate::sql::with_admin_access()?;
+
+    let issue_id: [u8; 16] = issue_id
+        .parse::<rusty_ulid::Ulid>()
+        .expect("a valid ulid to be returned from the form")
+        .into();
+
+    let showcases: Vec<SqlShowcaseData> = sqlx::query_as!(
+        SqlShowcaseData,
+        "SELECT
+        showcase.id,
+        showcase.title,
+        showcase.posted_date,
+        si.image_count
+FROM issue__showcase
+INNER JOIN showcase
+  ON showcase.id = issue__showcase.showcase_id
+LEFT JOIN (
+    SELECT showcase__image.showcase_id, COUNT(*) as image_count
+    FROM showcase__image
+    GROUP BY showcase__image.showcase_id
+) AS si ON si.showcase_id = showcase.id
+WHERE issue__showcase.issue_id = ?
+ORDER BY showcase.posted_date",
+issue_id.as_slice()
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(showcases.into_iter().map(ShowcaseData::from).collect())
 }

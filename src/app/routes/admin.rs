@@ -3,6 +3,11 @@ use leptos_router::*;
 
 pub mod issue;
 pub mod issues;
+pub mod showcase;
+pub mod crate_release;
+pub mod educational;
+pub mod devlog;
+pub mod image;
 
 #[component]
 pub fn AdminHomepage() -> impl IntoView {
@@ -196,6 +201,11 @@ pub fn AdminWrapper() -> impl IntoView {
                                 Educational
                             </A>
                         </li>
+                        <li>
+                            <A href="/admin/images" active_class="text-blue-600">
+                                Images
+                            </A>
+                        </li>
                     </ul>
                 </nav>
             </header>
@@ -204,129 +214,4 @@ pub fn AdminWrapper() -> impl IntoView {
     }
 }
 
-#[server]
-pub async fn add_showcase(
-    title: String,
-    url: String,
-    discord_url: String,
-    description: String,
-    posted_date: String,
-) -> Result<(), ServerFnError> {
-    let pool = use_context::<sqlx::MySqlPool>()
-        .expect("to be able to access app_state");
-    let username = crate::sql::with_admin_access()?;
 
-    let id: [u8; 16] = rusty_ulid::generate_ulid_bytes();
-
-    sqlx::query!(
-        r#"
-    INSERT INTO showcase ( id, title, url, discord_url, posted_date, description, submitted_by )
-    VALUES ( ?, ?, ?, ?, ?, ?, ? )
-        "#,
-        id.as_slice(),
-        title,
-        url,
-        discord_url,
-        posted_date,
-        description,
-        username.0
-    )
-    .execute(&pool)
-    .await
-    .expect("successful insert");
-    Ok(())
-}
-
-#[component]
-pub fn Showcase() -> impl IntoView {
-    let add_showcase =
-        create_server_action::<AddShowcase>();
-
-    view! {
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <ActionForm class="isolate -space-y-px rounded-md shadow-sm" action=add_showcase>
-                <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="title" class="block text-xs font-medium text-gray-900">
-                        Title
-                    </label>
-                    <input
-                        required
-                        type="text"
-                        name="title"
-                        id="title"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        placeholder="Hexagon procedural generation"
-                    />
-                </div>
-                <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="url" class="block text-xs font-medium text-gray-900">
-                        URL
-                    </label>
-                    <input
-                        required
-                        type="text"
-                        name="url"
-                        id="url"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        placeholder="https"
-                    />
-                </div>
-                <div class="relative rounded-md rounded-t-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="discord_url" class="block text-xs font-medium text-gray-900">
-                        Discord URL
-                    </label>
-                    <input
-                        type="text"
-                        name="discord_url"
-                        id="discord_url"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        placeholder="https"
-                    />
-                </div>
-                <label
-                    required
-                    for="posted_date"
-                    class="block text-sm font-medium leading-6 text-gray-900"
-                >
-                    Posted At
-                </label>
-                <div class="mt-2">
-                    <input type="date" id="posted_date" name="posted_date" min="2024-01-01"/>
-                </div>
-                <label
-                    required
-                    for="description"
-                    class="block text-sm font-medium leading-6 text-gray-900"
-                >
-                    Add your description (markdown compatible)
-                </label>
-                <div class="mt-2">
-                    <textarea
-                        rows="4"
-                        name="description"
-                        id="description"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    ></textarea>
-                </div>
-                <button
-                    type="submit"
-                    class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                    Add Showcase
-                </button>
-            </ActionForm>
-        </div>
-    }
-}
-#[component]
-pub fn CrateRelease() -> impl IntoView {
-    view! { <div>CrateRelease</div> }
-}
-#[component]
-pub fn Devlog() -> impl IntoView {
-    view! { <div>Devlog</div> }
-}
-#[component]
-pub fn Educational() -> impl IntoView {
-    view! { <div>Educational</div> }
-}
