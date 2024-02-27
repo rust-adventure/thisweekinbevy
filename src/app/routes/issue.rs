@@ -94,10 +94,10 @@ struct NewIssue {
 )]
 struct SqlNewGhIssue {
     title: String,
-url: String,
-gh_created_at: String,
-author: String,
-author_url: String,
+    url: String,
+    gh_created_at: String,
+    author: String,
+    author_url: String,
 }
 
 #[cfg(feature = "ssr")]
@@ -109,10 +109,10 @@ author_url: String,
 )]
 struct SqlNewPr {
     title: String,
-url: String,
-gh_created_at: String,
-author: String,
-author_url: String,
+    url: String,
+    gh_created_at: String,
+    author: String,
+    author_url: String,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -168,7 +168,6 @@ struct SqlMergedPullRequest {
 #[derive(Clone, Serialize, Deserialize)]
 struct Contributor;
 
-
 #[cfg(feature = "ssr")]
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 struct SqlShowcaseData {
@@ -178,10 +177,15 @@ struct SqlShowcaseData {
     display_name: String,
     description: String,
     youtube_id: String,
-    showcases: Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
-    new_github_issues: Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
-    new_pull_requests: Option<sqlx::types::Json<Vec<SqlNewPr>>>,
-    merged_pull_requests: Option<sqlx::types::Json<Vec<SqlMergedPullRequest>>>,
+    showcases:
+        Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
+    new_github_issues:
+        Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
+    new_pull_requests:
+        Option<sqlx::types::Json<Vec<SqlNewPr>>>,
+    merged_pull_requests: Option<
+        sqlx::types::Json<Vec<SqlMergedPullRequest>>,
+    >,
 }
 
 #[cfg(feature = "ssr")]

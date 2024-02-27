@@ -1,18 +1,19 @@
+use crate::app::components::Divider;
+use crate::app::server_fn::error::NoCustomError;
 use leptos::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
-use crate::app::components::Divider;
-use crate::app::server_fn::error::NoCustomError;
 
 #[component]
 pub fn GitHub() -> impl IntoView {
-    let select_new_github_issues = create_server_action::<SelectNewGithubIssues>();
-    let select_new_pull_requests = create_server_action::<SelectNewPullRequests>();
-    let select_merged_pull_requests = create_server_action::<SelectMergedPullRequests>();
-    let issues = create_resource(
-        move || {},
-        |_| fetch_issues(),
-    );
+    let select_new_github_issues =
+        create_server_action::<SelectNewGithubIssues>();
+    let select_new_pull_requests =
+        create_server_action::<SelectNewPullRequests>();
+    let select_merged_pull_requests =
+        create_server_action::<SelectMergedPullRequests>();
+    let issues =
+        create_resource(move || {}, |_| fetch_issues());
     view! {
         <Suspense fallback=move || {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
@@ -212,20 +213,19 @@ pub fn GitHub() -> impl IntoView {
     }
 }
 
-
 #[cfg(feature = "ssr")]
 #[derive(Debug, sqlx::FromRow)]
 struct SqlIssueShort {
     id: Vec<u8>,
     display_name: String,
-    issue_date: time::Date
+    issue_date: time::Date,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct IssueShort {
     pub id: String,
     pub display_name: String,
-    issue_date: time::Date
+    issue_date: time::Date,
 }
 
 #[cfg(feature = "ssr")]
@@ -239,7 +239,7 @@ impl From<SqlIssueShort> for IssueShort {
         IssueShort {
             id: id_str.to_string(),
             display_name: value.display_name,
-            issue_date: value.issue_date
+            issue_date: value.issue_date,
         }
     }
 }
@@ -276,9 +276,9 @@ pub async fn select_new_github_issues(
     let _username = crate::sql::with_admin_access()?;
 
     let issue_id: [u8; 16] = issue_id
-    .parse::<rusty_ulid::Ulid>()
-    .expect("a valid ulid to be returned from the form")
-    .into();
+        .parse::<rusty_ulid::Ulid>()
+        .expect("a valid ulid to be returned from the form")
+        .into();
 
     sqlx::query!(
         "INSERT INTO issue__new_github_issue (issue_id, github_issue_id )
@@ -311,9 +311,9 @@ pub async fn select_new_pull_requests(
     let _username = crate::sql::with_admin_access()?;
 
     let issue_id: [u8; 16] = issue_id
-    .parse::<rusty_ulid::Ulid>()
-    .expect("a valid ulid to be returned from the form")
-    .into();
+        .parse::<rusty_ulid::Ulid>()
+        .expect("a valid ulid to be returned from the form")
+        .into();
 
     sqlx::query!(
         "INSERT INTO issue__new_pull_request (issue_id, pull_request_id )
@@ -345,9 +345,9 @@ pub async fn select_merged_pull_requests(
     let _username = crate::sql::with_admin_access()?;
 
     let issue_id: [u8; 16] = issue_id
-    .parse::<rusty_ulid::Ulid>()
-    .expect("a valid ulid to be returned from the form")
-    .into();
+        .parse::<rusty_ulid::Ulid>()
+        .expect("a valid ulid to be returned from the form")
+        .into();
 
     sqlx::query!(
         "INSERT INTO issue__merged_pull_request (issue_id, merged_pull_request_id )

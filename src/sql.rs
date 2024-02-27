@@ -5,7 +5,7 @@ use sqlx::MySqlPool;
 #[cfg(feature = "ssr")]
 use std::time::Duration;
 
-#[cfg(feature="ssr")]
+#[cfg(feature = "ssr")]
 use crate::Username;
 
 #[cfg(feature = "ssr")]

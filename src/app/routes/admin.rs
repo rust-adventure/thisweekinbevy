@@ -4,11 +4,11 @@ use leptos_router::*;
 pub mod crate_release;
 pub mod devlog;
 pub mod educational;
+pub mod github;
 pub mod image;
 pub mod issue;
 pub mod issues;
 pub mod showcase;
-pub mod github;
 
 #[component]
 pub fn AdminHomepage() -> impl IntoView {
