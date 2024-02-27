@@ -14,39 +14,39 @@ pub struct Issue {
     /// date in yyyy-mm-dd format, but this field
     /// is a human-readable string that goes in
     /// the email subject line and slug url
-    pub title: String,
-    pub issue_date: time::Date,
+    title: String,
+    issue_date: time::Date,
     /// What is this issue about? Is there
     /// anything notable worth mentioning or
     /// making sure people are aware of?
-    pub description: String,
+    description: String,
     /// Showcase what people are doing with Bevy
     /// this week. Often these are in-progress
     /// games, experimental rendering approaches,
     /// or other in-progress bevy work
-    pub showcases: Vec<Showcase>,
+    showcases: Vec<Showcase>,
     /// Crates that have been released in the last
     /// week. This includes updates and new
     /// releases
-    pub crates: Vec<CrateRelease>,
+    crates: Vec<CrateRelease>,
     /// merged pull requests
     /// Meant to convey what is being added to
     /// Bevy
-    pub pull_requests: Vec<PullRequest>,
+    pull_requests: Vec<PullRequest>,
     /// educational resources published this week.
     /// videos and blog posts
-    pub educational: Vec<Educational>,
+    educational: Vec<Educational>,
     /// newsletter contributors
     /// (not a list of people that contribute to
     /// the bevy repo itself, that exists in the
     /// Bevy release announcements already)
-    pub contributors: Vec<Contributor>,
+    contributors: Vec<Contributor>,
     /// Want to contribute? check out these
     /// pull requests that need review
-    pub new_pull_requests: Vec<NewPullRequest>,
+    new_pull_requests: Vec<NewPullRequest>,
     /// Want to contribute? check out these
     ///  issues that just got opened
-    pub new_issues: Vec<NewIssue>,
+    new_issues: Vec<NewIssue>,
 }
 
 /// `NewPullRequest` is calculated just before
@@ -126,22 +126,7 @@ struct PullRequestAuthor {
 #[derive(Clone, Serialize, Deserialize)]
 struct Contributor;
 
-// struct SqlPr {
-//     gh_id
-//     title
-// }
-#[cfg(feature = "ssr")]
-#[derive(Debug, sqlx::FromRow)]
-struct SqlIssueData {
-    id: Vec<u8>,
-    slug: String,
-    issue_date: time::Date,
-    cloudinary_public_id: String,
-    display_name: String,
-    description: String,
-    youtube_id: String,
-    // prs: Vec<SqlPr>,
-}
+
 #[cfg(feature = "ssr")]
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 struct SqlShowcaseData {
@@ -197,24 +182,6 @@ async fn fetch_issue(
     use data_encoding::BASE64;
 
     let pool = crate::sql::pool()?;
-
-    //     let issue = sqlx::query_as!(
-    //         SqlIssueData,
-    //         r#"SELECT
-    //             id,
-    //             slug,
-    //             issue_date,
-    //             cloudinary_public_id,
-    //             display_name,
-    //             description,
-    //             youtube_id
-    // FROM issue
-    // WHERE issue_date = ?"#,
-    // // AND status != "draft"
-    //         date
-    //     )
-    //     .fetch_optional(&pool)
-    //     .await?;
 
     let showcase_issue = sqlx::query_file_as!(
         SqlShowcaseData,
@@ -454,11 +421,13 @@ pub fn Issue() -> impl IntoView {
     }
 }
 
+#[allow(dead_code)]
 enum ActivityListIcon {
     Default,
     Check,
 }
 #[component]
+#[allow(dead_code)]
 fn ActivityListItem(
     /// datetime for the <time> element
     #[prop(into)]
@@ -519,6 +488,7 @@ fn ActivityListItem(
     }
 }
 #[component]
+#[allow(dead_code)]
 fn ActivityListComment(
     /// datetime for the <time> element
     /// "2023-01-23T15:56"
@@ -533,6 +503,7 @@ fn ActivityListComment(
     #[prop(into, default = "Someone".to_string())]
     author: String,
 ) -> impl IntoView {
+    dbg!(url);
     view! {
         <li class="relative flex gap-x-4">
             <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
@@ -560,12 +531,14 @@ fn ActivityListComment(
 }
 
 #[component]
+#[allow(dead_code)]
 fn CrateRelease(
     #[prop(into)] title: String,
     #[prop(into)] description: String,
     #[prop(into)] url: String,
     #[prop(default=vec![])] images: Vec<String>,
 ) -> impl IntoView {
+    dbg!(url);
     view! {
         <h3 class="mt-2 text-xl font-bold text-slate-900">{title}</h3>
         <ul
@@ -679,6 +652,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
     }
 }
 
+#[allow(dead_code)]
 enum CalloutType {
     Info,
     Caution,

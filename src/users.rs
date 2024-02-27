@@ -58,12 +58,6 @@ struct UserInfo {
     login: String,
 }
 
-#[derive(Debug, Deserialize)]
-struct UserInfoFromDb {
-    id: String,
-    login: String,
-}
-
 #[derive(Debug, thiserror::Error)]
 pub enum BackendError {
     #[error(transparent)]

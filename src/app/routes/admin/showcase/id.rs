@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::app::server_fn::error::NoCustomError;
 
 #[server]
+#[allow(unused_variables)]
 async fn update_showcase(
     showcase_id: String,
     title: String,
@@ -15,10 +16,10 @@ async fn update_showcase(
     description: String,
     posted_date: String,
 ) -> Result<(), ServerFnError> {
-    let pool = crate::sql::pool()?;
+    let _pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
-    let id: [u8; 16] = showcase_id
+    let _id: [u8; 16] = showcase_id
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
@@ -234,13 +235,13 @@ struct SqlShowcaseData {
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ShowcaseData {
-    pub id: String,
-    pub title: String,
-    pub url: String,
-    pub posted_date: Option<time::Date>,
-    pub discord_url: String,
-    pub description: String,
-    pub images: Vec<ImgDataTransformed>,
+    id: String,
+    title: String,
+    url: String,
+    posted_date: Option<time::Date>,
+    discord_url: String,
+    description: String,
+    images: Vec<ImgDataTransformed>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -650,7 +651,7 @@ limit 5"#
     )
     .fetch_all(&pool)
     .await
-    .map_err(|e| {
+    .map_err(|_| {
         ServerFnError::<NoCustomError>::ServerError(
             "sql failed".to_string(),
         )

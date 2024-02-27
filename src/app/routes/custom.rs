@@ -12,38 +12,38 @@ pub struct Issue {
     /// date in yyyy-mm-dd format, but this field
     /// is a human-readable string that goes in
     /// the email subject line and slug url
-    pub title: String,
+    title: String,
     /// What is this issue about? Is there
     /// anything notable worth mentioning or
     /// making sure people are aware of?
-    pub description: String,
+    description: String,
     /// Showcase what people are doing with Bevy
     /// this week. Often these are in-progress
     /// games, experimental rendering approaches,
     /// or other in-progress bevy work
-    pub showcases: Vec<Showcase>,
+    showcases: Vec<Showcase>,
     /// Crates that have been released in the last
     /// week. This includes updates and new
     /// releases
-    pub crates: Vec<CrateRelease>,
+    crates: Vec<CrateRelease>,
     /// merged pull requests
     /// Meant to convey what is being added to
     /// Bevy
-    pub pull_requests: Vec<PullRequest>,
+    pull_requests: Vec<PullRequest>,
     /// educational resources published this week.
     /// videos and blog posts
-    pub educational: Vec<Educational>,
+    educational: Vec<Educational>,
     /// newsletter contributors
     /// (not a list of people that contribute to
     /// the bevy repo itself, that exists in the
     /// Bevy release announcements already)
-    pub contributors: Vec<Contributor>,
+    contributors: Vec<Contributor>,
     /// Want to contribute? check out these
     /// pull requests that need review
-    pub new_pull_requests: Vec<NewPullRequest>,
+    new_pull_requests: Vec<NewPullRequest>,
     /// Want to contribute? check out these
     ///  issues that just got opened
-    pub new_issues: Vec<NewIssue>,
+    new_issues: Vec<NewIssue>,
 }
 
 /// `NewPullRequest` is calculated just before
@@ -351,6 +351,7 @@ pub fn Issue() -> impl IntoView {
     }
 }
 
+#[allow(dead_code)]
 enum ActivityListIcon {
     Default,
     Check,
@@ -416,6 +417,7 @@ fn ActivityListItem(
     }
 }
 #[component]
+#[allow(unused_variables)]
 fn ActivityListComment(
     /// datetime for the <time> element
     /// "2023-01-23T15:56"
@@ -457,6 +459,7 @@ fn ActivityListComment(
 }
 
 #[component]
+#[allow(unused_variables)]
 fn CrateRelease(
     #[prop(into)] title: String,
     #[prop(into)] description: String,
@@ -498,6 +501,7 @@ fn CrateRelease(
     }
 }
 
+#[allow(dead_code)]
 enum CalloutType {
     Info,
     Caution,
@@ -607,6 +611,7 @@ impl CalloutType {
     }
 }
 
+#[allow(dead_code)]
 struct CalloutLink {
     href: String,
     label: String,

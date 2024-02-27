@@ -21,7 +21,7 @@ pub fn Issue() -> impl IntoView {
             }>
                 {move || {
                     issue
-                        .read()
+                        .get()
                         .map(|data| match data {
                             Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
                             Ok(issue) => {
@@ -98,7 +98,7 @@ pub async fn fetch_issue(
         .into();
 
     let pool = crate::sql::pool()?;
-    let username = crate::sql::with_admin_access()?;
+    let _username = crate::sql::with_admin_access()?;
 
     let issue = sqlx::query_as!(
         SqlIssueData,
@@ -133,7 +133,7 @@ pub async fn update_issue_metadata(
     let pool = use_context::<sqlx::MySqlPool>()
         .expect("to be able to access app_state");
 
-    let username = crate::sql::with_admin_access()?;
+    let _username = crate::sql::with_admin_access()?;
 
     let id: [u8; 16] = issue_id
         .parse::<rusty_ulid::Ulid>()
@@ -304,7 +304,7 @@ fn Showcases() -> impl IntoView {
             }>
                 {move || {
                     showcases
-                        .read()
+                        .get()
                         .map(|data| match data {
                             Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
                             Ok(showcases) => {

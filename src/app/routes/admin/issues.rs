@@ -45,7 +45,7 @@ pub fn Issues() -> impl IntoView {
                 <ul role="list" class="divide-y divide-gray-100">
                     {move || {
                         issues
-                            .read()
+                            .get()
                             .map(|data| match data {
                                 Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
                                 Ok(issues) => {
@@ -123,7 +123,7 @@ impl From<SqlIssueShort> for IssueShort {
 pub async fn fetch_issues(
 ) -> Result<Vec<IssueShort>, ServerFnError> {
     let pool = crate::sql::pool()?;
-    let username = crate::sql::with_admin_access()?;
+    let _username = crate::sql::with_admin_access()?;
 
     let issues: Vec<SqlIssueShort> = sqlx::query_as!(
         SqlIssueShort,
@@ -146,7 +146,7 @@ pub async fn create_draft_issue(
 ) -> Result<(), ServerFnError> {
     let pool = use_context::<sqlx::MySqlPool>()
         .expect("to be able to access app_state");
-    let username = crate::sql::with_admin_access()?;
+    let _username = crate::sql::with_admin_access()?;
 
     // https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/
 

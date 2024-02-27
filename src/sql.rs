@@ -2,8 +2,10 @@ use leptos::*;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::MySqlPool;
+#[cfg(feature = "ssr")]
 use std::time::Duration;
 
+#[cfg(feature="ssr")]
 use crate::Username;
 
 #[cfg(feature = "ssr")]
