@@ -3,9 +3,9 @@ use crate::{
         components::{AboutSection, TinyWaveFormIcon},
         routes::{
             admin::{self, AdminWrapper},
+            custom,
             index::Home,
             issue,
-            custom,
         },
     },
     error_template::{AppError, ErrorTemplate},
@@ -23,7 +23,8 @@ pub fn App() -> impl IntoView {
     // titles, meta tags, etc.
     provide_meta_context();
 
-    let pkg_path: &'static str = std::option_env!("CDN_PKG_PATH").unwrap_or("/pkg");
+    let pkg_path: &'static str =
+        std::option_env!("CDN_PKG_PATH").unwrap_or("/pkg");
     view! {
         <Html
             lang="en"

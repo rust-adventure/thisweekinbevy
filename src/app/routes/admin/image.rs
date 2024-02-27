@@ -1,9 +1,9 @@
-use leptos::*;
 use crate::app::components::Divider;
-use leptos_router::*;
-use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use crate::app::server_fn::error::NoCustomError;
+use leptos::*;
+use leptos_router::*;
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use tracing::error;
 
@@ -59,12 +59,10 @@ pub fn Image() -> impl IntoView {
     }
 }
 
-
-
 #[server]
 async fn add_image(
     cloudinary_public_id: String,
-    description: String
+    description: String,
 ) -> Result<(), ServerFnError> {
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
@@ -90,7 +88,8 @@ async fn add_image(
 
 #[component]
 fn Images() -> impl IntoView {
-    let images = create_resource(move || {}, |_| fetch_images());
+    let images =
+        create_resource(move || {}, |_| fetch_images());
 
     view! {
         <Suspense fallback=move || {
@@ -128,7 +127,11 @@ fn Images() -> impl IntoView {
 }
 
 #[component]
-fn ImageLi(id: String, url: String, description: String) -> impl IntoView {
+fn ImageLi(
+    id: String,
+    url: String,
+    description: String,
+) -> impl IntoView {
     view! {
         <li class="relative">
             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
@@ -154,25 +157,33 @@ fn ImageLi(id: String, url: String, description: String) -> impl IntoView {
 struct SqlImage {
     id: Vec<u8>,
     description: String,
-    cloudinary_public_id: String
+    cloudinary_public_id: String,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Image {
     pub id: String,
     pub description: String,
-    pub url: String
+    pub url: String,
 }
 
 #[cfg(feature = "ssr")]
 impl From<SqlImage> for Image {
     fn from(value: SqlImage) -> Self {
         use cloudinary::transformation::{
-            Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
+            resize_mode::ResizeMode::ScaleByWidth,
+            Image as CImage, Transformations::Resize,
         };
-        
-        let image = CImage::new("dilgcuzda".into(), value.cloudinary_public_id.into())
-            .add_transformation(Resize(ScaleByWidth{ width:300, ar: None, liquid:None }));
+
+        let image = CImage::new(
+            "dilgcuzda".into(),
+            value.cloudinary_public_id.into(),
+        )
+        .add_transformation(Resize(ScaleByWidth {
+            width: 300,
+            ar: None,
+            liquid: None,
+        }));
 
         let id_str =
             rusty_ulid::Ulid::try_from(value.id.as_slice())
@@ -182,15 +193,14 @@ impl From<SqlImage> for Image {
         Image {
             id: id_str.to_string(),
             description: value.description,
-            url: image.to_string()
+            url: image.to_string(),
         }
     }
 }
 
-
 #[server]
-async fn fetch_images(
-) -> Result<Vec<Image>, ServerFnError> {
+async fn fetch_images() -> Result<Vec<Image>, ServerFnError>
+{
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
@@ -208,7 +218,9 @@ limit 5"#
     .await
     .map_err(|e| {
         error!(?e);
-        ServerFnError::<NoCustomError>::ServerError("sql failed".to_string())
+        ServerFnError::<NoCustomError>::ServerError(
+            "sql failed".to_string(),
+        )
     })?;
 
     Ok(images.into_iter().map(Image::from).collect())

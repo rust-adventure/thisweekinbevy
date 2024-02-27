@@ -1,7 +1,7 @@
+use crate::app::components::Divider;
 use leptos::*;
 use leptos_router::*;
-use serde::{Serialize, Deserialize};
-use crate::app::components::Divider;
+use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "ssr")]
 use crate::app::server_fn::error::NoCustomError;
@@ -19,9 +19,13 @@ async fn update_showcase(
     let _username = crate::sql::with_admin_access()?;
 
     let id: [u8; 16] = showcase_id
-    .parse::<rusty_ulid::Ulid>()
-    .map_err(|_| ServerFnError::<NoCustomError>::ServerError("expected a valid showcase id".to_string()))?
-    .into();
+        .parse::<rusty_ulid::Ulid>()
+        .map_err(|_| {
+            ServerFnError::<NoCustomError>::ServerError(
+                "expected a valid showcase id".to_string(),
+            )
+        })?
+        .into();
 
     dbg!(title);
     // sqlx::query!(
@@ -55,14 +59,14 @@ pub fn Showcase() -> impl IntoView {
 
     let update_showcase =
         create_server_action::<UpdateShowcase>();
-    let showcase =
-        create_resource(move || {
+    let showcase = create_resource(
+        move || {
             params.with(|p| {
                 p.get("id").cloned().unwrap_or_default()
             })
-        }, 
-            fetch_showcase_by_id
-        );
+        },
+        fetch_showcase_by_id,
+    );
 
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -216,7 +220,6 @@ pub fn Showcase() -> impl IntoView {
     }
 }
 
-
 #[cfg(feature = "ssr")]
 #[derive(Debug, sqlx::FromRow)]
 struct SqlShowcaseData {
@@ -226,7 +229,7 @@ struct SqlShowcaseData {
     posted_date: Option<time::Date>,
     discord_url: String,
     description: String,
-    images: serde_json::Value
+    images: serde_json::Value,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -237,77 +240,98 @@ pub struct ShowcaseData {
     pub posted_date: Option<time::Date>,
     pub discord_url: String,
     pub description: String,
-    pub images: Vec<ImgDataTransformed>
-    
+    pub images: Vec<ImgDataTransformed>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct ImgData {
     id: String,
-    cloudinary_public_id: String
+    cloudinary_public_id: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct ImgDataTransformed {
     id: String,
-    url: String
+    url: String,
 }
 
 #[cfg(feature = "ssr")]
 impl From<SqlShowcaseData> for ShowcaseData {
     fn from(value: SqlShowcaseData) -> Self {
         use data_encoding::BASE64;
-       
+
         let id_str =
             rusty_ulid::Ulid::try_from(value.id.as_slice())
                 .expect(
                     "expect valid ids from the database",
                 );
-        let images = serde_json::from_value::<Vec<ImgData>>(value.images)
-        .inspect_err(|e| {tracing::warn!(?e);})
-        .unwrap_or_default()
-        .into_iter()
-        .map(|img_data| {
-            use cloudinary::transformation::{
-                Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
-            };
-            
-            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
-            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
-            .expect(
-                "expect valid ids from the database",
-            );
-            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
-                .add_transformation(Resize(ScaleByWidth{ width:300, ar: None, liquid:None }));
-            ImgDataTransformed {
-                id: img_ulid.to_string(),
-                url: image.to_string()
-            }
-        }).collect();
+        let images =
+            serde_json::from_value::<Vec<ImgData>>(
+                value.images,
+            )
+            .inspect_err(|e| {
+                tracing::warn!(?e);
+            })
+            .unwrap_or_default()
+            .into_iter()
+            .map(|img_data| {
+                use cloudinary::transformation::{
+                    resize_mode::ResizeMode::ScaleByWidth,
+                    Image as CImage,
+                    Transformations::Resize,
+                };
+
+                let base_id = BASE64
+                    .decode(img_data.id.as_bytes())
+                    .expect("a valid id in base64 format");
+                let img_ulid = rusty_ulid::Ulid::try_from(
+                    base_id.as_slice(),
+                )
+                .expect(
+                    "expect valid ids from the database",
+                );
+                let image = CImage::new(
+                    "dilgcuzda".into(),
+                    img_data.cloudinary_public_id.into(),
+                )
+                .add_transformation(Resize(ScaleByWidth {
+                    width: 300,
+                    ar: None,
+                    liquid: None,
+                }));
+                ImgDataTransformed {
+                    id: img_ulid.to_string(),
+                    url: image.to_string(),
+                }
+            })
+            .collect();
 
         ShowcaseData {
             id: id_str.to_string(),
             title: value.title,
-url: value.url,
-posted_date: value.posted_date,
-discord_url: value.discord_url,
-description: value.description,
-images
+            url: value.url,
+            posted_date: value.posted_date,
+            discord_url: value.discord_url,
+            description: value.description,
+            images,
         }
     }
 }
 
-
 #[server]
 pub async fn fetch_showcase_by_id(
-    showcase_id: String
+    showcase_id: String,
 ) -> Result<Option<ShowcaseData>, ServerFnError> {
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
     let showcase_id: [u8; 16] = showcase_id
         .parse::<rusty_ulid::Ulid>()
-        .map_err(|_| ServerFnError::<NoCustomError>::ServerError("expected a valid issue id".to_string()))?
+        .map_err(|_| {
+            ServerFnError::<NoCustomError>::ServerError(
+                "expected a valid issue id".to_string(),
+            )
+        })?
         .into();
 
     let showcase: Option<SqlShowcaseData> = sqlx::query_as!(
@@ -353,18 +377,25 @@ async fn associate_image_with_showcase(
     image_id: String,
     showcase_id: String,
 ) -> Result<(), ServerFnError> {
-
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
     let image_id: [u8; 16] = image_id
         .parse::<rusty_ulid::Ulid>()
-        .map_err(|_| ServerFnError::<NoCustomError>::ServerError("expected a valid image id".to_string()))?
+        .map_err(|_| {
+            ServerFnError::<NoCustomError>::ServerError(
+                "expected a valid image id".to_string(),
+            )
+        })?
         .into();
 
     let showcase_id: [u8; 16] = showcase_id
         .parse::<rusty_ulid::Ulid>()
-        .map_err(|_| ServerFnError::<NoCustomError>::ServerError("expected a valid showcase id".to_string()))?
+        .map_err(|_| {
+            ServerFnError::<NoCustomError>::ServerError(
+                "expected a valid showcase id".to_string(),
+            )
+        })?
         .into();
 
     sqlx::query!(
@@ -377,7 +408,11 @@ async fn associate_image_with_showcase(
     )
     .execute(&pool)
     .await
-    .map_err(|e| ServerFnError::<NoCustomError>::ServerError(e.to_string()))?;
+    .map_err(|e| {
+        ServerFnError::<NoCustomError>::ServerError(
+            e.to_string(),
+        )
+    })?;
     Ok(())
 }
 
@@ -386,18 +421,25 @@ async fn remove_image_from_showcase(
     image_id: String,
     showcase_id: String,
 ) -> Result<(), ServerFnError> {
-
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
     let image_id: [u8; 16] = image_id
         .parse::<rusty_ulid::Ulid>()
-        .map_err(|_| ServerFnError::<NoCustomError>::ServerError("expected a valid image id".to_string()))?
+        .map_err(|_| {
+            ServerFnError::<NoCustomError>::ServerError(
+                "expected a valid image id".to_string(),
+            )
+        })?
         .into();
 
     let showcase_id: [u8; 16] = showcase_id
         .parse::<rusty_ulid::Ulid>()
-        .map_err(|_| ServerFnError::<NoCustomError>::ServerError("expected a valid showcase id".to_string()))?
+        .map_err(|_| {
+            ServerFnError::<NoCustomError>::ServerError(
+                "expected a valid showcase id".to_string(),
+            )
+        })?
         .into();
 
     sqlx::query!(
@@ -411,13 +453,18 @@ async fn remove_image_from_showcase(
     )
     .execute(&pool)
     .await
-    .map_err(|e| ServerFnError::<NoCustomError>::ServerError(e.to_string()))?;
+    .map_err(|e| {
+        ServerFnError::<NoCustomError>::ServerError(
+            e.to_string(),
+        )
+    })?;
     Ok(())
 }
 
 #[component]
 fn Images(showcase_id: String) -> impl IntoView {
-    let images = create_resource(move || {}, |_| fetch_images());
+    let images =
+        create_resource(move || {}, |_| fetch_images());
 
     view! {
         <Suspense fallback=move || {
@@ -460,8 +507,13 @@ fn Images(showcase_id: String) -> impl IntoView {
 }
 
 #[component]
-fn ShowcaseImageLi(showcase_id: String, id: String, url: String) -> impl IntoView {
-    let remove_image_from_showcase = create_server_action::<RemoveImageFromShowcase>();
+fn ShowcaseImageLi(
+    showcase_id: String,
+    id: String,
+    url: String,
+) -> impl IntoView {
+    let remove_image_from_showcase =
+        create_server_action::<RemoveImageFromShowcase>();
 
     view! {
         <li class="relative">
@@ -494,8 +546,15 @@ fn ShowcaseImageLi(showcase_id: String, id: String, url: String) -> impl IntoVie
 }
 
 #[component]
-fn ImageLi(showcase_id: String, id: String, url: String, description: String) -> impl IntoView {
-    let associate_image_with_showcase = create_server_action::<AssociateImageWithShowcase>();
+fn ImageLi(
+    showcase_id: String,
+    id: String,
+    url: String,
+    description: String,
+) -> impl IntoView {
+    let associate_image_with_showcase =
+        create_server_action::<AssociateImageWithShowcase>(
+        );
 
     view! {
         <li class="relative">
@@ -532,25 +591,33 @@ fn ImageLi(showcase_id: String, id: String, url: String, description: String) ->
 struct SqlImage {
     id: Vec<u8>,
     description: String,
-    cloudinary_public_id: String
+    cloudinary_public_id: String,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Image {
     pub id: String,
     pub description: String,
-    pub url: String
+    pub url: String,
 }
 
 #[cfg(feature = "ssr")]
 impl From<SqlImage> for Image {
     fn from(value: SqlImage) -> Self {
         use cloudinary::transformation::{
-            Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
+            resize_mode::ResizeMode::ScaleByWidth,
+            Image as CImage, Transformations::Resize,
         };
-        
-        let image = CImage::new("dilgcuzda".into(), value.cloudinary_public_id.into())
-            .add_transformation(Resize(ScaleByWidth{ width:300, ar: None, liquid:None }));
+
+        let image = CImage::new(
+            "dilgcuzda".into(),
+            value.cloudinary_public_id.into(),
+        )
+        .add_transformation(Resize(ScaleByWidth {
+            width: 300,
+            ar: None,
+            liquid: None,
+        }));
 
         let id_str =
             rusty_ulid::Ulid::try_from(value.id.as_slice())
@@ -560,15 +627,14 @@ impl From<SqlImage> for Image {
         Image {
             id: id_str.to_string(),
             description: value.description,
-            url: image.to_string()
+            url: image.to_string(),
         }
     }
 }
 
-
 #[server]
-async fn fetch_images(
-) -> Result<Vec<Image>, ServerFnError> {
+async fn fetch_images() -> Result<Vec<Image>, ServerFnError>
+{
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
@@ -585,7 +651,9 @@ limit 5"#
     .fetch_all(&pool)
     .await
     .map_err(|e| {
-        ServerFnError::<NoCustomError>::ServerError("sql failed".to_string())
+        ServerFnError::<NoCustomError>::ServerError(
+            "sql failed".to_string(),
+        )
     })?;
 
     Ok(images.into_iter().map(Image::from).collect())

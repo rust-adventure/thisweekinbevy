@@ -680,5 +680,3 @@ fn CalloutInfo(
         </div>
     }
 }
-
-

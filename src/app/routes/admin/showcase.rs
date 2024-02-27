@@ -1,8 +1,8 @@
-use leptos::*;
-use leptos_router::*;
-use serde::{Serialize, Deserialize};
 use crate::app::components::Divider;
 use futures::future::join;
+use leptos::*;
+use leptos_router::*;
+use serde::{Deserialize, Serialize};
 pub mod id;
 
 #[server]
@@ -42,8 +42,10 @@ async fn add_showcase(
 pub fn Showcase() -> impl IntoView {
     let add_showcase =
         create_server_action::<AddShowcase>();
-    let showcases =
-        create_resource(move || {}, |_| join(fetch_showcases(), fetch_issues()));
+    let showcases = create_resource(
+        move || {},
+        |_| join(fetch_showcases(), fetch_issues()),
+    );
 
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -166,8 +168,13 @@ pub fn Showcase() -> impl IntoView {
 }
 
 #[component]
-fn AddShowcaseToIssueForm(showcase: ShowcaseData, issue_id: Option<String>) -> impl IntoView {
-    let associate_showcase_with_issue = create_server_action::<AssociateShowcaseWithIssue>();
+fn AddShowcaseToIssueForm(
+    showcase: ShowcaseData,
+    issue_id: Option<String>,
+) -> impl IntoView {
+    let associate_showcase_with_issue =
+        create_server_action::<AssociateShowcaseWithIssue>(
+        );
 
     view! {
         <li class="flex items-center justify-between gap-x-6 py-5">
@@ -264,7 +271,10 @@ ORDER BY showcase.id"
     .fetch_all(&pool)
     .await?;
 
-    Ok(showcases.into_iter().map(ShowcaseData::from).collect())
+    Ok(showcases
+        .into_iter()
+        .map(ShowcaseData::from)
+        .collect())
 }
 
 #[server]
@@ -300,7 +310,6 @@ async fn associate_showcase_with_issue(
     Ok(())
 }
 
-
 #[cfg(feature = "ssr")]
 #[derive(Debug, sqlx::FromRow)]
 struct SqlIssueShort {
@@ -324,7 +333,7 @@ impl From<SqlIssueShort> for IssueShort {
                 );
         IssueShort {
             id: id_str.to_string(),
-            display_name: value.display_name
+            display_name: value.display_name,
         }
     }
 }

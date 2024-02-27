@@ -1,7 +1,7 @@
+use crate::app::components::Divider;
 use leptos::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
-use crate::app::components::{Divider};
 
 #[component]
 pub fn Issue() -> impl IntoView {
@@ -293,7 +293,7 @@ fn Showcases() -> impl IntoView {
         },
         fetch_showcases_for_issue_id,
     );
-           
+
     view! {
         <ul
             role="list"
@@ -372,14 +372,13 @@ fn ShowcaseLi(showcase: ShowcaseData) -> impl IntoView {
     }
 }
 
-
 #[cfg(feature = "ssr")]
 #[derive(Debug, sqlx::FromRow)]
 struct SqlShowcaseData {
     id: Vec<u8>,
     title: String,
     posted_date: Option<time::Date>,
-    image_count: Option<i64>
+    image_count: Option<i64>,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -387,7 +386,7 @@ pub struct ShowcaseData {
     pub id: String,
     pub title: String,
     pub posted_date: Option<time::Date>,
-    pub image_count: u32
+    pub image_count: u32,
 }
 
 #[cfg(feature = "ssr")]
@@ -402,14 +401,17 @@ impl From<SqlShowcaseData> for ShowcaseData {
             id: id_str.to_string(),
             title: value.title,
             posted_date: value.posted_date,
-            image_count: value.image_count.unwrap_or_default() as u32
+            image_count: value
+                .image_count
+                .unwrap_or_default()
+                as u32,
         }
     }
 }
 
 #[server]
 pub async fn fetch_showcases_for_issue_id(
-    issue_id: String
+    issue_id: String,
 ) -> Result<Vec<ShowcaseData>, ServerFnError> {
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
@@ -441,5 +443,8 @@ issue_id.as_slice()
     .fetch_all(&pool)
     .await?;
 
-    Ok(showcases.into_iter().map(ShowcaseData::from).collect())
+    Ok(showcases
+        .into_iter()
+        .map(ShowcaseData::from)
+        .collect())
 }

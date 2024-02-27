@@ -1,9 +1,9 @@
 use crate::app::components::Container;
 use leptos::*;
 pub mod admin;
+pub mod custom;
 pub mod index;
 pub mod issue;
-pub mod custom;
 
 #[component]
 fn PauseIcon(

@@ -83,7 +83,9 @@ pub fn TinyWaveFormIcon(
 }
 
 #[component]
-pub fn Divider(#[prop(into)] title: String) -> impl IntoView {
+pub fn Divider(
+    #[prop(into)] title: String,
+) -> impl IntoView {
     view! {
         <div class="relative mt-12 mb-6">
             <div class="absolute inset-0 flex items-center" aria-hidden="true">

@@ -1,13 +1,13 @@
 use leptos::*;
 use leptos_router::*;
 
+pub mod crate_release;
+pub mod devlog;
+pub mod educational;
+pub mod image;
 pub mod issue;
 pub mod issues;
 pub mod showcase;
-pub mod crate_release;
-pub mod educational;
-pub mod devlog;
-pub mod image;
 
 #[component]
 pub fn AdminHomepage() -> impl IntoView {
@@ -213,5 +213,3 @@ pub fn AdminWrapper() -> impl IntoView {
         </div>
     }
 }
-
-

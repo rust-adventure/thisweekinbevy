@@ -103,10 +103,10 @@ struct Educational {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Showcase {
     title: String,
-url: String,
-discord_url: String,
-description: String,
-images: Vec<ImgDataTransformed>
+    url: String,
+    discord_url: String,
+    description: String,
+    images: Vec<ImgDataTransformed>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -141,7 +141,6 @@ struct SqlIssueData {
     description: String,
     youtube_id: String,
     // prs: Vec<SqlPr>,
-
 }
 #[cfg(feature = "ssr")]
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
@@ -152,11 +151,17 @@ struct SqlShowcaseData {
     display_name: String,
     description: String,
     youtube_id: String,
-    showcases: Option<sqlx::types::Json<Vec<ShowcaseData2>>>
+    showcases:
+        Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
 }
 
 #[cfg(feature = "ssr")]
-#[derive(Debug, serde::Deserialize, serde::Serialize, sqlx::FromRow)]
+#[derive(
+    Debug,
+    serde::Deserialize,
+    serde::Serialize,
+    sqlx::FromRow,
+)]
 struct ShowcaseData2 {
     title: String,
     url: String,
@@ -170,15 +175,14 @@ struct ShowcaseData2 {
 struct ImgData {
     id: String,
     description: String,
-    cloudinary_public_id: String
+    cloudinary_public_id: String,
 }
-
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct ImgDataTransformed {
     id: String,
     description: String,
-    url: String
+    url: String,
 }
 
 #[server]
@@ -186,41 +190,43 @@ async fn fetch_issue(
     date: time::Date,
 ) -> Result<Option<Issue>, leptos::ServerFnError> {
     use crate::markdown::compile;
-    use data_encoding::BASE64;
     use cloudinary::transformation::{
-        Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
+        resize_mode::ResizeMode::ScaleByWidth,
+        Image as CImage, Transformations::Resize,
     };
+    use data_encoding::BASE64;
 
     let pool = crate::sql::pool()?;
 
-//     let issue = sqlx::query_as!(
-//         SqlIssueData,
-//         r#"SELECT
-//             id,
-//             slug,
-//             issue_date,
-//             cloudinary_public_id,
-//             display_name,
-//             description,
-//             youtube_id
-// FROM issue
-// WHERE issue_date = ?"#,
-// // AND status != "draft"
-//         date
-//     )
-//     .fetch_optional(&pool)
-//     .await?;
+    //     let issue = sqlx::query_as!(
+    //         SqlIssueData,
+    //         r#"SELECT
+    //             id,
+    //             slug,
+    //             issue_date,
+    //             cloudinary_public_id,
+    //             display_name,
+    //             description,
+    //             youtube_id
+    // FROM issue
+    // WHERE issue_date = ?"#,
+    // // AND status != "draft"
+    //         date
+    //     )
+    //     .fetch_optional(&pool)
+    //     .await?;
 
-
-let showcase_issue = sqlx::query_file_as!(
-    SqlShowcaseData,
-    "src/app/routes/issue__showcase.sql",
-    date
-).fetch_optional(&pool)
-.await
-// .inspect(|v| {tracing::info!(?v);})
-.inspect_err(|e| {tracing::error!(?e);})
-?;
+    let showcase_issue = sqlx::query_file_as!(
+        SqlShowcaseData,
+        "src/app/routes/issue__showcase.sql",
+        date
+    )
+    .fetch_optional(&pool)
+    .await
+    // .inspect(|v| {tracing::info!(?v);})
+    .inspect_err(|e| {
+        tracing::error!(?e);
+    })?;
 
     Ok(showcase_issue.map(|issue| {
         
@@ -267,7 +273,6 @@ let showcase_issue = sqlx::query_file_as!(
         new_issues: vec![],
         }
     }))
-
 }
 
 #[component]
@@ -856,5 +861,3 @@ fn CalloutInfo(
         </div>
     }
 }
-
-
