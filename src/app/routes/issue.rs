@@ -1,7 +1,7 @@
 use std::ops::Not;
 
 use crate::app::components::{Container, Divider};
-use futures::future::join4;
+
 use leptos::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
@@ -188,7 +188,7 @@ async fn fetch_issue(
     use crate::markdown::compile;
     use data_encoding::BASE64;
     use cloudinary::transformation::{
-        Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage, aspect_ratio::AspectRatio
+        Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
     };
 
     let pool = crate::sql::pool()?;
@@ -226,18 +226,18 @@ let showcase_issue = sqlx::query_file_as!(
         
         let showcases = issue.showcases
 .map(|json| json.0)
-.unwrap_or(vec![])
+.unwrap_or_default()
 .into_iter().map(|showcase_data_2| {
     Showcase {
         title: showcase_data_2.title,
         url: showcase_data_2.url,
         discord_url: showcase_data_2.discord_url,
         description: compile(&showcase_data_2.description),
-        images: showcase_data_2.images.unwrap_or(vec![]).into_iter()
+        images: showcase_data_2.images.unwrap_or_default().into_iter()
         .map(|img_data| {
  
             
-            let base_id = BASE64.decode(&img_data.id.as_bytes()).expect("a valid id in base64 format");
+            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
             let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
             .expect(
                 "expect valid ids from the database",

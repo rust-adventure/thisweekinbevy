@@ -132,7 +132,7 @@ pub fn Showcase() -> impl IntoView {
                                     key=|showcase| showcase.id.clone()
                                     let:showcase
                                 >
-                                    <AddShowcaseToIssueForm showcase=showcase issue_id=issues.get(0).map(|issue| issue.id.clone())/>
+                                    <AddShowcaseToIssueForm showcase=showcase issue_id=issues.first().map(|issue| issue.id.clone())/>
                                 </For>
                                 </ul>
                                 </div>

@@ -147,7 +147,7 @@ pub struct Image {
 impl From<SqlImage> for Image {
     fn from(value: SqlImage) -> Self {
         use cloudinary::transformation::{
-            Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage, aspect_ratio::AspectRatio
+            Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
         };
         
         let image = CImage::new("dilgcuzda".into(), value.cloudinary_public_id.into())

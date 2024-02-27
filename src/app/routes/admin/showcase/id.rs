@@ -2,7 +2,7 @@ use leptos::*;
 use leptos_router::*;
 use serde::{Serialize, Deserialize};
 use crate::app::components::Divider;
-use futures::future::join;
+
 #[cfg(feature = "ssr")]
 use crate::app::server_fn::error::NoCustomError;
 
@@ -223,14 +223,14 @@ impl From<SqlShowcaseData> for ShowcaseData {
                 );
         let images = serde_json::from_value::<Vec<ImgData>>(value.images)
         .inspect_err(|e| {tracing::warn!(?e);})
-        .unwrap_or(vec![])
+        .unwrap_or_default()
         .into_iter()
         .map(|img_data| {
             use cloudinary::transformation::{
-                Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage, aspect_ratio::AspectRatio
+                Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
             };
             
-            let base_id = BASE64.decode(&img_data.id.as_bytes()).expect("a valid id in base64 format");
+            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
             let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
             .expect(
                 "expect valid ids from the database",
@@ -474,7 +474,7 @@ pub struct Image {
 impl From<SqlImage> for Image {
     fn from(value: SqlImage) -> Self {
         use cloudinary::transformation::{
-            Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage, aspect_ratio::AspectRatio
+            Transformations::Resize, resize_mode::ResizeMode::ScaleByWidth, Image as CImage
         };
         
         let image = CImage::new("dilgcuzda".into(), value.cloudinary_public_id.into())
