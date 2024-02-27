@@ -19,115 +19,196 @@ pub fn GitHub() -> impl IntoView {
         }>
             {match issues.get() {
                 None => view! { <div>error</div> },
-                Some(Err(e)) => view!{ <div>{e.to_string()}</div> },
+                Some(Err(e)) => view! { <div>{e.to_string()}</div> },
                 Some(Ok(issues)) => {
                     let issues_a = issues.clone();
                     let issues_b = issues.clone();
-                    view!{
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <Divider title="new github issues"/>
+                    view! {
+                        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                            <Divider title="new github issues"/>
 
-        <ActionForm
-            action=select_new_github_issues
-            class="isolate -space-y-px rounded-md shadow-sm"
-        >
-        <label for="issue_id" class="block text-sm font-medium leading-6 text-gray-900">issue_id</label>
-  <select  name="issue_id" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-    {issues_a.iter().map(|issue| view!{
-        <option value=&issue.id>{issue.issue_date.to_string()} - {&issue.display_name}</option>
-    }).collect_view()}
-  </select>
-        <label
-          for="start_date"
-          class="block text-sm font-medium leading-6 text-gray-900"
-        >
-            Start Date
-        </label>
-        <div class="mt-2">
-        <input type="date" id="start_date" name="start_date" min="2024-01-01"/>
-        </div>
-        <label
-          for="end_date"  
-          class="block text-sm font-medium leading-6 text-gray-900"
-        >
-            End Date
-        </label>
-        <div class="mt-2">
-        <input type="date" id="end_date" name="end_date" min="2024-01-01"/>
-        </div>
-        <button type="submit">Add to Issue</button>
-        </ActionForm>
-        
-        <Divider title="new pull requests"/>
+                            <ActionForm
+                                action=select_new_github_issues
+                                class="isolate -space-y-px rounded-md shadow-sm"
+                            >
+                                <label
+                                    for="issue_id"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    issue_id
+                                </label>
+                                <select
+                                    name="issue_id"
+                                    class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                >
+                                    {issues_a
+                                        .iter()
+                                        .map(|issue| {
+                                            view! {
+                                                <option value=&issue
+                                                    .id>
+                                                    {issue.issue_date.to_string()} - {&issue.display_name}
+                                                </option>
+                                            }
+                                        })
+                                        .collect_view()}
+                                </select>
+                                <label
+                                    for="start_date"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    Start Date
+                                </label>
+                                <div class="mt-2">
+                                    <input
+                                        type="date"
+                                        id="start_date"
+                                        name="start_date"
+                                        min="2024-01-01"
+                                    />
+                                </div>
+                                <label
+                                    for="end_date"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    End Date
+                                </label>
+                                <div class="mt-2">
+                                    <input
+                                        type="date"
+                                        id="end_date"
+                                        name="end_date"
+                                        min="2024-01-01"
+                                    />
+                                </div>
+                                <button type="submit">Add to Issue</button>
+                            </ActionForm>
 
-        <ActionForm
-            action=select_new_pull_requests
-            class="isolate -space-y-px rounded-md shadow-sm"
-        >
-        <label for="issue_id" class="block text-sm font-medium leading-6 text-gray-900">issue_id</label>
-  <select  name="issue_id" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-    {issues_b.clone().iter().map(|issue| view!{
-        <option value=&issue.id>{issue.issue_date.to_string()} - {&issue.display_name}</option>
-    }).collect_view()}
-  </select>
-        <label
-          for="start_date"
-          class="block text-sm font-medium leading-6 text-gray-900"
-        >
-            Start Date
-        </label>
-        <div class="mt-2">
-        <input type="date" id="start_date" name="start_date" min="2024-01-01"/>
-        </div>
-        <label
-          for="end_date"  
-          class="block text-sm font-medium leading-6 text-gray-900"
-        >
-            End Date
-        </label>
-        <div class="mt-2">
-        <input type="date" id="end_date" name="end_date" min="2024-01-01"/>
-        </div>
-        <button type="submit">Add to Issue</button>
-        </ActionForm>
+                            <Divider title="new pull requests"/>
 
-        <Divider title="merged pull requests"/>
+                            <ActionForm
+                                action=select_new_pull_requests
+                                class="isolate -space-y-px rounded-md shadow-sm"
+                            >
+                                <label
+                                    for="issue_id"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    issue_id
+                                </label>
+                                <select
+                                    name="issue_id"
+                                    class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                >
+                                    {issues_b
+                                        .clone()
+                                        .iter()
+                                        .map(|issue| {
+                                            view! {
+                                                <option value=&issue
+                                                    .id>
+                                                    {issue.issue_date.to_string()} - {&issue.display_name}
+                                                </option>
+                                            }
+                                        })
+                                        .collect_view()}
+                                </select>
+                                <label
+                                    for="start_date"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    Start Date
+                                </label>
+                                <div class="mt-2">
+                                    <input
+                                        type="date"
+                                        id="start_date"
+                                        name="start_date"
+                                        min="2024-01-01"
+                                    />
+                                </div>
+                                <label
+                                    for="end_date"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    End Date
+                                </label>
+                                <div class="mt-2">
+                                    <input
+                                        type="date"
+                                        id="end_date"
+                                        name="end_date"
+                                        min="2024-01-01"
+                                    />
+                                </div>
+                                <button type="submit">Add to Issue</button>
+                            </ActionForm>
 
-        <ActionForm
-            action=select_merged_pull_requests
-            class="isolate -space-y-px rounded-md shadow-sm"
-        >
-        <label for="issue_id" class="block text-sm font-medium leading-6 text-gray-900">issue_id</label>
-  <select  name="issue_id" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-    {
-        issues.iter().map(|issue| view!{
-        <option value=&issue.id>{issue.issue_date.to_string()} - {&issue.display_name}</option>
-    }).collect_view()}
-  </select>
-        <label
-          for="start_date"
-          class="block text-sm font-medium leading-6 text-gray-900"
-        >
-            Start Date
-        </label>
-        <div class="mt-2">
-        <input type="date" id="start_date" name="start_date" min="2024-01-01"/>
-        </div>
-        <label
-          for="end_date"  
-          class="block text-sm font-medium leading-6 text-gray-900"
-        >
-            End Date
-        </label>
-        <div class="mt-2">
-        <input type="date" id="end_date" name="end_date" min="2024-01-01"/>
-        </div>
-        <button type="submit">Add to Issue</button>
-        </ActionForm>
-        </div>
-    }}
-}}
-</Suspense>
+                            <Divider title="merged pull requests"/>
+
+                            <ActionForm
+                                action=select_merged_pull_requests
+                                class="isolate -space-y-px rounded-md shadow-sm"
+                            >
+                                <label
+                                    for="issue_id"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    issue_id
+                                </label>
+                                <select
+                                    name="issue_id"
+                                    class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                >
+
+                                    {issues
+                                        .iter()
+                                        .map(|issue| {
+                                            view! {
+                                                <option value=&issue
+                                                    .id>
+                                                    {issue.issue_date.to_string()} - {&issue.display_name}
+                                                </option>
+                                            }
+                                        })
+                                        .collect_view()}
+                                </select>
+                                <label
+                                    for="start_date"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    Start Date
+                                </label>
+                                <div class="mt-2">
+                                    <input
+                                        type="date"
+                                        id="start_date"
+                                        name="start_date"
+                                        min="2024-01-01"
+                                    />
+                                </div>
+                                <label
+                                    for="end_date"
+                                    class="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    End Date
+                                </label>
+                                <div class="mt-2">
+                                    <input
+                                        type="date"
+                                        id="end_date"
+                                        name="end_date"
+                                        min="2024-01-01"
+                                    />
+                                </div>
+                                <button type="submit">Add to Issue</button>
+                            </ActionForm>
+                        </div>
+                    }
+                }
+            }}
+
+        </Suspense>
     }
 }
 

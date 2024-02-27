@@ -209,7 +209,7 @@ pub fn AdminWrapper() -> impl IntoView {
                         </li>
                         <li>
                             <A href="/admin/github" active_class="text-blue-600">
-                              GitHub
+                                GitHub
                             </A>
                         </li>
                     </ul>

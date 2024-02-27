@@ -224,8 +224,8 @@ pub fn Issue() -> impl IntoView {
                                                 {issue.as_ref().unwrap().title.clone()}
                                             </h1>
                                             // <FormattedDate
-                                            <p // date={date}
-                                            class="order-first font-mono text-sm leading-7 text-slate-500">
+                                            // date={date}
+                                            <p class="order-first font-mono text-sm leading-7 text-slate-500">
                                                 // />
                                                 "2024-02-11"
                                             </p>

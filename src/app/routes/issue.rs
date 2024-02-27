@@ -437,19 +437,20 @@ pub fn Issue() -> impl IntoView {
                                 <Divider title="Pull Requests Merged This Week"/>
                                 <ul role="list" class="space-y-6 mt-6">
 
-                                {issue.merged_pull_requests
-                                .iter()
-                                .map(|pull_request| {
-                                view! {
-                                <ActivityListItem
-                                date=&pull_request.merged_at_date
-                                url=&pull_request.url
-                                title=&pull_request.title
-                                author=&pull_request.author
-                                />
-                                }
-                                })
-                                .collect_view()}
+                                    {issue
+                                        .merged_pull_requests
+                                        .iter()
+                                        .map(|pull_request| {
+                                            view! {
+                                                <ActivityListItem
+                                                    date=&pull_request.merged_at_date
+                                                    url=&pull_request.url
+                                                    title=&pull_request.title
+                                                    author=&pull_request.author
+                                                />
+                                            }
+                                        })
+                                        .collect_view()}
                                 </ul>
                                 <Divider title="Contributing"/>
                                 <CalloutInfo
@@ -468,38 +469,40 @@ pub fn Issue() -> impl IntoView {
                                     Pull Requests Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
-                                {issue.new_pull_requests
-                                .iter()
-                                .map(|pull_request| {
-                                view! {
-                                <ActivityListItem
-                                date=&pull_request.gh_created_at
-                                url=&pull_request.url
-                                title=&pull_request.title
-                                author=&pull_request.author
-                                />
-                                }
-                                })
-                                .collect_view()}
+                                    {issue
+                                        .new_pull_requests
+                                        .iter()
+                                        .map(|pull_request| {
+                                            view! {
+                                                <ActivityListItem
+                                                    date=&pull_request.gh_created_at
+                                                    url=&pull_request.url
+                                                    title=&pull_request.title
+                                                    author=&pull_request.author
+                                                />
+                                            }
+                                        })
+                                        .collect_view()}
 
                                 </ul>
                                 <h2 class="mt-6 text-2xl font-bold text-slate-900">
                                     Issues Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
-                                {issue.new_github_issues
-                                .iter()
-                                .map(|issue| {
-                                view! {
-                                <ActivityListItem
-                                date=issue.github_created_at.clone()
-                                url=&issue.url
-                                title=&issue.title
-                                author=&issue.author
-                                />
-                                }
-                                })
-                                .collect::<Vec<_>>()}
+                                    {issue
+                                        .new_github_issues
+                                        .iter()
+                                        .map(|issue| {
+                                            view! {
+                                                <ActivityListItem
+                                                    date=issue.github_created_at.clone()
+                                                    url=&issue.url
+                                                    title=&issue.title
+                                                    author=&issue.author
+                                                />
+                                            }
+                                        })
+                                        .collect::<Vec<_>>()}
 
                                 </ul>
                             </Container>
@@ -572,7 +575,10 @@ fn ActivityListItem(
                 " authored by "
                 <span class="font-medium text-gray-900">{author}</span>
             </p>
-            <time datetime=date.to_string() class="flex-none py-0.5 text-xs leading-5 text-gray-500">
+            <time
+                datetime=date.to_string()
+                class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+            >
                 {date.to_string()}
             </time>
         </li>
