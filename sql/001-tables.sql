@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS issue__new_pull_request(
     pull_request_id VARBINARY(16) NOT NULL CHECK (pull_request_id <> ''),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE now(),
-    PRIMARY KEY (issue_id)
+    PRIMARY KEY (issue_id, pull_request_id)
 );
 
 CREATE TABLE IF NOT EXISTS new_github_issue(

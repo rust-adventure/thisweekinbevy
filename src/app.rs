@@ -70,6 +70,7 @@ pub fn App() -> impl IntoView {
                         <Route path="/devlog" view=admin::devlog::Devlog/>
                         <Route path="/educational" view=admin::educational::Educational/>
                         <Route path="/images" view=admin::image::Image/>
+                        <Route path="/github" view=admin::github::GitHub/>
                     </ProtectedRoute>
                 </Routes>
             </Wrapper>
@@ -241,7 +242,3 @@ fn Wrapper(children: Children) -> impl IntoView {
     }
 }
 
-#[component]
-fn HomePage() -> impl IntoView {
-    view! { <h1>"hello"</h1> }
-}

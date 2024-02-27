@@ -282,8 +282,7 @@ async fn associate_showcase_with_issue(
     showcase_id: String,
     issue_id: String,
 ) -> Result<(), ServerFnError> {
-    let pool = use_context::<sqlx::MySqlPool>()
-        .expect("to be able to access app_state");
+    let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
     let issue_id: [u8; 16] = issue_id

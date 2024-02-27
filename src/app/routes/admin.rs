@@ -8,6 +8,7 @@ pub mod image;
 pub mod issue;
 pub mod issues;
 pub mod showcase;
+pub mod github;
 
 #[component]
 pub fn AdminHomepage() -> impl IntoView {
@@ -204,6 +205,11 @@ pub fn AdminWrapper() -> impl IntoView {
                         <li>
                             <A href="/admin/images" active_class="text-blue-600">
                                 Images
+                            </A>
+                        </li>
+                        <li>
+                            <A href="/admin/github" active_class="text-blue-600">
+                              GitHub
                             </A>
                         </li>
                     </ul>

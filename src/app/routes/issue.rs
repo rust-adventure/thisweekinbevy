@@ -32,7 +32,7 @@ pub struct Issue {
     /// merged pull requests
     /// Meant to convey what is being added to
     /// Bevy
-    pull_requests: Vec<PullRequest>,
+    merged_pull_requests: Vec<MergedPullRequest>,
     /// educational resources published this week.
     /// videos and blog posts
     educational: Vec<Educational>,
@@ -46,7 +46,7 @@ pub struct Issue {
     new_pull_requests: Vec<NewPullRequest>,
     /// Want to contribute? check out these
     ///  issues that just got opened
-    new_issues: Vec<NewIssue>,
+    new_github_issues: Vec<NewIssue>,
 }
 
 /// `NewPullRequest` is calculated just before
@@ -58,12 +58,12 @@ pub struct Issue {
 /// opportunity to discover pull requests that
 /// could benefit from review this week.
 #[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 struct NewPullRequest {
-    author: String,
-    github_id: String,
     title: String,
     url: String,
+    gh_created_at: String,
+    author: String,
+    author_url: String,
 }
 
 /// `NewIssue` is calculated just before
@@ -78,10 +78,41 @@ struct NewPullRequest {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct NewIssue {
-    author: String,
-    github_id: String,
     title: String,
     url: String,
+    github_created_at: String,
+    author: String,
+    author_url: String,
+}
+
+#[cfg(feature = "ssr")]
+#[derive(
+    Debug,
+    serde::Deserialize,
+    serde::Serialize,
+    sqlx::FromRow,
+)]
+struct SqlNewGhIssue {
+    title: String,
+url: String,
+gh_created_at: String,
+author: String,
+author_url: String,
+}
+
+#[cfg(feature = "ssr")]
+#[derive(
+    Debug,
+    serde::Deserialize,
+    serde::Serialize,
+    sqlx::FromRow,
+)]
+struct SqlNewPr {
+    title: String,
+url: String,
+gh_created_at: String,
+author: String,
+author_url: String,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -111,16 +142,27 @@ struct Showcase {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct PullRequest {
-    author: PullRequestAuthor,
-    closed_at: String,
-    number: u32,
+struct MergedPullRequest {
     title: String,
     url: String,
+    merged_at_date: String,
+    author: String,
+    author_url: String,
 }
-#[derive(Clone, Serialize, Deserialize)]
-struct PullRequestAuthor {
-    login: String,
+
+#[cfg(feature = "ssr")]
+#[derive(
+    Debug,
+    serde::Deserialize,
+    serde::Serialize,
+    sqlx::FromRow,
+)]
+struct SqlMergedPullRequest {
+    title: String,
+    url: String,
+    merged_at_date: String,
+    author: String,
+    author_url: String,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -136,8 +178,10 @@ struct SqlShowcaseData {
     display_name: String,
     description: String,
     youtube_id: String,
-    showcases:
-        Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
+    showcases: Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
+    new_github_issues: Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
+    new_pull_requests: Option<sqlx::types::Json<Vec<SqlNewPr>>>,
+    merged_pull_requests: Option<sqlx::types::Json<Vec<SqlMergedPullRequest>>>,
 }
 
 #[cfg(feature = "ssr")]
@@ -227,17 +271,68 @@ async fn fetch_issue(
     }
 }).collect::<Vec<Showcase>>();
 
+let new_github_issues = issue.new_github_issues
+.map(|json| json.0)
+.unwrap_or_default()
+.into_iter().map(|SqlNewGhIssue{
+    title,
+    url,
+    gh_created_at,
+    author,
+    author_url}| NewIssue{
+title,
+url,
+github_created_at: gh_created_at,
+author,
+author_url
+
+}).collect();
+
+let new_pull_requests = issue.new_pull_requests
+.map(|json| json.0)
+.unwrap_or_default()
+.into_iter().map(|SqlNewPr{
+    title,
+    url,
+    gh_created_at,
+    author,
+    author_url}| NewPullRequest{
+title,
+url,
+gh_created_at,
+author,
+author_url
+
+}).collect();
+
+let merged_pull_requests = issue.merged_pull_requests
+.map(|json| json.0)
+.unwrap_or_default()
+.into_iter().map(|SqlMergedPullRequest{
+    title,
+    url,
+    merged_at_date,
+    author,
+    author_url}| MergedPullRequest{
+title,
+url,
+merged_at_date,
+author,
+author_url
+
+}).collect();
+
         Issue {
         title: issue.display_name,
         issue_date: issue.issue_date,
         description: compile(&issue.description),
         showcases,
         crates: vec![],
-        pull_requests: vec![],
+        merged_pull_requests,
         contributors: vec![],
         educational: vec![],
-        new_pull_requests: vec![],
-        new_issues: vec![],
+        new_pull_requests,
+        new_github_issues,
         }
     }))
 }
@@ -340,24 +435,22 @@ pub fn Issue() -> impl IntoView {
                                 // Pull Requests Merged this week
                                 // </h2>
                                 <Divider title="Pull Requests Merged This Week"/>
-                                // <ul role="list" class="space-y-6 mt-6">
+                                <ul role="list" class="space-y-6 mt-6">
 
-                                // {merged_pull_requests
-                                // .expect("")
-                                // .iter()
-                                // .map(|pull_request| {
-                                // view! {
-                                // <ActivityListItem
-                                // date=&pull_request.merged_at_date
-                                // url=&pull_request.url
-                                // title=&pull_request.title
-                                // author=&pull_request.author
-                                // />
-                                // }
-                                // })
-                                // .collect::<Vec<_>>()}
-
-                                // </ul>
+                                {issue.merged_pull_requests
+                                .iter()
+                                .map(|pull_request| {
+                                view! {
+                                <ActivityListItem
+                                date=&pull_request.merged_at_date
+                                url=&pull_request.url
+                                title=&pull_request.title
+                                author=&pull_request.author
+                                />
+                                }
+                                })
+                                .collect_view()}
+                                </ul>
                                 <Divider title="Contributing"/>
                                 <CalloutInfo
                                     r#type=CalloutType::Info
@@ -375,40 +468,38 @@ pub fn Issue() -> impl IntoView {
                                     Pull Requests Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
-                                // {opened_pull_requests
-                                // .expect("")
-                                // .iter()
-                                // .map(|pull_request| {
-                                // view! {
-                                // <ActivityListItem
-                                // date=&pull_request.gh_created_at
-                                // url=&pull_request.url
-                                // title=&pull_request.title
-                                // author=&pull_request.author
-                                // />
-                                // }
-                                // })
-                                // .collect::<Vec<_>>()}
+                                {issue.new_pull_requests
+                                .iter()
+                                .map(|pull_request| {
+                                view! {
+                                <ActivityListItem
+                                date=&pull_request.gh_created_at
+                                url=&pull_request.url
+                                title=&pull_request.title
+                                author=&pull_request.author
+                                />
+                                }
+                                })
+                                .collect_view()}
 
                                 </ul>
                                 <h2 class="mt-6 text-2xl font-bold text-slate-900">
                                     Issues Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
-                                // {opened_issues
-                                // .expect("")
-                                // .iter()
-                                // .map(|issue| {
-                                // view! {
-                                // <ActivityListItem
-                                // date=&issue.gh_created_at
-                                // url=&issue.url
-                                // title=&issue.title
-                                // author=&issue.author
-                                // />
-                                // }
-                                // })
-                                // .collect::<Vec<_>>()}
+                                {issue.new_github_issues
+                                .iter()
+                                .map(|issue| {
+                                view! {
+                                <ActivityListItem
+                                date=issue.github_created_at.clone()
+                                url=&issue.url
+                                title=&issue.title
+                                author=&issue.author
+                                />
+                                }
+                                })
+                                .collect::<Vec<_>>()}
 
                                 </ul>
                             </Container>
@@ -481,8 +572,8 @@ fn ActivityListItem(
                 " authored by "
                 <span class="font-medium text-gray-900">{author}</span>
             </p>
-            <time datetime=&date class="flex-none py-0.5 text-xs leading-5 text-gray-500">
-                {date}
+            <time datetime=date.to_string() class="flex-none py-0.5 text-xs leading-5 text-gray-500">
+                {date.to_string()}
             </time>
         </li>
     }
