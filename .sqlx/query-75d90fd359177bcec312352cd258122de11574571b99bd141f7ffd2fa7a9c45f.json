@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO issue__new_pull_request (issue_id, pull_request_id )\nSELECT ?, ngi.id\nFROM new_pull_request ngi \nWHERE gh_created_at BETWEEN ? AND ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "75d90fd359177bcec312352cd258122de11574571b99bd141f7ffd2fa7a9c45f"
+}

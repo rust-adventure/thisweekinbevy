@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO issue__new_github_issue (issue_id, github_issue_id )\nSELECT ?, ngi.id\nFROM new_github_issue ngi \nWHERE gh_created_at BETWEEN ? AND ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "5d7ed3cbf12beb8301dbeb953d46307541acf3b8a27e108729980ab9e2639dab"
+}

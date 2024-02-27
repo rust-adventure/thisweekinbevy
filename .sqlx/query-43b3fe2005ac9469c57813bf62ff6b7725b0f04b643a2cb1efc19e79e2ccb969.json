@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO issue__merged_pull_request (issue_id, merged_pull_request_id )\nSELECT ?, ngi.id\nFROM merged_pull_request ngi \nWHERE merged_at_date BETWEEN ? AND ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "43b3fe2005ac9469c57813bf62ff6b7725b0f04b643a2cb1efc19e79e2ccb969"
+}

@@ -1,0 +1,47 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n        id,\n        display_name,\n        issue_date\nFROM issue\nWHERE status = \"draft\"\nORDER BY issue_date DESC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 400
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "issue_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 10
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "96c2263ba79e4896488f25fd81dfcf9da0422b287efa5f74524d9c6acf93ac6a"
+}
