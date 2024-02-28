@@ -377,7 +377,7 @@ author_url
         issue_date: issue.issue_date,
         description: compile(&issue.description),
         showcases,
-        crate_releases: crate_releases,
+        crate_releases,
         merged_pull_requests,
         contributors: vec![],
         educational: vec![],
