@@ -673,7 +673,7 @@ fn ActivityListComment(
 #[component]
 #[allow(dead_code)]
 fn CrateReleaseView(
-    crate_release: CrateRelease
+    crate_release: CrateRelease,
 ) -> impl IntoView {
     view! {
         <h3 class="mt-2 text-xl font-bold text-slate-900">{crate_release.title}</h3>

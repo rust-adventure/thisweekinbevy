@@ -23,7 +23,8 @@ async fn update_crate_release(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid crate_release id".to_string(),
+                "expected a valid crate_release id"
+                    .to_string(),
             )
         })?
         .into();
@@ -394,7 +395,8 @@ async fn associate_image_with_crate_release(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid crate_release id".to_string(),
+                "expected a valid crate_release id"
+                    .to_string(),
             )
         })?
         .into();
@@ -438,7 +440,8 @@ async fn remove_image_from_crate_release(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid crate_release id".to_string(),
+                "expected a valid crate_release id"
+                    .to_string(),
             )
         })?
         .into();
@@ -514,7 +517,8 @@ fn CrateReleaseImageLi(
     url: String,
 ) -> impl IntoView {
     let remove_image_from_crate_release =
-        create_server_action::<RemoveImageFromCrateRelease>();
+        create_server_action::<RemoveImageFromCrateRelease>(
+        );
 
     view! {
         <li class="relative">
@@ -554,8 +558,9 @@ fn ImageLi(
     description: String,
 ) -> impl IntoView {
     let associate_image_with_crate_release =
-        create_server_action::<AssociateImageWithCrateRelease>(
-        );
+        create_server_action::<
+            AssociateImageWithCrateRelease,
+        >();
 
     view! {
         <li class="relative">

@@ -173,8 +173,9 @@ fn AddCrateReleaseToIssueForm(
     issue_id: Option<String>,
 ) -> impl IntoView {
     let associate_crate_release_with_issue =
-        create_server_action::<AssociateCrateReleaseWithIssue>(
-        );
+        create_server_action::<
+            AssociateCrateReleaseWithIssue,
+        >();
 
     view! {
         <li class="flex items-center justify-between gap-x-6 py-5">

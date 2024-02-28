@@ -498,7 +498,9 @@ fn CrateReleases() -> impl IntoView {
 }
 
 #[component]
-fn CrateReleaseLi(crate_release: CrateReleaseData) -> impl IntoView {
+fn CrateReleaseLi(
+    crate_release: CrateReleaseData,
+) -> impl IntoView {
     view! {
         <li class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
             <div class="flex min-w-0 gap-x-4">
