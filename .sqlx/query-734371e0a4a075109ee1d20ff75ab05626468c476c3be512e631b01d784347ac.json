@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO issue__crate_release ( issue_id, crate_release_id )\n    VALUES ( ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "734371e0a4a075109ee1d20ff75ab05626468c476c3be512e631b01d784347ac"
+}

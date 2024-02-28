@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO crate_release__image ( image_id, crate_release_id )\n    VALUES ( ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "31e6ddfd38bed07cfc5d3ddd8674818b0e6fc9fc1535c6b6c7f88f6ed8b3059b"
+}

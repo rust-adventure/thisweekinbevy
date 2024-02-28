@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    DELETE FROM crate_release__image\n    WHERE image_id = ?\n    AND crate_release_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "385bfd181b368b51ea6f8a44954cd07b06d8e1d60eabafeaf2bea60932b1c2e4"
+}

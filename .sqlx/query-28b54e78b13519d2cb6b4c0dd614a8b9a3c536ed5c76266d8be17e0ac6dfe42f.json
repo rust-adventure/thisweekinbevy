@@ -1,0 +1,58 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n        crate_release.id,\n        crate_release.title,\n        crate_release.posted_date,\n        si.image_count\nFROM issue__crate_release\nINNER JOIN crate_release\n  ON crate_release.id = issue__crate_release.crate_release_id\nLEFT JOIN (\n    SELECT crate_release__image.crate_release_id, COUNT(*) as image_count\n    FROM crate_release__image\n    GROUP BY crate_release__image.crate_release_id\n) AS si ON si.crate_release_id = crate_release.id\nWHERE issue__crate_release.issue_id = ?\nORDER BY crate_release.posted_date",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "posted_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "BINARY",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "image_count",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NUM",
+          "char_set": 63,
+          "max_size": 21
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "28b54e78b13519d2cb6b4c0dd614a8b9a3c536ed5c76266d8be17e0ac6dfe42f"
+}

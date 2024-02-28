@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO crate_release ( id, title, url, discord_url, posted_date, description, submitted_by )\n    VALUES ( ?, ?, ?, ?, ?, ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "b5a6161957ee6477d6c0784d0088f6f930b4c25b5ff37dd2501d317df8e5afce"
+}
