@@ -37,6 +37,8 @@ pub fn Issue() -> impl IntoView {
             </Suspense>
             <Divider title="Showcases"/>
             <Showcases/>
+            <Divider title="Crate Releases"/>
+            <CrateReleases/>
         </div>
     }
 }
@@ -446,5 +448,175 @@ issue_id.as_slice()
     Ok(showcases
         .into_iter()
         .map(ShowcaseData::from)
+        .collect())
+}
+
+// crate_releases
+
+#[component]
+fn CrateReleases() -> impl IntoView {
+    let params = use_params_map();
+
+    let crate_releases = create_resource(
+        move || {
+            params.with(|p| {
+                p.get("id").cloned().unwrap_or_default()
+            })
+        },
+        fetch_crate_releases_for_issue_id,
+    );
+
+    view! {
+        <ul
+            role="list"
+            class="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
+        >
+            <Suspense fallback=move || {
+                view! { <p>"Loading (Suspense Fallback)..."</p> }
+            }>
+                {move || {
+                    crate_releases
+                        .get()
+                        .map(|data| match data {
+                            Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                            Ok(crate_releases) => {
+                                crate_releases
+                                    .iter()
+                                    .map(|crate_release| {
+                                        view! { <CrateReleaseLi crate_release=crate_release.clone()/> }
+                                    })
+                                    .collect_view()
+                            }
+                        })
+                }}
+
+            </Suspense>
+        </ul>
+    }
+}
+
+#[component]
+fn CrateReleaseLi(crate_release: CrateReleaseData) -> impl IntoView {
+    view! {
+        <li class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
+            <div class="flex min-w-0 gap-x-4">
+                <div class="min-w-0 flex-auto">
+                    <p class="text-sm font-semibold leading-6 text-gray-900">
+                        <a href=format!("/admin/crate_release/{}", crate_release.id)>
+                            <span class="absolute inset-x-0 -top-px bottom-0"></span>
+                            {crate_release.title}
+                        </a>
+                    </p>
+                    {crate_release
+                        .posted_date
+                        .map(|posted_date| {
+                            view! {
+                                <p class="mt-1 flex text-xs leading-5 text-gray-500">
+                                    <span>"posted at"</span>
+                                    <time datetime=posted_date.to_string() class="ml-1">
+                                        {posted_date.to_string()}
+                                    </time>
+                                </p>
+                            }
+                        })}
+
+                </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-x-4">
+                <div class="hidden sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm leading-6 text-gray-900">{crate_release.image_count} images</p>
+                // <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p>
+                </div>
+                <svg
+                    class="h-5 w-5 flex-none text-gray-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                        clip-rule="evenodd"
+                    ></path>
+                </svg>
+            </div>
+        </li>
+    }
+}
+
+#[cfg(feature = "ssr")]
+#[derive(Debug, sqlx::FromRow)]
+struct SqlCrateReleaseData {
+    id: Vec<u8>,
+    title: String,
+    posted_date: Option<time::Date>,
+    image_count: Option<i64>,
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct CrateReleaseData {
+    pub id: String,
+    pub title: String,
+    pub posted_date: Option<time::Date>,
+    pub image_count: u32,
+}
+
+#[cfg(feature = "ssr")]
+impl From<SqlCrateReleaseData> for CrateReleaseData {
+    fn from(value: SqlCrateReleaseData) -> Self {
+        let id_str =
+            rusty_ulid::Ulid::try_from(value.id.as_slice())
+                .expect(
+                    "expect valid ids from the database",
+                );
+        CrateReleaseData {
+            id: id_str.to_string(),
+            title: value.title,
+            posted_date: value.posted_date,
+            image_count: value
+                .image_count
+                .unwrap_or_default()
+                as u32,
+        }
+    }
+}
+
+#[server]
+pub async fn fetch_crate_releases_for_issue_id(
+    issue_id: String,
+) -> Result<Vec<CrateReleaseData>, ServerFnError> {
+    let pool = crate::sql::pool()?;
+    let _username = crate::sql::with_admin_access()?;
+
+    let issue_id: [u8; 16] = issue_id
+        .parse::<rusty_ulid::Ulid>()
+        .expect("a valid ulid to be returned from the form")
+        .into();
+
+    let crate_releases: Vec<SqlCrateReleaseData> = sqlx::query_as!(
+        SqlCrateReleaseData,
+        "SELECT
+        crate_release.id,
+        crate_release.title,
+        crate_release.posted_date,
+        si.image_count
+FROM issue__crate_release
+INNER JOIN crate_release
+  ON crate_release.id = issue__crate_release.crate_release_id
+LEFT JOIN (
+    SELECT crate_release__image.crate_release_id, COUNT(*) as image_count
+    FROM crate_release__image
+    GROUP BY crate_release__image.crate_release_id
+) AS si ON si.crate_release_id = crate_release.id
+WHERE issue__crate_release.issue_id = ?
+ORDER BY crate_release.posted_date",
+issue_id.as_slice()
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(crate_releases
+        .into_iter()
+        .map(CrateReleaseData::from)
         .collect())
 }

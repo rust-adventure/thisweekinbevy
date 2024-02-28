@@ -6,6 +6,7 @@ SELECT
     description,
     youtube_id,
     showcases as "showcases: Json<Vec<ShowcaseData2>>",
+    crate_releases as "crate_releases: Json<Vec<SqlCrateRelease>>",
     new_github_issues as "new_github_issues: Json<Vec<SqlNewGhIssue>>",
     new_pull_requests as "new_pull_requests: Json<Vec<SqlNewPr>>",
     merged_pull_requests as "merged_pull_requests: Json<Vec<SqlMergedPullRequest>>"
@@ -63,6 +64,58 @@ FROM
         GROUP BY
             issue_id
     ) AS s ON s.issue_id = issue.id
+    LEFT JOIN (
+        SELECT
+            issue_id,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    "title",
+                    crelease.title,
+                    "url",
+                    crelease.url,
+                    "discord_url",
+                    crelease.discord_url,
+                    "description",
+                    crelease.description,
+                    "images",
+                    crelease.images
+                )
+            ) AS crate_releases
+        FROM
+            issue__crate_release
+            LEFT JOIN (
+                SELECT
+                    id,
+                    title,
+                    url,
+                    description,
+                    discord_url,
+                    images
+                from
+                    crate_release
+                    LEFT JOIN (
+                        SELECT
+                            crate_release_id,
+                            JSON_ARRAYAGG(
+                                JSON_OBJECT(
+                                    "id",
+                                    TO_BASE64(image.id),
+                                    "description",
+                                    description,
+                                    "cloudinary_public_id",
+                                    cloudinary_public_id
+                                )
+                            ) AS images
+                        FROM
+                            crate_release__image
+                            LEFT JOIN image ON crate_release__image.image_id = image.id
+                        GROUP BY
+                            crate_release_id
+                    ) as i on i.crate_release_id = crate_release.id
+            ) as crelease ON crelease.id = issue__crate_release.crate_release_id
+        GROUP BY
+            issue_id
+    ) AS cr ON cr.issue_id = issue.id
     LEFT JOIN (
         SELECT
             issue_id,

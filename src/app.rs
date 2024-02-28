@@ -67,6 +67,7 @@ pub fn App() -> impl IntoView {
                         <Route path="/showcase" view=admin::showcase::Showcase/>
                         <Route path="/showcase/:id" view=admin::showcase::id::Showcase/>
                         <Route path="/crate_release" view=admin::crate_release::CrateRelease/>
+                        <Route path="/crate_release/:id" view=admin::crate_release::id::CrateRelease/>
                         <Route path="/devlog" view=admin::devlog::Devlog/>
                         <Route path="/educational" view=admin::educational::Educational/>
                         <Route path="/images" view=admin::image::Image/>

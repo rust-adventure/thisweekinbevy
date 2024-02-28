@@ -97,11 +97,11 @@ CREATE TABLE IF NOT EXISTS image(
 );
 
 CREATE TABLE IF NOT EXISTS crate_release__image(
-    issue_id VARBINARY(16) NOT NULL,
+    crate_release_id VARBINARY(16) NOT NULL,
     image_id VARBINARY(16) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE now(),
-    PRIMARY KEY (issue_id, image_id)
+    PRIMARY KEY (crate_release_id, image_id)
 );
 
 CREATE TABLE IF NOT EXISTS showcase(

@@ -28,7 +28,7 @@ pub struct Issue {
     /// Crates that have been released in the last
     /// week. This includes updates and new
     /// releases
-    crates: Vec<CrateRelease>,
+    crate_releases: Vec<CrateRelease>,
     /// merged pull requests
     /// Meant to convey what is being added to
     /// Bevy
@@ -118,9 +118,25 @@ struct SqlNewPr {
 #[derive(Clone, Serialize, Deserialize)]
 struct CrateRelease {
     title: String,
-    description: String,
     url: String,
-    images: Vec<String>,
+    discord_url: String,
+    description: String,
+    images: Vec<ImgDataTransformed>,
+}
+
+#[cfg(feature = "ssr")]
+#[derive(
+    Debug,
+    serde::Deserialize,
+    serde::Serialize,
+    sqlx::FromRow,
+)]
+struct SqlCrateRelease {
+    title: String,
+    url: String,
+    discord_url: String,
+    description: String,
+    images: Option<Vec<ImgData>>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -179,6 +195,8 @@ struct SqlShowcaseData {
     youtube_id: String,
     showcases:
         Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
+    crate_releases:
+        Option<sqlx::types::Json<Vec<SqlCrateRelease>>>,
     new_github_issues:
         Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
     new_pull_requests:
@@ -275,6 +293,34 @@ async fn fetch_issue(
     }
 }).collect::<Vec<Showcase>>();
 
+let crate_releases = issue.crate_releases
+.map(|json| json.0)
+.unwrap_or_default()
+.into_iter().map(|value| {
+    CrateRelease {
+        title: value.title,
+        url: value.url,
+        discord_url: value.discord_url,
+        description: compile(&value.description),
+        images: value.images.unwrap_or_default().into_iter()
+        .map(|img_data| {
+            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
+            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
+            .expect(
+                "expect valid ids from the database",
+            );
+            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
+                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
+            ImgDataTransformed {
+                id: img_ulid.to_string(),
+                description: img_data.description,
+                url: image.to_string()
+            }
+        })
+        .collect()
+    }
+}).collect::<Vec<CrateRelease>>();
+
 let new_github_issues = issue.new_github_issues
 .map(|json| json.0)
 .unwrap_or_default()
@@ -331,7 +377,7 @@ author_url
         issue_date: issue.issue_date,
         description: compile(&issue.description),
         showcases,
-        crates: vec![],
+        crate_releases: crate_releases,
         merged_pull_requests,
         contributors: vec![],
         educational: vec![],
@@ -416,19 +462,16 @@ pub fn Issue() -> impl IntoView {
                                 <Divider title="Crates"/>
 
                                 {issue
-                                    .crates
-                                    .iter()
+                                    .crate_releases
+                                    .into_iter()
                                     .map(|crate_release| {
                                         view! {
-                                            <CrateRelease
-                                                title=&crate_release.title
-                                                description=&crate_release.description
-                                                url=&crate_release.url
-                                                images=crate_release.images.clone()
+                                            <CrateReleaseView
+                                                crate_release=crate_release
                                             />
                                         }
                                     })
-                                    .collect::<Vec<_>>()}
+                                    .collect_view()}
 
                                 <Divider title="Devlogs"/>
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">Devlogs</h2>
@@ -633,44 +676,40 @@ fn ActivityListComment(
 
 #[component]
 #[allow(dead_code)]
-fn CrateRelease(
-    #[prop(into)] title: String,
-    #[prop(into)] description: String,
-    #[prop(into)] url: String,
-    #[prop(default=vec![])] images: Vec<String>,
+fn CrateReleaseView(
+    crate_release: CrateRelease
 ) -> impl IntoView {
-    dbg!(url);
     view! {
-        <h3 class="mt-2 text-xl font-bold text-slate-900">{title}</h3>
+        <h3 class="mt-2 text-xl font-bold text-slate-900">{crate_release.title}</h3>
         <ul
             role="list"
             class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
         >
 
-            {images
+            {crate_release.images
                 .iter()
                 .map(|image| {
                     view! {
                         <li class="relative">
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                 <img
-                                    src=image
-                                    alt=""
+                                    src=&image.url
+                                    alt=&image.description
                                     class="pointer-events-none object-cover group-hover:opacity-75"
                                 />
                                 <button type="button" class="absolute inset-0 focus:outline-none">
-                                    <span class="sr-only">View details for IMG_4985</span>
+                                    <span class="sr-only">View details</span>
                                 </button>
                             </div>
                         </li>
                     }
                 })
-                .collect::<Vec<_>>()}
+                .collect_view()}
 
         </ul>
         <div
             class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
-            inner_html=description
+            inner_html=crate_release.description
         ></div>
     }
 }
