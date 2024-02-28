@@ -23,7 +23,8 @@ async fn update_educational(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid educational id".to_string(),
+                "expected a valid educational id"
+                    .to_string(),
             )
         })?
         .into();
@@ -414,7 +415,8 @@ async fn associate_image_with_educational(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid educational id".to_string(),
+                "expected a valid educational id"
+                    .to_string(),
             )
         })?
         .into();
@@ -458,7 +460,8 @@ async fn remove_image_from_educational(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid educational id".to_string(),
+                "expected a valid educational id"
+                    .to_string(),
             )
         })?
         .into();
@@ -534,7 +537,8 @@ fn EducationalImageLi(
     url: String,
 ) -> impl IntoView {
     let remove_image_from_educational =
-        create_server_action::<RemoveImageFromEducational>();
+        create_server_action::<RemoveImageFromEducational>(
+        );
 
     view! {
         <li class="relative">
@@ -574,7 +578,8 @@ fn ImageLi(
     description: String,
 ) -> impl IntoView {
     let associate_image_with_educational =
-        create_server_action::<AssociateImageWithEducational>();
+        create_server_action::<AssociateImageWithEducational>(
+        );
 
     view! {
         <li class="relative">

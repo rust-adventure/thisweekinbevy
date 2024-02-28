@@ -798,7 +798,6 @@ ORDER BY devlog.posted_date",
     Ok(devlogs.into_iter().map(DevlogData::from).collect())
 }
 
-
 // educationals
 
 #[component]
@@ -844,7 +843,9 @@ fn Educationals() -> impl IntoView {
 }
 
 #[component]
-fn EducationalLi(educational: EducationalData) -> impl IntoView {
+fn EducationalLi(
+    educational: EducationalData,
+) -> impl IntoView {
     view! {
         <li class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
             <div class="flex min-w-0 gap-x-4">
@@ -963,5 +964,8 @@ ORDER BY educational.posted_date",
     .fetch_all(&pool)
     .await?;
 
-    Ok(educationals.into_iter().map(EducationalData::from).collect())
+    Ok(educationals
+        .into_iter()
+        .map(EducationalData::from)
+        .collect())
 }

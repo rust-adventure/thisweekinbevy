@@ -42,7 +42,8 @@ async fn add_educational(
 
 #[component]
 pub fn Educational() -> impl IntoView {
-    let add_educational = create_server_action::<AddEducational>();
+    let add_educational =
+        create_server_action::<AddEducational>();
     let educationals = create_resource(
         move || {},
         |_| join(fetch_educationals(), fetch_issues()),
@@ -187,7 +188,8 @@ fn AddEducationalToIssueForm(
     issue_id: Option<String>,
 ) -> impl IntoView {
     let associate_educational_with_issue =
-        create_server_action::<AssociateEducationalWithIssue>();
+        create_server_action::<AssociateEducationalWithIssue>(
+        );
 
     view! {
         <li class="flex items-center justify-between gap-x-6 py-5">
@@ -271,9 +273,10 @@ pub async fn fetch_educationals(
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
-    let educationals: Vec<SqlEducationalData> = sqlx::query_as!(
-        SqlEducationalData,
-        "SELECT
+    let educationals: Vec<SqlEducationalData> =
+        sqlx::query_as!(
+            SqlEducationalData,
+            "SELECT
         id,
         title,
         posted_date
@@ -282,11 +285,14 @@ LEFT JOIN issue__educational
   ON educational.id = issue__educational.educational_id
 WHERE issue__educational.issue_id IS NULL
 ORDER BY educational.id"
-    )
-    .fetch_all(&pool)
-    .await?;
+        )
+        .fetch_all(&pool)
+        .await?;
 
-    Ok(educationals.into_iter().map(EducationalData::from).collect())
+    Ok(educationals
+        .into_iter()
+        .map(EducationalData::from)
+        .collect())
 }
 
 #[server]

@@ -168,7 +168,6 @@ struct SqlDevlog {
     images: Option<Vec<ImgData>>,
 }
 
-
 #[derive(Clone, Serialize, Deserialize)]
 struct Educational {
     title: String,
@@ -245,9 +244,10 @@ struct SqlShowcaseData {
         Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
     crate_releases:
         Option<sqlx::types::Json<Vec<SqlCrateRelease>>>,
-        devlogs: Option<sqlx::types::Json<Vec<SqlDevlog>>>,
-        educationals: Option<sqlx::types::Json<Vec<SqlEducational>>>,
-        new_github_issues:
+    devlogs: Option<sqlx::types::Json<Vec<SqlDevlog>>>,
+    educationals:
+        Option<sqlx::types::Json<Vec<SqlEducational>>>,
+    new_github_issues:
         Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
     new_pull_requests:
         Option<sqlx::types::Json<Vec<SqlNewPr>>>,
@@ -909,9 +909,10 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
     }
 }
 
-
 #[component]
-fn EducationalView(educational: Educational) -> impl IntoView {
+fn EducationalView(
+    educational: Educational,
+) -> impl IntoView {
     let mut it = educational.images.iter();
     let first_image = it.next();
     view! {
