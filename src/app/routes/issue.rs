@@ -35,7 +35,7 @@ pub struct Issue {
     merged_pull_requests: Vec<MergedPullRequest>,
     /// educational resources published this week.
     /// videos and blog posts
-    educational: Vec<Educational>,
+    educationals: Vec<Educational>,
     /// devlogs published this week.
     /// videos and blog posts
     devlogs: Vec<Devlog>,
@@ -168,12 +168,31 @@ struct SqlDevlog {
     images: Option<Vec<ImgData>>,
 }
 
+
 #[derive(Clone, Serialize, Deserialize)]
 struct Educational {
     title: String,
+    post_url: String,
+    video_url: String,
+    discord_url: String,
     description: String,
-    url: String,
-    images: Vec<String>,
+    images: Vec<ImgDataTransformed>,
+}
+
+#[cfg(feature = "ssr")]
+#[derive(
+    Debug,
+    serde::Deserialize,
+    serde::Serialize,
+    sqlx::FromRow,
+)]
+struct SqlEducational {
+    title: String,
+    post_url: String,
+    video_url: String,
+    discord_url: String,
+    description: String,
+    images: Option<Vec<ImgData>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -226,8 +245,9 @@ struct SqlShowcaseData {
         Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
     crate_releases:
         Option<sqlx::types::Json<Vec<SqlCrateRelease>>>,
-    devlogs: Option<sqlx::types::Json<Vec<SqlDevlog>>>,
-    new_github_issues:
+        devlogs: Option<sqlx::types::Json<Vec<SqlDevlog>>>,
+        educationals: Option<sqlx::types::Json<Vec<SqlEducational>>>,
+        new_github_issues:
         Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
     new_pull_requests:
         Option<sqlx::types::Json<Vec<SqlNewPr>>>,
@@ -380,6 +400,35 @@ let devlogs = issue.devlogs
     }
 }).collect::<Vec<Devlog>>();
 
+let educationals = issue.educationals
+.map(|json| json.0)
+.unwrap_or_default()
+.into_iter().map(|value| {
+    Educational {
+        title: value.title,
+        post_url: value.post_url,
+        video_url: value.video_url,
+        discord_url: value.discord_url,
+        description: compile(&value.description),
+        images: value.images.unwrap_or_default().into_iter()
+        .map(|img_data| {
+            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
+            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
+            .expect(
+                "expect valid ids from the database",
+            );
+            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
+                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
+            ImgDataTransformed {
+                id: img_ulid.to_string(),
+                description: img_data.description,
+                url: image.to_string()
+            }
+        })
+        .collect()
+    }
+}).collect::<Vec<Educational>>();
+
 let new_github_issues = issue.new_github_issues
 .map(|json| json.0)
 .unwrap_or_default()
@@ -440,7 +489,7 @@ author_url
         devlogs,
         merged_pull_requests,
         contributors: vec![],
-        educational: vec![],
+        educationals,
         new_pull_requests,
         new_github_issues,
         }
@@ -540,6 +589,13 @@ pub fn Issue() -> impl IntoView {
                                     .collect_view()}
 
                                 <Divider title="Educational"/>
+                                {issue
+                                    .educationals
+                                    .into_iter()
+                                    .map(|educational| {
+                                        view! { <EducationalView educational=educational/> }
+                                    })
+                                    .collect_view()}
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">Education</h2>
                                 // <Divider title="Fixes and Features"/>
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">
@@ -827,16 +883,19 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
 
                 {devlog
                     .post_url
+                    .trim()
                     .is_empty()
                     .not()
                     .then_some(view! { <PostLink url=devlog.post_url/> })}
                 {devlog
                     .video_url
+                    .trim()
                     .is_empty()
                     .not()
                     .then_some(view! { <VideoLink url=devlog.video_url/> })}
                 {devlog
                     .discord_url
+                    .trim()
                     .is_empty()
                     .not()
                     .then_some(view! { <DiscordLink discord_url=devlog.discord_url/> })}
@@ -846,6 +905,82 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
         <div
             class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
             inner_html=devlog.description
+        ></div>
+    }
+}
+
+
+#[component]
+fn EducationalView(educational: Educational) -> impl IntoView {
+    let mut it = educational.images.iter();
+    let first_image = it.next();
+    view! {
+        {first_image
+            .map(|image| {
+                view! {
+                    <a href=&educational.post_url>
+                        <img
+                            class="mt-12 w-full rounded-t-md"
+                            src=&image.url
+                            alt=&image.description
+                        />
+                    </a>
+                }
+            })}
+
+        <ul
+            role="list"
+            class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+        >
+
+            {it
+                .map(|image| {
+                    view! {
+                        <li class="relative">
+                            <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                                <img
+                                    src=&image.url
+                                    alt=&image.description
+                                    class="pointer-events-none object-cover group-hover:opacity-75"
+                                />
+                                <button type="button" class="absolute inset-0 focus:outline-none">
+                                    <span class="sr-only">View details</span>
+                                </button>
+                            </div>
+                        </li>
+                    }
+                })
+                .collect_view()}
+
+        </ul>
+        <div class="flex justify-between">
+            <h3 class="mt-2 text-xl font-bold text-slate-900">{educational.title}</h3>
+            <div class="flex space-x-4">
+
+                {educational
+                    .post_url
+                    .trim()
+                    .is_empty()
+                    .not()
+                    .then_some(view! { <PostLink url=educational.post_url/> })}
+                {educational
+                    .video_url
+                    .trim()
+                    .is_empty()
+                    .not()
+                    .then_some(view! { <VideoLink url=educational.video_url/> })}
+                {educational
+                    .discord_url
+                    .trim()
+                    .is_empty()
+                    .not()
+                    .then_some(view! { <DiscordLink discord_url=educational.discord_url/> })}
+
+            </div>
+        </div>
+        <div
+            class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+            inner_html=educational.description
         ></div>
     }
 }
@@ -894,6 +1029,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
 
             {showcase
                 .discord_url
+                .trim()
                 .is_empty()
                 .not()
                 .then_some(view! { <DiscordLink discord_url=showcase.discord_url/> })}
@@ -1118,6 +1254,7 @@ fn CalloutInfo(
                 <div class="ml-3">
 
                     {title
+                        .trim()
                         .is_empty()
                         .not()
                         .then_some(

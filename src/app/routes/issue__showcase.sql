@@ -8,6 +8,7 @@ SELECT
     showcases as "showcases: Json<Vec<ShowcaseData2>>",
     crate_releases as "crate_releases: Json<Vec<SqlCrateRelease>>",
     devlogs as "devlogs: Json<Vec<SqlDevlog>>",
+    educationals as "educationals: Json<Vec<SqlEducational>>",
     new_github_issues as "new_github_issues: Json<Vec<SqlNewGhIssue>>",
     new_pull_requests as "new_pull_requests: Json<Vec<SqlNewPr>>",
     merged_pull_requests as "merged_pull_requests: Json<Vec<SqlMergedPullRequest>>"
@@ -172,6 +173,61 @@ FROM
         GROUP BY
             issue_id
     ) AS d ON d.issue_id = issue.id
+    LEFT JOIN (
+        SELECT
+            issue_id,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    "title",
+                    edu.title,
+                    "post_url",
+                    edu.post_url,
+                    "video_url",
+                    edu.video_url,
+                    "discord_url",
+                    edu.discord_url,
+                    "description",
+                    edu.description,
+                    "images",
+                    edu.images
+                )
+            ) AS educationals
+        FROM
+            issue__educational
+            LEFT JOIN (
+                SELECT
+                    id,
+                    title,
+                    post_url,
+                    video_url,
+                    description,
+                    discord_url,
+                    images
+                from
+                    educational
+                    LEFT JOIN (
+                        SELECT
+                            educational_id,
+                            JSON_ARRAYAGG(
+                                JSON_OBJECT(
+                                    "id",
+                                    TO_BASE64(image.id),
+                                    "description",
+                                    description,
+                                    "cloudinary_public_id",
+                                    cloudinary_public_id
+                                )
+                            ) AS images
+                        FROM
+                            educational__image
+                            LEFT JOIN image ON educational__image.image_id = image.id
+                        GROUP BY
+                            educational_id
+                    ) as i on i.educational_id = educational.id
+            ) as edu ON edu.id = issue__educational.educational_id
+        GROUP BY
+            issue_id
+    ) AS e ON e.issue_id = issue.id
     LEFT JOIN (
         SELECT
             issue_id,
