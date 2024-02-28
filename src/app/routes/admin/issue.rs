@@ -631,7 +631,6 @@ issue_id.as_slice()
 
 // devlogs
 
-
 #[component]
 fn Devlogs() -> impl IntoView {
     let params = use_params_map();
@@ -675,9 +674,7 @@ fn Devlogs() -> impl IntoView {
 }
 
 #[component]
-fn DevlogLi(
-    devlog: DevlogData,
-) -> impl IntoView {
+fn DevlogLi(devlog: DevlogData) -> impl IntoView {
     view! {
         <li class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
             <div class="flex min-w-0 gap-x-4">
@@ -791,13 +788,10 @@ LEFT JOIN (
 ) AS si ON si.devlog_id = devlog.id
 WHERE issue__devlog.issue_id = ?
 ORDER BY devlog.posted_date",
-issue_id.as_slice()
+        issue_id.as_slice()
     )
     .fetch_all(&pool)
     .await?;
 
-    Ok(devlogs
-        .into_iter()
-        .map(DevlogData::from)
-        .collect())
+    Ok(devlogs.into_iter().map(DevlogData::from).collect())
 }

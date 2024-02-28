@@ -42,8 +42,7 @@ async fn add_devlog(
 
 #[component]
 pub fn Devlog() -> impl IntoView {
-    let add_devlog =
-        create_server_action::<AddDevlog>();
+    let add_devlog = create_server_action::<AddDevlog>();
     let devlogs = create_resource(
         move || {},
         |_| join(fetch_devlogs(), fetch_issues()),
@@ -188,9 +187,7 @@ fn AddDevlogToIssueForm(
     issue_id: Option<String>,
 ) -> impl IntoView {
     let associate_devlog_with_issue =
-        create_server_action::<
-            AssociateDevlogWithIssue,
-        >();
+        create_server_action::<AssociateDevlogWithIssue>();
 
     view! {
         <li class="flex items-center justify-between gap-x-6 py-5">
@@ -287,10 +284,7 @@ ORDER BY devlog.id"
     .fetch_all(&pool)
     .await?;
 
-    Ok(devlogs
-        .into_iter()
-        .map(DevlogData::from)
-        .collect())
+    Ok(devlogs.into_iter().map(DevlogData::from).collect())
 }
 
 #[server]

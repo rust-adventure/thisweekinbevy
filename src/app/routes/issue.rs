@@ -142,7 +142,6 @@ struct SqlCrateRelease {
     images: Option<Vec<ImgData>>,
 }
 
-
 #[derive(Clone, Serialize, Deserialize)]
 struct Devlog {
     title: String,
@@ -227,8 +226,7 @@ struct SqlShowcaseData {
         Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
     crate_releases:
         Option<sqlx::types::Json<Vec<SqlCrateRelease>>>,
-    devlogs:
-        Option<sqlx::types::Json<Vec<SqlDevlog>>>,
+    devlogs: Option<sqlx::types::Json<Vec<SqlDevlog>>>,
     new_github_issues:
         Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
     new_pull_requests:
@@ -781,9 +779,7 @@ fn CrateReleaseView(
 }
 
 #[component]
-fn DevlogView(
-    devlog: Devlog,
-) -> impl IntoView {
+fn DevlogView(devlog: Devlog) -> impl IntoView {
     let mut it = devlog.images.iter();
     let first_image = it.next();
     view! {
@@ -959,7 +955,6 @@ fn VideoLink(url: String) -> impl IntoView {
         </a>
     }
 }
-
 
 #[component]
 fn PostLink(url: String) -> impl IntoView {

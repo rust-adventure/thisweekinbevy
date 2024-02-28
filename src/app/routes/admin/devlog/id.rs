@@ -23,8 +23,7 @@ async fn update_devlog(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid devlog id"
-                    .to_string(),
+                "expected a valid devlog id".to_string(),
             )
         })?
         .into();
@@ -415,8 +414,7 @@ async fn associate_image_with_devlog(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid devlog id"
-                    .to_string(),
+                "expected a valid devlog id".to_string(),
             )
         })?
         .into();
@@ -460,8 +458,7 @@ async fn remove_image_from_devlog(
         .parse::<rusty_ulid::Ulid>()
         .map_err(|_| {
             ServerFnError::<NoCustomError>::ServerError(
-                "expected a valid devlog id"
-                    .to_string(),
+                "expected a valid devlog id".to_string(),
             )
         })?
         .into();
@@ -537,8 +534,7 @@ fn DevlogImageLi(
     url: String,
 ) -> impl IntoView {
     let remove_image_from_devlog =
-        create_server_action::<RemoveImageFromDevlog>(
-        );
+        create_server_action::<RemoveImageFromDevlog>();
 
     view! {
         <li class="relative">
@@ -578,9 +574,7 @@ fn ImageLi(
     description: String,
 ) -> impl IntoView {
     let associate_image_with_devlog =
-        create_server_action::<
-            AssociateImageWithDevlog,
-        >();
+        create_server_action::<AssociateImageWithDevlog>();
 
     view! {
         <li class="relative">
