@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO devlog ( id, title, video_url, post_url, discord_url, posted_date, description, submitted_by )\n    VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "5fa0bf25cd9bb4c7244b287a9a6daf5ab73100f70f45a840a7a5bbedfbd7b132"
+}

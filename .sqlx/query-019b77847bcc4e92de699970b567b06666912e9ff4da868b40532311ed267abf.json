@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO devlog__image ( image_id, devlog_id )\n    VALUES ( ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "019b77847bcc4e92de699970b567b06666912e9ff4da868b40532311ed267abf"
+}

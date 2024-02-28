@@ -36,6 +36,9 @@ pub struct Issue {
     /// educational resources published this week.
     /// videos and blog posts
     educational: Vec<Educational>,
+    /// devlogs published this week.
+    /// videos and blog posts
+    devlogs: Vec<Devlog>,
     /// newsletter contributors
     /// (not a list of people that contribute to
     /// the bevy repo itself, that exists in the
@@ -139,6 +142,33 @@ struct SqlCrateRelease {
     images: Option<Vec<ImgData>>,
 }
 
+
+#[derive(Clone, Serialize, Deserialize)]
+struct Devlog {
+    title: String,
+    post_url: String,
+    video_url: String,
+    discord_url: String,
+    description: String,
+    images: Vec<ImgDataTransformed>,
+}
+
+#[cfg(feature = "ssr")]
+#[derive(
+    Debug,
+    serde::Deserialize,
+    serde::Serialize,
+    sqlx::FromRow,
+)]
+struct SqlDevlog {
+    title: String,
+    post_url: String,
+    video_url: String,
+    discord_url: String,
+    description: String,
+    images: Option<Vec<ImgData>>,
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 struct Educational {
     title: String,
@@ -197,6 +227,8 @@ struct SqlShowcaseData {
         Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
     crate_releases:
         Option<sqlx::types::Json<Vec<SqlCrateRelease>>>,
+    devlogs:
+        Option<sqlx::types::Json<Vec<SqlDevlog>>>,
     new_github_issues:
         Option<sqlx::types::Json<Vec<SqlNewGhIssue>>>,
     new_pull_requests:
@@ -321,6 +353,35 @@ let crate_releases = issue.crate_releases
     }
 }).collect::<Vec<CrateRelease>>();
 
+let devlogs = issue.devlogs
+.map(|json| json.0)
+.unwrap_or_default()
+.into_iter().map(|value| {
+    Devlog {
+        title: value.title,
+        post_url: value.post_url,
+        video_url: value.video_url,
+        discord_url: value.discord_url,
+        description: compile(&value.description),
+        images: value.images.unwrap_or_default().into_iter()
+        .map(|img_data| {
+            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
+            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
+            .expect(
+                "expect valid ids from the database",
+            );
+            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
+                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
+            ImgDataTransformed {
+                id: img_ulid.to_string(),
+                description: img_data.description,
+                url: image.to_string()
+            }
+        })
+        .collect()
+    }
+}).collect::<Vec<Devlog>>();
+
 let new_github_issues = issue.new_github_issues
 .map(|json| json.0)
 .unwrap_or_default()
@@ -378,6 +439,7 @@ author_url
         description: compile(&issue.description),
         showcases,
         crate_releases,
+        devlogs,
         merged_pull_requests,
         contributors: vec![],
         educational: vec![],
@@ -471,6 +533,14 @@ pub fn Issue() -> impl IntoView {
 
                                 <Divider title="Devlogs"/>
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">Devlogs</h2>
+                                {issue
+                                    .devlogs
+                                    .into_iter()
+                                    .map(|devlog| {
+                                        view! { <DevlogView devlog=devlog/> }
+                                    })
+                                    .collect_view()}
+
                                 <Divider title="Educational"/>
                                 // <h2 class="mt-2 text-2xl font-bold text-slate-900">Education</h2>
                                 // <Divider title="Fixes and Features"/>
@@ -671,12 +741,10 @@ fn ActivityListComment(
 }
 
 #[component]
-#[allow(dead_code)]
 fn CrateReleaseView(
     crate_release: CrateRelease,
 ) -> impl IntoView {
     view! {
-        <h3 class="mt-2 text-xl font-bold text-slate-900">{crate_release.title}</h3>
         <ul
             role="list"
             class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
@@ -704,9 +772,96 @@ fn CrateReleaseView(
                 .collect_view()}
 
         </ul>
+        <h3 class="mt-2 text-xl font-bold text-slate-900">{crate_release.title}</h3>
         <div
             class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
             inner_html=crate_release.description
+        ></div>
+    }
+}
+
+#[component]
+fn DevlogView(
+    devlog: Devlog,
+) -> impl IntoView {
+    let mut it = devlog.images.iter();
+    let first_image = it.next();
+    view! {
+        {first_image
+            .map(|image| {
+                view! {
+                    <a
+                      href=&devlog.post_url
+                    >
+                        <img class="mt-12 w-full rounded-t-md" src=&image.url alt=&image.description/>
+                    </a>
+                }
+        })}
+        <ul
+            role="list"
+            class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+        >
+
+            {it.map(|image| {
+                    view! {
+                        <li class="relative">
+                            <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                                <img
+                                    src=&image.url
+                                    alt=&image.description
+                                    class="pointer-events-none object-cover group-hover:opacity-75"
+                                />
+                                <button type="button" class="absolute inset-0 focus:outline-none">
+                                    <span class="sr-only">View details</span>
+                                </button>
+                            </div>
+                        </li>
+                    }
+                })
+                .collect_view()}
+
+        </ul>
+        <div class="flex justify-between">
+            <h3 class="mt-2 text-xl font-bold text-slate-900">{devlog.title}</h3>
+            <div class="flex space-x-4">
+            {
+                devlog
+                    .post_url
+                    .is_empty()
+                    .not()
+                    .then_some(
+                        view! {
+                            <PostLink url=devlog.post_url/>
+                        },
+                    )
+            }
+            {
+                devlog
+                    .video_url
+                    .is_empty()
+                    .not()
+                    .then_some(
+                        view! {
+                            <VideoLink url=devlog.video_url/>
+                        },
+                    )
+            }
+            {
+                devlog
+                    .discord_url
+                    .is_empty()
+                    .not()
+                    .then_some(
+                        view! {
+                            <DiscordLink discord_url=devlog.discord_url/>
+                        },
+                    )
+            }
+            </div>
+        </div>
+        <div
+            class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+            inner_html=devlog.description
         ></div>
     }
 }
@@ -750,42 +905,80 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
                 .collect::<Vec<_>>()}
 
         </ul>
-        <div class="flex">
+        <div class="flex justify-between">
             <h3 class="mt-2 text-xl font-bold text-slate-900">{showcase.title}</h3>
-            {showcase
-                .discord_url
-                .is_empty()
-                .not()
-                .then_some(
-                    view! {
-                        <a
-                            href=&showcase.discord_url
-                            class="text-indigo-700 hover:text-indigo-400 flex items-end ml-4"
-                        >
-                            <span>discord</span>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                                class="w-6 h-6"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
-                                ></path>
-                            </svg>
-                        </a>
-                    },
-                )}
-
+            {
+                showcase
+                    .discord_url
+                    .is_empty()
+                    .not()
+                    .then_some(
+                        view! {
+                            <DiscordLink discord_url=showcase.discord_url/>
+                        },
+                    )
+            }
         </div>
         <div
             class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
             inner_html=showcase.description
         ></div>
+    }
+}
+
+#[component]
+fn DiscordLink(discord_url: String) -> impl IntoView {
+    view! {
+        <a
+            href=&discord_url
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+            Discord
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
+                ></path>
+            </svg>
+        </a>
+    }
+}
+
+#[component]
+fn VideoLink(url: String) -> impl IntoView {
+    view! {
+        <a
+            href=&url
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+Video
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clip-rule="evenodd" />
+</svg>
+        </a>
+    }
+}
+
+
+#[component]
+fn PostLink(url: String) -> impl IntoView {
+    view! {
+        <a
+            href=&url
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+Post
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+</svg>
+
+        </a>
     }
 }
 

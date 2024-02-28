@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    DELETE FROM devlog__image\n    WHERE image_id = ?\n    AND devlog_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "b3b5f16a0f9bbbf3760f10fa3c29550e6a5bfa7c4288244edd5bebefb6fbb498"
+}

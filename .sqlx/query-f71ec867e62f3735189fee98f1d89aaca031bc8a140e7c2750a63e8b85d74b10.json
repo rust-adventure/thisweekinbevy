@@ -1,0 +1,58 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n        devlog.id,\n        devlog.title,\n        devlog.posted_date,\n        si.image_count\nFROM issue__devlog\nINNER JOIN devlog\n  ON devlog.id = issue__devlog.devlog_id\nLEFT JOIN (\n    SELECT devlog__image.devlog_id, COUNT(*) as image_count\n    FROM devlog__image\n    GROUP BY devlog__image.devlog_id\n) AS si ON si.devlog_id = devlog.id\nWHERE issue__devlog.issue_id = ?\nORDER BY devlog.posted_date",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "posted_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "BINARY",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "image_count",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NUM",
+          "char_set": 63,
+          "max_size": 21
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "f71ec867e62f3735189fee98f1d89aaca031bc8a140e7c2750a63e8b85d74b10"
+}

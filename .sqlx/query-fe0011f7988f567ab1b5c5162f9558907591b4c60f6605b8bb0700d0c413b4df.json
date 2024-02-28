@@ -1,0 +1,102 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    id,\n    title,\n    video_url,\n    post_url,\n    posted_date,\n    discord_url,\n    description,\n    images\nfrom\n    devlog\n    LEFT JOIN (\n        SELECT\n            devlog_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"id\",\n                    TO_BASE64(image.id),\n                    \"cloudinary_public_id\",\n                    cloudinary_public_id\n                )\n            ) AS images\n        FROM\n            devlog__image\n            LEFT JOIN image ON devlog__image.image_id = image.id\n        GROUP BY\n            devlog_id\n    ) as i on i.devlog_id = devlog.id\nWHERE devlog.id = ?",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "video_url",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "post_url",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "posted_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "BINARY",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "discord_url",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 20000
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "images",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "fe0011f7988f567ab1b5c5162f9558907591b4c60f6605b8bb0700d0c413b4df"
+}

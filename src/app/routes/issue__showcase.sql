@@ -7,6 +7,7 @@ SELECT
     youtube_id,
     showcases as "showcases: Json<Vec<ShowcaseData2>>",
     crate_releases as "crate_releases: Json<Vec<SqlCrateRelease>>",
+    devlogs as "devlogs: Json<Vec<SqlDevlog>>",
     new_github_issues as "new_github_issues: Json<Vec<SqlNewGhIssue>>",
     new_pull_requests as "new_pull_requests: Json<Vec<SqlNewPr>>",
     merged_pull_requests as "merged_pull_requests: Json<Vec<SqlMergedPullRequest>>"
@@ -116,6 +117,61 @@ FROM
         GROUP BY
             issue_id
     ) AS cr ON cr.issue_id = issue.id
+    LEFT JOIN (
+        SELECT
+            issue_id,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    "title",
+                    dlog.title,
+                    "post_url",
+                    dlog.post_url,
+                    "video_url",
+                    dlog.video_url,
+                    "discord_url",
+                    dlog.discord_url,
+                    "description",
+                    dlog.description,
+                    "images",
+                    dlog.images
+                )
+            ) AS devlogs
+        FROM
+            issue__devlog
+            LEFT JOIN (
+                SELECT
+                    id,
+                    title,
+                    post_url,
+                    video_url,
+                    description,
+                    discord_url,
+                    images
+                from
+                    devlog
+                    LEFT JOIN (
+                        SELECT
+                            devlog_id,
+                            JSON_ARRAYAGG(
+                                JSON_OBJECT(
+                                    "id",
+                                    TO_BASE64(image.id),
+                                    "description",
+                                    description,
+                                    "cloudinary_public_id",
+                                    cloudinary_public_id
+                                )
+                            ) AS images
+                        FROM
+                            devlog__image
+                            LEFT JOIN image ON devlog__image.image_id = image.id
+                        GROUP BY
+                            devlog_id
+                    ) as i on i.devlog_id = devlog.id
+            ) as dlog ON dlog.id = issue__devlog.devlog_id
+        GROUP BY
+            issue_id
+    ) AS d ON d.issue_id = issue.id
     LEFT JOIN (
         SELECT
             issue_id,

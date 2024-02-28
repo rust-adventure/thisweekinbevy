@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO issue__devlog ( issue_id, devlog_id )\n    VALUES ( ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "01136abb22f93c57ed38b1cb2ae242ca64355765b081dc11a118cbed3e467b3b"
+}
