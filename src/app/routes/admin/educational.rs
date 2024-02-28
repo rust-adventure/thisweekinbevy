@@ -202,7 +202,9 @@ fn AddEducationalToIssueForm(
                             .posted_date
                             .as_ref()
                             .unwrap()
-                            .to_string()>{educational.posted_date.as_ref().unwrap().to_string()}</time>
+                            .to_string()>
+                            {educational.posted_date.as_ref().unwrap().to_string()}
+                        </time>
                     </p>
                     <svg viewBox="0 0 2 2" class="h-0.5 w-0.5 fill-current">
                         <circle cx="1" cy="1" r="1"></circle>
