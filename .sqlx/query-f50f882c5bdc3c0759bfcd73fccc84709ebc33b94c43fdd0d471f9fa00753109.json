@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO issue__educational ( issue_id, educational_id )\n    VALUES ( ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "f50f882c5bdc3c0759bfcd73fccc84709ebc33b94c43fdd0d471f9fa00753109"
+}

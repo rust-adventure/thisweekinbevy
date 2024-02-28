@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    INSERT INTO educational ( id, title, video_url, post_url, discord_url, posted_date, description, submitted_by )\n    VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "0942f282362ecbe774701c1f8f8719157b7b43af6c976230a1312a6b05de2cf0"
+}

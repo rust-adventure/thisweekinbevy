@@ -1,0 +1,47 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n        id,\n        title,\n        posted_date\nFROM educational\nLEFT JOIN issue__educational\n  ON educational.id = issue__educational.educational_id\nWHERE issue__educational.issue_id IS NULL\nORDER BY educational.id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "posted_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "BINARY",
+          "char_set": 63,
+          "max_size": 10
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "2b4a67b64e58ce2198f6eb60de9847d4504700aa6a03b1600481c7b26617e454"
+}

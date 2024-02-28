@@ -1,0 +1,58 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n        educational.id,\n        educational.title,\n        educational.posted_date,\n        si.image_count\nFROM issue__educational\nINNER JOIN educational\n  ON educational.id = issue__educational.educational_id\nLEFT JOIN (\n    SELECT educational__image.educational_id, COUNT(*) as image_count\n    FROM educational__image\n    GROUP BY educational__image.educational_id\n) AS si ON si.educational_id = educational.id\nWHERE issue__educational.issue_id = ?\nORDER BY educational.posted_date",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 16
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 2000
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "posted_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "BINARY",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "image_count",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NUM",
+          "char_set": 63,
+          "max_size": 21
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "0e2be3f3bfd1c806c848c82457d662e3ad2ec65ef178eb2f9ae94428368b28c8"
+}
