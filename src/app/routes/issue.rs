@@ -465,11 +465,7 @@ pub fn Issue() -> impl IntoView {
                                     .crate_releases
                                     .into_iter()
                                     .map(|crate_release| {
-                                        view! {
-                                            <CrateReleaseView
-                                                crate_release=crate_release
-                                            />
-                                        }
+                                        view! { <CrateReleaseView crate_release=crate_release/> }
                                     })
                                     .collect_view()}
 
@@ -686,7 +682,8 @@ fn CrateReleaseView(
             class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
         >
 
-            {crate_release.images
+            {crate_release
+                .images
                 .iter()
                 .map(|image| {
                     view! {

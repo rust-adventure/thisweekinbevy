@@ -180,7 +180,9 @@ fn AddCrateReleaseToIssueForm(
         <li class="flex items-center justify-between gap-x-6 py-5">
             <div class="min-w-0">
                 <div class="flex items-start gap-x-3">
-                    <p class="text-sm font-semibold leading-6 text-gray-900">{crate_release.title}</p>
+                    <p class="text-sm font-semibold leading-6 text-gray-900">
+                        {crate_release.title}
+                    </p>
                 </div>
                 <div class="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
                     <p class="whitespace-nowrap">
@@ -189,7 +191,9 @@ fn AddCrateReleaseToIssueForm(
                             .posted_date
                             .as_ref()
                             .unwrap()
-                            .to_string()>{crate_release.posted_date.as_ref().unwrap().to_string()}</time>
+                            .to_string()>
+                            {crate_release.posted_date.as_ref().unwrap().to_string()}
+                        </time>
                     </p>
                     <svg viewBox="0 0 2 2" class="h-0.5 w-0.5 fill-current">
                         <circle cx="1" cy="1" r="1"></circle>
@@ -202,7 +206,11 @@ fn AddCrateReleaseToIssueForm(
                     view! {
                         <div class="flex flex-none items-center gap-x-4">
                             <ActionForm action=associate_crate_release_with_issue>
-                                <input type="hidden" value=crate_release.id name="crate_release_id"/>
+                                <input
+                                    type="hidden"
+                                    value=crate_release.id
+                                    name="crate_release_id"
+                                />
                                 <input type="hidden" value=issue_id name="issue_id"/>
                                 <button
                                     type="submit"

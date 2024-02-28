@@ -483,7 +483,9 @@ fn CrateReleases() -> impl IntoView {
                                 crate_releases
                                     .iter()
                                     .map(|crate_release| {
-                                        view! { <CrateReleaseLi crate_release=crate_release.clone()/> }
+                                        view! {
+                                            <CrateReleaseLi crate_release=crate_release.clone()/>
+                                        }
                                     })
                                     .collect_view()
                             }
@@ -524,7 +526,9 @@ fn CrateReleaseLi(crate_release: CrateReleaseData) -> impl IntoView {
             </div>
             <div class="flex shrink-0 items-center gap-x-4">
                 <div class="hidden sm:flex sm:flex-col sm:items-end">
-                    <p class="text-sm leading-6 text-gray-900">{crate_release.image_count} images</p>
+                    <p class="text-sm leading-6 text-gray-900">
+                        {crate_release.image_count} images
+                    </p>
                 // <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p>
                 </div>
                 <svg
