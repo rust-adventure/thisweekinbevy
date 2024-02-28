@@ -139,20 +139,20 @@ pub fn Devlog() -> impl IntoView {
                                             />
                                         </div>
                                         <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                                        <label
-                                            for="post_url"
-                                            class="block text-xs font-medium text-gray-900"
-                                        >
-                                            Post URL
-                                        </label>
-                                        <input
-                                            required
-                                            type="text"
-                                            name="post_url"
-                                            id="post_url"
-                                            class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                            value=devlog.post_url
-                                        />
+                                            <label
+                                                for="post_url"
+                                                class="block text-xs font-medium text-gray-900"
+                                            >
+                                                Post URL
+                                            </label>
+                                            <input
+                                                required
+                                                type="text"
+                                                name="post_url"
+                                                id="post_url"
+                                                class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                value=devlog.post_url
+                                            />
                                         </div>
                                         <div class="relative rounded-md rounded-t-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
                                             <label

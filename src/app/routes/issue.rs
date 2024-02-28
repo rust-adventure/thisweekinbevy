@@ -790,19 +790,23 @@ fn DevlogView(
         {first_image
             .map(|image| {
                 view! {
-                    <a
-                      href=&devlog.post_url
-                    >
-                        <img class="mt-12 w-full rounded-t-md" src=&image.url alt=&image.description/>
+                    <a href=&devlog.post_url>
+                        <img
+                            class="mt-12 w-full rounded-t-md"
+                            src=&image.url
+                            alt=&image.description
+                        />
                     </a>
                 }
-        })}
+            })}
+
         <ul
             role="list"
             class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
         >
 
-            {it.map(|image| {
+            {it
+                .map(|image| {
                     view! {
                         <li class="relative">
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
@@ -824,39 +828,23 @@ fn DevlogView(
         <div class="flex justify-between">
             <h3 class="mt-2 text-xl font-bold text-slate-900">{devlog.title}</h3>
             <div class="flex space-x-4">
-            {
-                devlog
+
+                {devlog
                     .post_url
                     .is_empty()
                     .not()
-                    .then_some(
-                        view! {
-                            <PostLink url=devlog.post_url/>
-                        },
-                    )
-            }
-            {
-                devlog
+                    .then_some(view! { <PostLink url=devlog.post_url/> })}
+                {devlog
                     .video_url
                     .is_empty()
                     .not()
-                    .then_some(
-                        view! {
-                            <VideoLink url=devlog.video_url/>
-                        },
-                    )
-            }
-            {
-                devlog
+                    .then_some(view! { <VideoLink url=devlog.video_url/> })}
+                {devlog
                     .discord_url
                     .is_empty()
                     .not()
-                    .then_some(
-                        view! {
-                            <DiscordLink discord_url=devlog.discord_url/>
-                        },
-                    )
-            }
+                    .then_some(view! { <DiscordLink discord_url=devlog.discord_url/> })}
+
             </div>
         </div>
         <div
@@ -907,17 +895,13 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
         </ul>
         <div class="flex justify-between">
             <h3 class="mt-2 text-xl font-bold text-slate-900">{showcase.title}</h3>
-            {
-                showcase
-                    .discord_url
-                    .is_empty()
-                    .not()
-                    .then_some(
-                        view! {
-                            <DiscordLink discord_url=showcase.discord_url/>
-                        },
-                    )
-            }
+
+            {showcase
+                .discord_url
+                .is_empty()
+                .not()
+                .then_some(view! { <DiscordLink discord_url=showcase.discord_url/> })}
+
         </div>
         <div
             class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
@@ -957,11 +941,21 @@ fn VideoLink(url: String) -> impl IntoView {
     view! {
         <a
             href=&url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-Video
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clip-rule="evenodd" />
-</svg>
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+            Video
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                class="w-6 h-6"
+            >
+                <path
+                    fill-rule="evenodd"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
+                    clip-rule="evenodd"
+                ></path>
+            </svg>
         </a>
     }
 }
@@ -972,11 +966,23 @@ fn PostLink(url: String) -> impl IntoView {
     view! {
         <a
             href=&url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-Post
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-</svg>
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+            Post
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                ></path>
+            </svg>
 
         </a>
     }

@@ -66,10 +66,7 @@ pub fn Devlog() -> impl IntoView {
                     />
                 </div>
                 <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label
-                        for="video_url"
-                        class="block text-xs font-medium text-gray-900"
-                    >
+                    <label for="video_url" class="block text-xs font-medium text-gray-900">
                         Video URL
                     </label>
                     <input
@@ -82,10 +79,7 @@ pub fn Devlog() -> impl IntoView {
                     />
                 </div>
                 <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label
-                        for="post_url"
-                        class="block text-xs font-medium text-gray-900"
-                    >
+                    <label for="post_url" class="block text-xs font-medium text-gray-900">
                         Post URL
                     </label>
                     <input
@@ -202,9 +196,7 @@ fn AddDevlogToIssueForm(
         <li class="flex items-center justify-between gap-x-6 py-5">
             <div class="min-w-0">
                 <div class="flex items-start gap-x-3">
-                    <p class="text-sm font-semibold leading-6 text-gray-900">
-                        {devlog.title}
-                    </p>
+                    <p class="text-sm font-semibold leading-6 text-gray-900">{devlog.title}</p>
                 </div>
                 <div class="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
                     <p class="whitespace-nowrap">
@@ -213,9 +205,7 @@ fn AddDevlogToIssueForm(
                             .posted_date
                             .as_ref()
                             .unwrap()
-                            .to_string()>
-                            {devlog.posted_date.as_ref().unwrap().to_string()}
-                        </time>
+                            .to_string()>{devlog.posted_date.as_ref().unwrap().to_string()}</time>
                     </p>
                     <svg viewBox="0 0 2 2" class="h-0.5 w-0.5 fill-current">
                         <circle cx="1" cy="1" r="1"></circle>
@@ -228,11 +218,7 @@ fn AddDevlogToIssueForm(
                     view! {
                         <div class="flex flex-none items-center gap-x-4">
                             <ActionForm action=associate_devlog_with_issue>
-                                <input
-                                    type="hidden"
-                                    value=devlog.id
-                                    name="devlog_id"
-                                />
+                                <input type="hidden" value=devlog.id name="devlog_id"/>
                                 <input type="hidden" value=issue_id name="issue_id"/>
                                 <button
                                     type="submit"
