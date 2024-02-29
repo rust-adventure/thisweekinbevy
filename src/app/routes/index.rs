@@ -138,9 +138,14 @@ pub struct IssueShort {
     pub description: String,
 }
 
-#[cfg(feature="ssr")]
+#[cfg(feature = "ssr")]
 fn markdown_trim(input: &str) -> nom::IResult<&str, &str> {
-    use nom::{combinator::consumed,multi::many_till,sequence::{pair,tuple},character::complete::{anychar,line_ending}};
+    use nom::{
+        character::complete::{anychar, line_ending},
+        combinator::consumed,
+        multi::many_till,
+        sequence::{pair, tuple},
+    };
     let (input, (intro, _)) = consumed(tuple((
         many_till(anychar, pair(line_ending, line_ending)),
         many_till(anychar, pair(line_ending, line_ending)),
@@ -158,7 +163,9 @@ impl From<SqlIssueShort> for IssueShort {
                 .expect(
                     "expect valid ids from the database",
                 );
-        let summary = markdown_trim(&value.description).map(|(_, output)| output).unwrap_or(&value.description);
+        let summary = markdown_trim(&value.description)
+            .map(|(_, output)| output)
+            .unwrap_or(&value.description);
         IssueShort {
             id: id_str.to_string(),
             slug: value.slug,

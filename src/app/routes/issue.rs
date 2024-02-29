@@ -1,11 +1,11 @@
-use std::ops::Not;
-use itertools::Itertools;
 use crate::app::components::{Container, Divider};
+use itertools::Itertools;
 use leptos::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::types::Json;
+use std::ops::Not;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {
