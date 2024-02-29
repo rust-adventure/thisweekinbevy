@@ -1,7 +1,6 @@
 use std::ops::Not;
-
+use itertools::Itertools;
 use crate::app::components::{Container, Divider};
-
 use leptos::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
@@ -607,6 +606,7 @@ pub fn Issue() -> impl IntoView {
                                     {issue
                                         .merged_pull_requests
                                         .iter()
+                                        .sorted_by_key(|pr| &pr.merged_at_date)
                                         .map(|pull_request| {
                                             view! {
                                                 <ActivityListItem
@@ -639,6 +639,7 @@ pub fn Issue() -> impl IntoView {
                                     {issue
                                         .new_pull_requests
                                         .iter()
+                                        .sorted_by_key(|pr| &pr.gh_created_at)
                                         .map(|pull_request| {
                                             view! {
                                                 <ActivityListItem
@@ -659,6 +660,7 @@ pub fn Issue() -> impl IntoView {
                                     {issue
                                         .new_github_issues
                                         .iter()
+                                        .sorted_by_key(|issue| &issue.github_created_at)
                                         .map(|issue| {
                                             view! {
                                                 <ActivityListItem
@@ -736,11 +738,11 @@ fn ActivityListItem(
 
             </div>
             <p class="flex-auto py-0.5 text-xs leading-5 text-gray-500">
-                <a href=url class="font-medium text-gray-900">
+                <a href=url class=format!("font-medium {}", if author.starts_with("dependabot") { "" } else { "text-gray-900" })>
                     {title}
                 </a>
                 " authored by "
-                <span class="font-medium text-gray-900">{author}</span>
+                <span class=format!("font-medium {}", if author.starts_with("dependabot") { "" } else { "text-gray-900" })>{author}</span>
             </p>
             <time
                 datetime=date.to_string()
