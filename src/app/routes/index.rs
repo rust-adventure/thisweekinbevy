@@ -43,9 +43,10 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
                     <p class="order-first font-mono text-sm leading-7 text-slate-500">
                         {&issue.issue_date.map(|date| date.to_string()).unwrap_or("".to_string())}
                     </p>
-                    <div class=r#"mt-1 text-base leading-7 text-slate-700 prose prose [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+                    <div
+                        class=r#"mt-1 text-base leading-7 text-slate-700 prose prose [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
                         inner_html=issue.description.clone()
-                    />
+                    ></div>
                     <div class="mt-4 flex items-center gap-4">
                         // <EpisodePlayButton
                         // episode={episode}

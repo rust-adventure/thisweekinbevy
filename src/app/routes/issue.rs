@@ -738,11 +738,20 @@ fn ActivityListItem(
 
             </div>
             <p class="flex-auto py-0.5 text-xs leading-5 text-gray-500">
-                <a href=url class=format!("font-medium {}", if author.starts_with("dependabot") { "" } else { "text-gray-900" })>
+                <a
+                    href=url
+                    class=format!(
+                        "font-medium {}",
+                        if author.starts_with("dependabot") { "" } else { "text-gray-900" },
+                    )
+                >
                     {title}
                 </a>
                 " authored by "
-                <span class=format!("font-medium {}", if author.starts_with("dependabot") { "" } else { "text-gray-900" })>{author}</span>
+                <span class=format!(
+                    "font-medium {}",
+                    if author.starts_with("dependabot") { "" } else { "text-gray-900" },
+                )>{author}</span>
             </p>
             <time
                 datetime=date.to_string()
