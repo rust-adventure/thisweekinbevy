@@ -1,7 +1,7 @@
 use crate::app::components::Container;
 use leptos::*;
-use serde::{Deserialize, Serialize};
 use leptos_meta::*;
+use serde::{Deserialize, Serialize};
 
 #[component]
 fn PauseIcon(
@@ -84,7 +84,6 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
 
 #[component]
 pub fn Home() -> impl IntoView {
-    
     let issues =
         create_resource(move || {}, |_| fetch_issues());
 

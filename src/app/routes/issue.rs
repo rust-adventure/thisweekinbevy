@@ -1,12 +1,12 @@
 use crate::app::components::{Container, Divider};
 use itertools::Itertools;
 use leptos::*;
+use leptos_meta::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::types::Json;
 use std::ops::Not;
-use leptos_meta::*;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {
@@ -243,8 +243,7 @@ struct SqlIssue {
     display_name: String,
     description: String,
     youtube_id: String,
-    showcases:
-        Option<sqlx::types::Json<Vec<ShowcaseData>>>,
+    showcases: Option<sqlx::types::Json<Vec<ShowcaseData>>>,
     crate_releases:
         Option<sqlx::types::Json<Vec<SqlCrateRelease>>>,
     devlogs: Option<sqlx::types::Json<Vec<SqlDevlog>>>,

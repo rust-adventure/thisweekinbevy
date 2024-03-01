@@ -100,7 +100,7 @@ struct SqlIssueShort {
     id: Vec<u8>,
     display_name: String,
     status: String,
-    issue_date: time::Date
+    issue_date: time::Date,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -108,7 +108,7 @@ pub struct IssueShort {
     id: String,
     display_name: String,
     status: String,
-    issue_date: time::Date
+    issue_date: time::Date,
 }
 
 #[cfg(feature = "ssr")]
@@ -125,7 +125,7 @@ impl From<SqlIssueShort> for IssueShort {
             id: id_str.to_string(),
             display_name: value.display_name,
             status: value.status,
-            issue_date: value.issue_date
+            issue_date: value.issue_date,
         }
     }
 }

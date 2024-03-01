@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n        id,\n        display_name,\n        status\nFROM issue\nORDER BY status, issue_date DESC",
+  "query": "SELECT\n        id,\n        display_name,\n        status,\n        issue_date\nFROM issue\nORDER BY status, issue_date DESC",
   "describe": {
     "columns": [
       {
@@ -32,6 +32,16 @@
           "char_set": 255,
           "max_size": 200
         }
+      },
+      {
+        "ordinal": 3,
+        "name": "issue_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 10
+        }
       }
     ],
     "parameters": {
@@ -40,8 +50,9 @@
     "nullable": [
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "f719d40d94941523124d7c671d5b8ba5533745ff117ee62a4062fae2ae563663"
+  "hash": "7fad14c65cb976e0d9db8f41fc22780d7ca70c8afb7ba1b4961515dfb3bdcd71"
 }
