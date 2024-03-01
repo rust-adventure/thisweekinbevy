@@ -34,7 +34,7 @@ pub fn App() -> impl IntoView {
         <Body class="flex min-h-full"/>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
-
+        <Meta name="og:site_name" content="This Week in Bevy"/>
         <Router fallback=|| {
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);

@@ -489,7 +489,7 @@ let header_image = CImage::new("dilgcuzda".into(), issue.cloudinary_public_id.in
         title: issue.display_name,
         issue_date: issue.issue_date,
         slug: issue.slug,
-        opengraph_image: opengraph_image.to_string(),
+        opengraph_image: opengraph_image.to_string().replace(".avif", ".png"),
         header_image: header_image.to_string(),
         description: compile(&issue.description),
         showcases,
@@ -549,7 +549,15 @@ pub fn Issue() -> impl IntoView {
                                 property="og:url"
                                 content=format!("https://thisweekinbevy.com/issue/{}", issue.slug)
                             />
-                            <Meta property="og:image" content=issue.opengraph_image/>
+                            <Meta property="og:image" content=issue.opengraph_image.clone()/>
+                            <Meta name="twitter:card" content="summary_large_image"/>
+                            <Meta name="twitter:creator" content="@chrisbiscardi"/>
+                            <Meta name="twitter:title" content=issue.title.clone()/>
+                            <Meta name="twitter:description" content=format!(
+                                "What happened in the week of {} the Bevy Game Engine ecosystem",
+                                &issue.issue_date,
+                            )/>
+                            <Meta name="twitter:image" content=issue.opengraph_image/>
 
                             <Container>
                                 <img class="w-full" src=issue.header_image alt=""/>
