@@ -52,9 +52,16 @@ pub fn Issues() -> impl IntoView {
                                     issues
                                         .iter()
                                         .map(|issue| {
+                                            let status_style = match issue.status.as_ref() {
+                                                "draft" => "text-yellow-400 bg-yellow-400/10",
+                                                "publish" => "text-green-400 bg-green-400/10",
+                                                _ => "text-slate-400 bg-slate-400/10",
+                                            };
                                             view! {
                                                 <li class="flex gap-x-4 py-5">
-                                                    <div class="flex-none rounded-full p-1 text-green-400 bg-green-400/10">
+                                                    <div class=format!(
+                                                        "flex-none rounded-full p-1 {status_style}",
+                                                    )>
                                                         <div class="h-2 w-2 rounded-full bg-current"></div>
                                                     </div>
                                                     <div class="flex-auto">
@@ -65,12 +72,13 @@ pub fn Issues() -> impl IntoView {
                                                             >
                                                                 {&issue.display_name}
                                                             </a>
-                                                            // <time datetime={&issue.issue_date}>{&issue.issue_date}</time>
-                                                            <p class="flex-none text-xs text-gray-600"></p>
+                                                            <time datetime=&issue
+                                                                .issue_date
+                                                                .to_string()>{&issue.issue_date.to_string()}</time>
+                                                            <p class="flex-none text-xs text-gray-600">
+                                                                something here
+                                                            </p>
                                                         </div>
-                                                        <p class="mt-1 line-clamp-2 text-sm leading-6 text-gray-600">
-                                                            "trimmed description without markdown render"
-                                                        </p>
                                                     </div>
                                                 </li>
                                             }
@@ -92,13 +100,15 @@ struct SqlIssueShort {
     id: Vec<u8>,
     display_name: String,
     status: String,
+    issue_date: time::Date
 }
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct IssueShort {
-    pub id: String,
-    pub display_name: String,
-    pub status: String,
+    id: String,
+    display_name: String,
+    status: String,
+    issue_date: time::Date
 }
 
 #[cfg(feature = "ssr")]
@@ -115,6 +125,7 @@ impl From<SqlIssueShort> for IssueShort {
             id: id_str.to_string(),
             display_name: value.display_name,
             status: value.status,
+            issue_date: value.issue_date
         }
     }
 }
@@ -130,7 +141,8 @@ pub async fn fetch_issues(
         "SELECT
         id,
         display_name,
-        status
+        status,
+        issue_date
 FROM issue
 ORDER BY status, issue_date DESC"
     )
@@ -144,8 +156,7 @@ ORDER BY status, issue_date DESC"
 pub async fn create_draft_issue(
     issue_date: String,
 ) -> Result<(), ServerFnError> {
-    let pool = use_context::<sqlx::MySqlPool>()
-        .expect("to be able to access app_state");
+    let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
     // https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/

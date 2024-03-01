@@ -1,6 +1,7 @@
 use crate::app::components::Container;
 use leptos::*;
 use serde::{Deserialize, Serialize};
+use leptos_meta::*;
 
 #[component]
 fn PauseIcon(
@@ -83,11 +84,25 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
 
 #[component]
 pub fn Home() -> impl IntoView {
+    
     let issues =
         create_resource(move || {}, |_| fetch_issues());
 
     view! {
         <div class="pb-12 pt-16 sm:pb-4 lg:pt-12">
+            <Title text="This Week in the Bevy Game Engine"/>
+            <Meta
+                name="description"
+                content="What happened this week in the Bevy Game Engine ecosystem"
+            />
+
+            <Meta property="og:type" content="website"/>
+            <Meta property="og:url" content="https://thisweekinbevy.com/"/>
+            <Meta
+                property="og:image"
+                content="https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.avif"
+            />
+
             <Container>
                 <h1 class="text-2xl font-bold leading-7 text-slate-900">Issues</h1>
             </Container>

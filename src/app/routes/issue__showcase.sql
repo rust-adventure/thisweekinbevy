@@ -5,7 +5,7 @@ SELECT
     display_name,
     description,
     youtube_id,
-    showcases as "showcases: Json<Vec<ShowcaseData2>>",
+    showcases as "showcases: Json<Vec<ShowcaseData>>",
     crate_releases as "crate_releases: Json<Vec<SqlCrateRelease>>",
     devlogs as "devlogs: Json<Vec<SqlDevlog>>",
     educationals as "educationals: Json<Vec<SqlEducational>>",

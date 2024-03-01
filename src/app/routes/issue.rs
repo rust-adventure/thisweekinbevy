@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::types::Json;
 use std::ops::Not;
+use leptos_meta::*;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {
@@ -14,6 +15,9 @@ pub struct Issue {
     /// is a human-readable string that goes in
     /// the email subject line and slug url
     title: String,
+    slug: String,
+    opengraph_image: String,
+    header_image: String,
     issue_date: time::Date,
     /// What is this issue about? Is there
     /// anything notable worth mentioning or
@@ -232,15 +236,15 @@ struct Contributor;
 
 #[cfg(feature = "ssr")]
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
-struct SqlShowcaseData {
-    slug: String,
+struct SqlIssue {
     issue_date: time::Date,
+    slug: String,
     cloudinary_public_id: String,
     display_name: String,
     description: String,
     youtube_id: String,
     showcases:
-        Option<sqlx::types::Json<Vec<ShowcaseData2>>>,
+        Option<sqlx::types::Json<Vec<ShowcaseData>>>,
     crate_releases:
         Option<sqlx::types::Json<Vec<SqlCrateRelease>>>,
     devlogs: Option<sqlx::types::Json<Vec<SqlDevlog>>>,
@@ -262,7 +266,7 @@ struct SqlShowcaseData {
     serde::Serialize,
     sqlx::FromRow,
 )]
-struct ShowcaseData2 {
+struct ShowcaseData {
     title: String,
     url: String,
     discord_url: String,
@@ -299,7 +303,7 @@ async fn fetch_issue(
     let pool = crate::sql::pool()?;
 
     let showcase_issue = sqlx::query_file_as!(
-        SqlShowcaseData,
+        SqlIssue,
         "src/app/routes/issue__showcase.sql",
         date
     )
@@ -479,9 +483,15 @@ author_url
 
 }).collect();
 
+let opengraph_image = CImage::new("dilgcuzda".into(), (*issue.cloudinary_public_id).into());
+let header_image = CImage::new("dilgcuzda".into(), issue.cloudinary_public_id.into());
+
         Issue {
         title: issue.display_name,
         issue_date: issue.issue_date,
+        slug: issue.slug,
+        opengraph_image: opengraph_image.to_string(),
+        header_image: header_image.to_string(),
         description: compile(&issue.description),
         showcases,
         crate_releases,
@@ -498,11 +508,12 @@ author_url
 #[component]
 pub fn Issue() -> impl IntoView {
     let params = use_params_map();
+
     // slug id only cares about the date, which is the
     // unique id. the rest of the slug can be
     // changed any time.
     // 2024-02-11-the-one-before-bevy-0-13
-    let issue = create_resource(
+    let issue = create_blocking_resource(
         move || {
             params.with(|p| {
                 p.get("slug").cloned().and_then(|slug|
@@ -524,9 +535,26 @@ pub fn Issue() -> impl IntoView {
                 None | Some(None) => view! { <article>"404"</article> },
                 Some(Some(issue)) => {
                     view! {
-                        <article class="py-16 lg:py-36">
+                        <article class="py-16 lg:py-16">
+                            <Title text=issue.title.clone()/>
+                            <Meta
+                                name="description"
+                                content=format!(
+                                    "What happened in the week of {} the Bevy Game Engine ecosystem",
+                                    &issue.issue_date,
+                                )
+                            />
+
+                            <Meta property="og:type" content="article"/>
+                            <Meta
+                                property="og:url"
+                                content=format!("https://thisweekinbevy.com/issue/{}", issue.slug)
+                            />
+                            <Meta property="og:image" content=issue.opengraph_image/>
+
                             <Container>
-                                <header class="flex flex-col">
+                                <img class="w-full" src=issue.header_image alt=""/>
+                                <header class="flex flex-col pt-16">
                                     <div class="flex items-center gap-6">
                                         // <EpisodePlayButton
                                         // episode={episode}
@@ -745,6 +773,7 @@ fn ActivityListItem(
                         if author.starts_with("dependabot") { "" } else { "text-gray-900" },
                     )
                 >
+
                     {title}
                 </a>
                 " authored by "

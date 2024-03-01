@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS issue (
     -- year-month-day
     issue_date DATE NOT NULL,
     cloudinary_public_id VARCHAR(20) NOT NULL CHECK (cloudinary_public_id <> ''),
-    -- draft, published
+    -- draft, publish
     status VARCHAR(50) NOT NULL DEFAULT 'draft',
     -- Bevy 0.13, and more
     display_name VARCHAR(100) NOT NULL DEFAULT '',
