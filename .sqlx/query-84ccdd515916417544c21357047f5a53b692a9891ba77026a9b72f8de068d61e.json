@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n          id,\n          slug,\n          issue_date,\n          display_name,\n          description\nFROM issue\nORDER BY status, issue_date DESC",
+  "query": "SELECT\n          id,\n          slug,\n          issue_date,\n          display_name,\n          description,\n          youtube_id\nFROM issue\nORDER BY status, issue_date DESC",
   "describe": {
     "columns": [
       {
@@ -52,6 +52,16 @@
           "char_set": 255,
           "max_size": 20000
         }
+      },
+      {
+        "ordinal": 5,
+        "name": "youtube_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 400
+        }
       }
     ],
     "parameters": {
@@ -62,8 +72,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "87c68fcc9885cedcc96dbd5d6a2d17e5d7ce621eaaa02256745ca91ea0234bee"
+  "hash": "84ccdd515916417544c21357047f5a53b692a9891ba77026a9b72f8de068d61e"
 }
