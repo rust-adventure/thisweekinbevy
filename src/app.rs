@@ -181,16 +181,16 @@ fn Wrapper(children: Children) -> impl IntoView {
                         class="relative mx-auto block w-48 overflow-hidden rounded-lg bg-ctp-crust shadow-xl shadow-ctp-crust sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
                         aria-label="Homepage"
                     >
-                    <picture>
-                        <source
-                            srcset="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevydark_wdnm2d.avif"
-                            media="(prefers-color-scheme: dark)"
-                        />
-                        <img
-                            class="w-full"
-                            src="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevylight_uddwes.avif"
-                            alt=""
-                        />
+                        <picture>
+                            <source
+                                srcset="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevydark_wdnm2d.avif"
+                                media="(prefers-color-scheme: dark)"
+                            />
+                            <img
+                                class="w-full"
+                                src="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevylight_uddwes.avif"
+                                alt=""
+                            />
                         </picture>
                         <div class="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/10 sm:rounded-xl lg:rounded-2xl"></div>
                     </a>

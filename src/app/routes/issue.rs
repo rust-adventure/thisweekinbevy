@@ -555,10 +555,13 @@ pub fn Issue() -> impl IntoView {
                             <Meta name="twitter:card" content="summary_large_image"/>
                             <Meta name="twitter:creator" content="@chrisbiscardi"/>
                             <Meta name="twitter:title" content=issue.title.clone()/>
-                            <Meta name="twitter:description" content=format!(
-                                "What happened in the week of {} the Bevy Game Engine ecosystem",
-                                &issue.issue_date,
-                            )/>
+                            <Meta
+                                name="twitter:description"
+                                content=format!(
+                                    "What happened in the week of {} the Bevy Game Engine ecosystem",
+                                    &issue.issue_date,
+                                )
+                            />
                             <Meta name="twitter:image" content=issue.opengraph_image/>
 
                             <Container>
@@ -667,7 +670,9 @@ pub fn Issue() -> impl IntoView {
                                         Here you can find two types of potential contribution: Pull Requests that might need review and Issues that might need to be worked on.
                                     </p>
                                     <p class="flex justify-end mt-2">
-                                    <a href="https://github.com/bevyengine/bevy/blob/main/CONTRIBUTING.md">How do I contribute?</a>
+                                        <a href="https://github.com/bevyengine/bevy/blob/main/CONTRIBUTING.md">
+                                            How do I contribute?
+                                        </a>
                                     </p>
                                 </CalloutInfo>
                                 <h2 class="mt-6 text-2xl font-bold text-ctp-text">
@@ -775,11 +780,11 @@ fn ActivityListItem(
                 }}
 
             </div>
-            <p class=format!("flex-auto py-0.5 text-xs leading-5 {}", if author.starts_with("dependabot") { "text-ctp-overlay1" } else { "text-ctp-text" })>
-                <a
-                    href=url
-                    class="font-medium"
-                >
+            <p class=format!(
+                "flex-auto py-0.5 text-xs leading-5 {}",
+                if author.starts_with("dependabot") { "text-ctp-overlay1" } else { "text-ctp-text" },
+            )>
+                <a href=url class="font-medium">
                     {title}
                 </a>
                 " authored by "
@@ -868,10 +873,7 @@ fn CrateReleaseView(
 
         </ul>
         <h3 class="mt-2 text-xl font-bold text-ctp-text">{crate_release.title}</h3>
-        <div
-            class=format!("mt-3 {}", PROSE)
-            inner_html=crate_release.description
-        ></div>
+        <div class=format!("mt-3 {}", PROSE) inner_html=crate_release.description></div>
     }
 }
 
@@ -943,10 +945,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
 
             </div>
         </div>
-        <div
-            class=format!("mt-3 {}", PROSE)
-            inner_html=devlog.description
-        ></div>
+        <div class=format!("mt-3 {}", PROSE) inner_html=devlog.description></div>
     }
 }
 
@@ -1020,10 +1019,7 @@ fn EducationalView(
 
             </div>
         </div>
-        <div
-            class=format!("mt-3 {}", PROSE)
-            inner_html=educational.description
-        ></div>
+        <div class=format!("mt-3 {}", PROSE) inner_html=educational.description></div>
     }
 }
 
@@ -1077,10 +1073,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
                 .then_some(view! { <DiscordLink discord_url=showcase.discord_url/> })}
 
         </div>
-        <div
-            class=format!("mt-3, {}", PROSE)
-            inner_html=showcase.description
-        ></div>
+        <div class=format!("mt-3, {}", PROSE) inner_html=showcase.description></div>
     }
 }
 

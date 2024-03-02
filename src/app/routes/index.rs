@@ -50,19 +50,29 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
                         inner_html=issue.description.clone()
                     ></div>
                     <div class="mt-4 flex items-center gap-4">
-                        {
-                            issue.youtube_id.trim().is_empty().not().then_some(view! {
-                                <a
-                                href=format!("https://youtube.com/watch?v=") 
-                                class="flex items-center gap-x-3 text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900">
-                                  <PlayIcon class="h-2.5 w-2.5 fill-current" />
-                                  <span aria-hidden="true">Watch</span>
-                                </a>
-                                <span aria-hidden="true" class="text-sm font-bold text-ctp-text">
-                                    /
-                                </span>
-                            })
-                        }
+
+                        {issue
+                            .youtube_id
+                            .trim()
+                            .is_empty()
+                            .not()
+                            .then_some(
+                                view! {
+                                    <a
+                                        href=format!("https://youtube.com/watch?v=")
+                                        class="flex items-center gap-x-3 text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900"
+                                    >
+                                        <PlayIcon class="h-2.5 w-2.5 fill-current"/>
+                                        <span aria-hidden="true">Watch</span>
+                                    </a>
+                                    <span
+                                        aria-hidden="true"
+                                        class="text-sm font-bold text-ctp-text"
+                                    >
+                                        /
+                                    </span>
+                                },
+                            )}
                         <a
                             href=format!("/issue/{}", issue.slug)
                             class="flex items-center text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900"
@@ -98,9 +108,9 @@ pub fn Home() -> impl IntoView {
             />
 
             <div class="pt-16 lg:pt-12 sm:pb-4 lg:pb-8 bg-gradient-to-r from-ctp-mantle to-ctp-base">
-            <Container>
-                <h1 class="text-2xl font-bold leading-7 text-ctp-text">Issues</h1>
-            </Container>
+                <Container>
+                    <h1 class="text-2xl font-bold leading-7 text-ctp-text">Issues</h1>
+                </Container>
             </div>
             <Suspense fallback=move || {
                 view! { <p>"Loading (Suspense Fallback)..."</p> }
