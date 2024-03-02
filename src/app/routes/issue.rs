@@ -1164,10 +1164,18 @@ enum CalloutType {
 impl CalloutType {
     fn bg(&self) -> &str {
         match self {
-            CalloutType::Info => "bg-blue-50 dark:bg-blue-950",
-            CalloutType::Caution => "bg-yellow-50 dark:bg-yellow-950",
-            CalloutType::Warning => "bg-red-50 dark:bg-red-950",
-            CalloutType::Success => "bg-green-50 dark:bg-green-950",
+            CalloutType::Info => {
+                "bg-blue-50 dark:bg-blue-950"
+            }
+            CalloutType::Caution => {
+                "bg-yellow-50 dark:bg-yellow-950"
+            }
+            CalloutType::Warning => {
+                "bg-red-50 dark:bg-red-950"
+            }
+            CalloutType::Success => {
+                "bg-green-50 dark:bg-green-950"
+            }
         }
     }
     fn icon(&self) -> &str {
