@@ -9,7 +9,7 @@ pub fn AboutSection(
 
     view! {
         <section class=class>
-            <h2 class="flex items-center font-mono text-sm font-medium leading-7 text-slate-900">
+            <h2 class="flex items-center font-mono text-sm font-medium leading-7 text-ctp-text">
                 <TinyWaveFormIcon
                     start_color="fill-violet-300"
                     end_color="fill-pink-300"
@@ -19,7 +19,7 @@ pub fn AboutSection(
             </h2>
             <p class=move || {
                 format!(
-                    "mt-2 text-base leading-7 text-slate-700 {}",
+                    "mt-2 text-base leading-7 text-ctp-text {}",
                     if is_expanded.get() { "lg:line-clamp-4" } else { "" },
                 )
             }>
@@ -33,7 +33,7 @@ pub fn AboutSection(
                         view! {
                             <button
                                 type="button"
-                                class="mt-2 hidden text-sm font-bold leading-6 text-pink-500 hover:text-pink-700 active:text-pink-900 lg:inline-block"
+                                class="mt-2 hidden text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900 lg:inline-block"
                                 on:click=move |_| set_is_expanded(true)
                             >
                                 Show more
@@ -89,10 +89,10 @@ pub fn Divider(
     view! {
         <div class="relative mt-12 mb-6">
             <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                <div class="w-full border-t border-gray-300"></div>
+                <div class="w-full border-t border-ctp-surface1"></div>
             </div>
             <div class="relative flex justify-center">
-                <span class="bg-white px-3 text-base font-semibold leading-6 text-gray-900">
+                <span class="bg-ctp-base px-3 text-base font-semibold leading-6 text-ctp-text">
                     {title}
                 </span>
             </div>

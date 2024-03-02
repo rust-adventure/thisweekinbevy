@@ -123,7 +123,7 @@
 :root {
   --ctp-rosewater: rgb(220, 138, 120);
   --ctp-flamingo: rgb(221, 120, 120);
-  --ctp-pink: rgb(234, 118, 203);
+  --ctp-pink: hsl(316, 73%, 69%);
   --ctp-mauve: rgb(136, 57, 239);
   --ctp-red: rgb(210, 15, 57);
   --ctp-maroon: rgb(230, 69, 83);
@@ -144,9 +144,12 @@
   --ctp-surface2: rgb(172, 176, 190);
   --ctp-surface1: rgb(188, 192, 204);
   --ctp-surface0: rgb(204, 208, 218);
-  --ctp-base: rgb(239, 241, 245);
-  --ctp-mantle: rgb(230, 233, 239);
-  --ctp-crust: rgb(220, 224, 232);
+  /* --ctp-base: rgb(239, 241, 245); */
+  --ctp-base: hsl(210, 33%, 99%);
+  --ctp-mantle: hsl(197, 33%, 95%);
+  --ctp-crust: hsl(197, 33%, 90%);
+
+  --brand-discord: #5865F2;
 }
 
 @media (prefers-color-scheme: dark) {

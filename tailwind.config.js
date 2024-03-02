@@ -39,6 +39,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       borderColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -67,6 +68,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       caretColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -95,6 +97,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       colors: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -123,6 +126,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       divideColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -151,6 +155,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       fill: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -179,6 +184,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       gradientColorStops: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -207,6 +213,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       placeholderColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -235,6 +242,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       ringColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -263,6 +271,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       ringOffsetColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -291,6 +300,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       stroke: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -319,6 +329,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
       textColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
@@ -347,6 +358,7 @@ module.exports = {
         "ctp-base": "var(--ctp-base)",
         "ctp-mantle": "var(--ctp-mantle)",
         "ctp-crust": "var(--ctp-crust)",
+        "brand-discord": "var(--brand-discord)",
       },
     },
   },

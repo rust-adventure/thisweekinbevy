@@ -29,7 +29,7 @@ pub fn App() -> impl IntoView {
         <Html
             lang="en"
             // arbitrary additional attributes can be passed via `attr:`
-            attr:class="h-full bg-white antialiased"
+            attr:class="h-full bg-ctp-base antialiased"
         />
         <Body class="flex min-h-full"/>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
@@ -160,7 +160,7 @@ fn Wrapper(children: Children) -> impl IntoView {
         } else {
             view! {
                 <>
-                    <span aria-hidden="true" class="text-slate-400">
+                    <span aria-hidden="true" class="text-ctp-text">
                         "/"
                     </span>
                     <span>{cite.to_string()}</span>
@@ -170,37 +170,41 @@ fn Wrapper(children: Children) -> impl IntoView {
         }).collect_view();
     view! {
         <div class="w-full">
-            <header class="bg-slate-50 lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120">
+            <header class="bg-ctp-mantle lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120">
                 <div class="hidden lg:sticky lg:top-0 lg:flex lg:w-16 lg:flex-none lg:items-center lg:whitespace-nowrap lg:py-12 lg:text-sm lg:leading-7 lg:[writing-mode:vertical-rl]">
-                    <span class="font-mono text-slate-500">Curated by</span>
-                    <span class="mt-6 flex gap-6 font-bold text-slate-900">{mntnrs.clone()}</span>
+                    <span class="font-mono text-ctp-text">Curated by</span>
+                    <span class="mt-6 flex gap-6 font-bold text-ctp-text">{mntnrs.clone()}</span>
                 </div>
-                <div class="relative z-10 mx-auto px-4 pb-4 pt-10 sm:px-6 md:max-w-2xl md:px-4 lg:min-h-full lg:flex-auto lg:border-x lg:border-slate-200 lg:px-8 lg:py-12 xl:px-12">
+                <div class="relative z-10 mx-auto px-4 pb-4 pt-10 sm:px-6 md:max-w-2xl md:px-4 lg:min-h-full lg:flex-auto lg:border-x lg:border-ctp-crust lg:px-8 lg:py-12 xl:px-12">
                     <a
                         href="/"
-                        class="relative mx-auto block w-48 overflow-hidden rounded-lg bg-slate-200 shadow-xl shadow-slate-200 sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
+                        class="relative mx-auto block w-48 overflow-hidden rounded-lg bg-ctp-crust shadow-xl shadow-ctp-crust sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
                         aria-label="Homepage"
                     >
+                    <picture>
+                        <source
+                            srcset="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevydark_wdnm2d.avif"
+                            media="(prefers-color-scheme: dark)"
+                        />
                         <img
                             class="w-full"
                             src="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevylight_uddwes.avif"
                             alt=""
-                            sizes="(min-width: 1024px) 20rem, (min-width: 640px) 16rem, 12rem"
-                            priority
                         />
+                        </picture>
                         <div class="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/10 sm:rounded-xl lg:rounded-2xl"></div>
                     </a>
                     <div class="mt-10 text-center lg:mt-12 lg:text-left">
-                        <p class="text-xl font-bold text-slate-900">
+                        <p class="text-xl font-bold text-ctp-text">
                             <a href="/">This Week in Bevy</a>
                         </p>
-                        <p class="mt-3 text-lg font-medium leading-8 text-slate-700">
+                        <p class="mt-3 text-lg font-medium leading-8 text-ctp-text">
                             What happened this week in the Bevy Engine ecosystem
                         </p>
                     </div>
                     <AboutSection class="mt-12 hidden lg:block"/>
                     <section class="mt-10 lg:mt-12">
-                        <h2 class="sr-only flex items-center font-mono text-sm font-medium leading-7 text-slate-900 lg:not-sr-only">
+                        <h2 class="sr-only flex items-center font-mono text-sm font-medium leading-7 text-ctp-text lg:not-sr-only">
                             <TinyWaveFormIcon
                                 start_color="fill-pink-300"
                                 end_color="fill-rose-300"
@@ -211,7 +215,7 @@ fn Wrapper(children: Children) -> impl IntoView {
                         <div class="h-px bg-gradient-to-r from-slate-200/0 via-slate-200 to-slate-200/0 lg:hidden"></div>
                         <ul
                             role="list"
-                            class="mt-4 flex justify-center gap-10 text-base font-medium leading-7 text-slate-700 sm:gap-8 lg:flex-col lg:gap-4"
+                            class="mt-4 flex justify-center gap-10 text-base font-medium leading-7 text-ctp-text sm:gap-8 lg:flex-col lg:gap-4"
                         >
 
                             {[("YouTube Playlist", YouTubeIcon)]
@@ -234,18 +238,18 @@ fn Wrapper(children: Children) -> impl IntoView {
                     </section>
                 </div>
             </header>
-            <main class="border-t border-slate-200 lg:relative lg:mb-28 lg:ml-112 lg:border-t-0 xl:ml-120">
+            <main class="border-t border-ctp-crust lg:relative lg:mb-28 lg:ml-112 lg:border-t-0 xl:ml-120">
                 // <Waveform class="absolute left-0 top-0 h-20 w-full" />
                 <div class="relative">{children()}</div>
             </main>
-            <footer class="border-t border-slate-200 bg-slate-50 py-10 pb-40 sm:py-16 sm:pb-32 lg:hidden">
+            <footer class="border-t border-ctp-crust bg-ctp-mantle py-10 pb-40 sm:py-16 sm:pb-32 lg:hidden">
                 <div class="mx-auto px-4 sm:px-6 md:max-w-2xl md:px-4">
                     <AboutSection/>
-                    <h2 class="mt-8 flex items-center font-mono text-sm font-medium leading-7 text-slate-900">
+                    <h2 class="mt-8 flex items-center font-mono text-sm font-medium leading-7 text-ctp-text">
                         <PersonIcon class="h-3 w-auto fill-slate-300"/>
                         <span class="ml-2.5">Curated by</span>
                     </h2>
-                    <div class="mt-2 flex gap-6 text-sm font-bold leading-7 text-slate-900">
+                    <div class="mt-2 flex gap-6 text-sm font-bold leading-7 text-ctp-text">
                         {mntnrs}
                     </div>
                 </div>

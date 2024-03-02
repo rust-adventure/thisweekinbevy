@@ -2,6 +2,7 @@ use crate::app::components::Container;
 use leptos::*;
 use leptos_meta::*;
 use serde::{Deserialize, Serialize};
+use std::ops::Not;
 
 #[component]
 fn PauseIcon(
@@ -37,40 +38,34 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
                 <div class="flex flex-col items-start">
                     <h2
                         id=format!("issue-{}-title", issue.id)
-                        class="mt-2 text-lg font-bold text-slate-900"
+                        class="mt-2 text-lg font-bold text-ctp-text"
                     >
                         <a href=format!("/issue/{}", issue.slug)>{&issue.display_name}</a>
                     </h2>
-                    <p class="order-first font-mono text-sm leading-7 text-slate-500">
+                    <p class="order-first font-mono text-sm leading-7 text-ctp-text">
                         {&issue.issue_date.map(|date| date.to_string()).unwrap_or("".to_string())}
                     </p>
                     <div
-                        class=r#"mt-1 text-base leading-7 text-slate-700 prose prose [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+                        class=r#"mt-1 text-base leading-7 text-ctp-text prose [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
                         inner_html=issue.description.clone()
                     ></div>
                     <div class="mt-4 flex items-center gap-4">
-                        // <EpisodePlayButton
-                        // episode={episode}
-                        // class="flex items-center gap-x-3 text-sm font-bold leading-6 text-pink-500 hover:text-pink-700 active:text-pink-900"
-                        // playing={
-                        // <>
-                        // <PauseIcon class="h-2.5 w-2.5 fill-current" />
-                        // <span aria-hidden="true">Listen</span>
-                        // </>
-                        // }
-                        // paused={
-                        // <>
-                        // <PlayIcon class="h-2.5 w-2.5 fill-current" />
-                        // <span aria-hidden="true">Listen</span>
-                        // </>
-                        // }
-                        // />
-                        <span aria-hidden="true" class="text-sm font-bold text-slate-400">
-                            /
-                        </span>
+                        {
+                            issue.youtube_id.trim().is_empty().not().then_some(view! {
+                                <a
+                                href=format!("https://youtube.com/watch?v=") 
+                                class="flex items-center gap-x-3 text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900">
+                                  <PlayIcon class="h-2.5 w-2.5 fill-current" />
+                                  <span aria-hidden="true">Watch</span>
+                                </a>
+                                <span aria-hidden="true" class="text-sm font-bold text-ctp-text">
+                                    /
+                                </span>
+                            })
+                        }
                         <a
                             href=format!("/issue/{}", issue.slug)
-                            class="flex items-center text-sm font-bold leading-6 text-pink-500 hover:text-pink-700 active:text-pink-900"
+                            class="flex items-center text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900"
                             aria-label=format!("full issue for {}", issue.display_name)
                         >
                             Read issue...
@@ -88,7 +83,7 @@ pub fn Home() -> impl IntoView {
         create_resource(move || {}, |_| fetch_issues());
 
     view! {
-        <div class="pb-12 pt-16 sm:pb-4 lg:pt-12">
+        <div class="pb-12 sm:pb-4">
             <Title text="This Week in the Bevy Game Engine"/>
             <Meta
                 name="description"
@@ -102,9 +97,11 @@ pub fn Home() -> impl IntoView {
                 content="https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.avif"
             />
 
+            <div class="pt-16 lg:pt-12 sm:pb-4 lg:pb-8 bg-gradient-to-r from-ctp-mantle to-ctp-base">
             <Container>
-                <h1 class="text-2xl font-bold leading-7 text-slate-900">Issues</h1>
+                <h1 class="text-2xl font-bold leading-7 text-ctp-text">Issues</h1>
             </Container>
+            </div>
             <Suspense fallback=move || {
                 view! { <p>"Loading (Suspense Fallback)..."</p> }
             }>
@@ -115,7 +112,7 @@ pub fn Home() -> impl IntoView {
                             Err(_e) => view! { <div></div> },
                             Ok(issues) => {
                                 view! {
-                                    <div class="divide-y divide-slate-100 sm:mt-4 lg:mt-8 lg:border-t lg:border-slate-100">
+                                    <div class="divide-y divide-ctp-mantle lg:border-y-4 lg:border-ctp-mantle">
 
                                         {issues
                                             .into_iter()
@@ -141,6 +138,7 @@ struct SqlIssueShort {
     pub issue_date: Option<time::Date>,
     pub display_name: String,
     pub description: String,
+    pub youtube_id: String,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -150,6 +148,7 @@ pub struct IssueShort {
     pub issue_date: Option<time::Date>,
     pub display_name: String,
     pub description: String,
+    pub youtube_id: String,
 }
 
 #[cfg(feature = "ssr")]
@@ -186,6 +185,7 @@ impl From<SqlIssueShort> for IssueShort {
             issue_date: value.issue_date,
             display_name: value.display_name,
             description: compile(summary),
+            youtube_id: value.youtube_id,
         }
     }
 }
@@ -202,7 +202,8 @@ pub async fn fetch_issues(
           slug,
           issue_date,
           display_name,
-          description
+          description,
+          youtube_id
 FROM issue
 ORDER BY status, issue_date DESC"
     )

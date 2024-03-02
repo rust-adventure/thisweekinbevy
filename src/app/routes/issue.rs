@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 use std::ops::Not;
 
+const PROSE: &str = "prose text-ctp-text prose-code:text-ctp-text prose-a:text-ctp-sky hover:prose-a:text-ctp-blue prose-blockquote:text-ctp-text";
+
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {
     /// The title of the issue is technically the
@@ -574,26 +576,24 @@ pub fn Issue() -> impl IntoView {
                                         // }
                                         // />
                                         <div class="flex flex-col">
-                                            <h1 class="mt-2 text-4xl font-bold text-slate-900">
+                                            <h1 class="mt-2 text-4xl font-bold text-ctp-text">
                                                 {issue.title.clone()}
                                             </h1>
-                                            <p class="order-first font-mono text-sm leading-7 text-slate-500">
+                                            <p class="order-first font-mono text-sm leading-7 text-ctp-text">
                                                 {issue.issue_date.to_string()}
                                             </p>
                                         </div>
                                     </div>
-                                    // <p class="ml-24 mt-3 text-lg font-medium leading-8 text-slate-700">
+                                    // <p class="ml-24 mt-3 text-lg font-medium leading-8 text-ctp-text">
                                     // {issue.as_ref().unwrap().description.clone()}
                                     // </p>
                                     <div
-                                        class=r#"mt-3 leading-8 text-slate-700 prose [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+                                        class=format!("mt-3 leading-8 {}", PROSE)
                                         inner_html=issue.description.clone()
                                     ></div>
                                 </header>
                                 <Divider title="Showcase"/>
-                                <div class=r#"prose prose-slate mt-14 [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#></div>
-                                // dangerouslySetInnerHTML={{ __html: episode.content }}
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Showcase</h2>
+                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Showcase</h2>
                                 {issue
                                     .showcases
                                     .into_iter()
@@ -601,7 +601,7 @@ pub fn Issue() -> impl IntoView {
                                         view! { <ShowcaseView showcase=showcase/> }
                                     })
                                     .collect::<Vec<_>>()}
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Crates</h2>
+                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Crates</h2>
                                 <Divider title="Crates"/>
 
                                 {issue
@@ -613,7 +613,7 @@ pub fn Issue() -> impl IntoView {
                                     .collect_view()}
 
                                 <Divider title="Devlogs"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Devlogs</h2>
+                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Devlogs</h2>
                                 {issue
                                     .devlogs
                                     .into_iter()
@@ -630,9 +630,9 @@ pub fn Issue() -> impl IntoView {
                                         view! { <EducationalView educational=educational/> }
                                     })
                                     .collect_view()}
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">Education</h2>
+                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Education</h2>
                                 // <Divider title="Fixes and Features"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-slate-900">
+                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">
                                 // Pull Requests Merged this week
                                 // </h2>
                                 <Divider title="Pull Requests Merged This Week"/>
@@ -666,8 +666,11 @@ pub fn Issue() -> impl IntoView {
                                     <p>
                                         Here you can find two types of potential contribution: Pull Requests that might need review and Issues that might need to be worked on.
                                     </p>
+                                    <p class="flex justify-end mt-2">
+                                    <a href="https://github.com/bevyengine/bevy/blob/main/CONTRIBUTING.md">How do I contribute?</a>
+                                    </p>
                                 </CalloutInfo>
-                                <h2 class="mt-6 text-2xl font-bold text-slate-900">
+                                <h2 class="mt-6 text-2xl font-bold text-ctp-text">
                                     Pull Requests Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
@@ -688,7 +691,7 @@ pub fn Issue() -> impl IntoView {
                                         .collect_view()}
 
                                 </ul>
-                                <h2 class="mt-6 text-2xl font-bold text-slate-900">
+                                <h2 class="mt-6 text-2xl font-bold text-ctp-text">
                                     Issues Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
@@ -739,15 +742,15 @@ fn ActivityListItem(
     view! {
         <li class="relative flex gap-x-4">
             <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
-                <div class="w-px bg-gray-200"></div>
+                <div class="w-px bg-ctp-overlay1"></div>
             </div>
-            <div class="relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+            <div class="relative flex h-6 w-6 flex-none items-center justify-center bg-ctp-base">
 
                 {match icon {
                     ActivityListIcon::Default => {
                         view! {
                             <>
-                                <div class="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                <div class="h-1.5 w-1.5 rounded-full bg-ctp-overlay1 ring-1 ring-ctp-overlay-2"></div>
                             </>
                         }
                     }
@@ -772,26 +775,19 @@ fn ActivityListItem(
                 }}
 
             </div>
-            <p class="flex-auto py-0.5 text-xs leading-5 text-gray-500">
+            <p class=format!("flex-auto py-0.5 text-xs leading-5 {}", if author.starts_with("dependabot") { "text-ctp-overlay1" } else { "text-ctp-text" })>
                 <a
                     href=url
-                    class=format!(
-                        "font-medium {}",
-                        if author.starts_with("dependabot") { "" } else { "text-gray-900" },
-                    )
+                    class="font-medium"
                 >
-
                     {title}
                 </a>
                 " authored by "
-                <span class=format!(
-                    "font-medium {}",
-                    if author.starts_with("dependabot") { "" } else { "text-gray-900" },
-                )>{author}</span>
+                <span class="font-medium">{author}</span>
             </p>
             <time
                 datetime=date.to_string()
-                class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+                class="flex-none py-0.5 text-xs leading-5 text-ctp-text"
             >
                 {date.to_string()}
             </time>
@@ -799,7 +795,6 @@ fn ActivityListItem(
     }
 }
 #[component]
-#[allow(dead_code)]
 fn ActivityListComment(
     /// datetime for the <time> element
     /// "2023-01-23T15:56"
@@ -814,7 +809,6 @@ fn ActivityListComment(
     #[prop(into, default = "Someone".to_string())]
     author: String,
 ) -> impl IntoView {
-    dbg!(url);
     view! {
         <li class="relative flex gap-x-4">
             <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
@@ -827,15 +821,15 @@ fn ActivityListComment(
             />
             <div class="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200">
                 <div class="flex justify-between gap-x-4">
-                    <div class="py-0.5 text-xs leading-5 text-gray-500">
-                        <span class="font-medium text-gray-900">{author}</span>
+                    <div class="py-0.5 text-xs leading-5 text-ctp-text">
+                        <span class="font-medium text-ctp-text">{author}</span>
                         commented
                     </div>
-                    <time datetime=time class="flex-none py-0.5 text-xs leading-5 text-gray-500">
+                    <time datetime=time class="flex-none py-0.5 text-xs leading-5 text-ctp-text">
                         3d ago
                     </time>
                 </div>
-                <p class="text-sm leading-6 text-gray-500">{comment}</p>
+                <p class="text-sm leading-6 text-ctp-text">{comment}</p>
             </div>
         </li>
     }
@@ -873,9 +867,9 @@ fn CrateReleaseView(
                 .collect_view()}
 
         </ul>
-        <h3 class="mt-2 text-xl font-bold text-slate-900">{crate_release.title}</h3>
+        <h3 class="mt-2 text-xl font-bold text-ctp-text">{crate_release.title}</h3>
         <div
-            class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+            class=format!("mt-3 {}", PROSE)
             inner_html=crate_release.description
         ></div>
     }
@@ -891,7 +885,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
                 view! {
                     <a href=&devlog.post_url>
                         <img
-                            class="mt-12 w-full rounded-t-md"
+                            class="w-full mt-12 w-full rounded-t-md"
                             src=&image.url
                             alt=&image.description
                         />
@@ -925,7 +919,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
 
         </ul>
         <div class="flex justify-between">
-            <h3 class="mt-2 text-xl font-bold text-slate-900">{devlog.title}</h3>
+            <h3 class="mt-2 text-xl font-bold text-ctp-text">{devlog.title}</h3>
             <div class="flex space-x-4">
 
                 {devlog
@@ -950,7 +944,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
             </div>
         </div>
         <div
-            class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+            class=format!("mt-3 {}", PROSE)
             inner_html=devlog.description
         ></div>
     }
@@ -968,7 +962,7 @@ fn EducationalView(
                 view! {
                     <a href=&educational.post_url>
                         <img
-                            class="mt-12 w-full rounded-t-md"
+                            class="w-full mt-12 w-full rounded-t-md"
                             src=&image.url
                             alt=&image.description
                         />
@@ -1002,7 +996,7 @@ fn EducationalView(
 
         </ul>
         <div class="flex justify-between">
-            <h3 class="mt-2 text-xl font-bold text-slate-900">{educational.title}</h3>
+            <h3 class="mt-2 text-xl font-bold text-ctp-text">{educational.title}</h3>
             <div class="flex space-x-4">
 
                 {educational
@@ -1027,7 +1021,7 @@ fn EducationalView(
             </div>
         </div>
         <div
-            class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+            class=format!("mt-3 {}", PROSE)
             inner_html=educational.description
         ></div>
     }
@@ -1042,7 +1036,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
             .map(|image| {
                 view! {
                     <a href=&showcase.url>
-                        <img class="mt-12" src=&image.url alt=&image.description/>
+                        <img class="w-full mt-12" src=&image.url alt=&image.description/>
                     </a>
                 }
             })}
@@ -1073,7 +1067,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
 
         </ul>
         <div class="flex justify-between">
-            <h3 class="mt-2 text-xl font-bold text-slate-900">{showcase.title}</h3>
+            <h3 class="mt-2 text-xl font-bold text-ctp-text">{showcase.title}</h3>
 
             {showcase
                 .discord_url
@@ -1084,7 +1078,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
 
         </div>
         <div
-            class=r#"mt-3 prose prose-slate [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+            class=format!("mt-3, {}", PROSE)
             inner_html=showcase.description
         ></div>
     }
@@ -1095,7 +1089,7 @@ fn DiscordLink(discord_url: String) -> impl IntoView {
     view! {
         <a
             href=&discord_url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-brand-discord px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-discord focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-discord"
         >
             Discord
             <svg
@@ -1121,7 +1115,7 @@ fn VideoLink(url: String) -> impl IntoView {
     view! {
         <a
             href=&url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
         >
             Video
             <svg
@@ -1145,7 +1139,7 @@ fn PostLink(url: String) -> impl IntoView {
     view! {
         <a
             href=&url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
         >
             Post
             <svg
@@ -1177,18 +1171,18 @@ enum CalloutType {
 impl CalloutType {
     fn bg(&self) -> &str {
         match self {
-            CalloutType::Info => "bg-blue-50",
-            CalloutType::Caution => "bg-yellow-50",
-            CalloutType::Warning => "bg-red-50",
-            CalloutType::Success => "bg-green-50",
+            CalloutType::Info => "bg-blue-50 dark:bg-blue-950",
+            CalloutType::Caution => "bg-yellow-50 dark:bg-yellow-950",
+            CalloutType::Warning => "bg-red-50 dark:bg-red-950",
+            CalloutType::Success => "bg-green-50 dark:bg-green-950",
         }
     }
     fn icon(&self) -> &str {
         match self {
-            CalloutType::Info => "text-blue-400",
-            CalloutType::Caution => "text-yellow-400",
-            CalloutType::Warning => "text-red-400",
-            CalloutType::Success => "text-green-400",
+            CalloutType::Info => "text-ctp-blue",
+            CalloutType::Caution => "text-ctp-yellow",
+            CalloutType::Warning => "text-ctp-red",
+            CalloutType::Success => "text-ctp-green",
         }
     }
     fn icon_svg(&self) -> impl IntoView {
@@ -1253,18 +1247,18 @@ impl CalloutType {
     }
     fn title(&self) -> &str {
         match self {
-            CalloutType::Info => "text-blue-800",
-            CalloutType::Caution => "text-yellow-800",
-            CalloutType::Warning => "text-red-800",
-            CalloutType::Success => "text-green-800",
+            CalloutType::Info => "text-ctp-blue",
+            CalloutType::Caution => "text-ctp-yellow",
+            CalloutType::Warning => "text-ctp-red",
+            CalloutType::Success => "text-ctp-green",
         }
     }
     fn content(&self) -> &str {
         match self {
-            CalloutType::Info => "text-blue-700",
-            CalloutType::Caution => "text-yellow-700",
-            CalloutType::Warning => "text-red-700",
-            CalloutType::Success => "text-green-700",
+            CalloutType::Info => "text-ctp-blue",
+            CalloutType::Caution => "text-ctp-yellow",
+            CalloutType::Warning => "text-ctp-red",
+            CalloutType::Success => "text-ctp-green",
         }
     }
     fn child_links(&self) -> &str {
