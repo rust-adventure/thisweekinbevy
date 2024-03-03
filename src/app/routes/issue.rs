@@ -565,6 +565,7 @@ pub fn Issue() -> impl IntoView {
                                     &issue.issue_date,
                                 )
                             />
+
                             <Meta name="twitter:image" content=issue.opengraph_image/>
 
                             <Container>
@@ -866,11 +867,13 @@ fn CrateReleaseView(
                     </a>
                 }
             })}
+
         <ul
             role="list"
             class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
         >
-            {it.map(|image| {
+            {it
+                .map(|image| {
                     view! {
                         <li class="relative">
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
