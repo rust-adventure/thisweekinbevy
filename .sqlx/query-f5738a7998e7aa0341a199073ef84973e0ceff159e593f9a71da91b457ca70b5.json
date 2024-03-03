@@ -1,0 +1,157 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    slug,\n    issue_date,\n    cloudinary_public_id,\n    display_name,\n    description,\n    youtube_id,\n    showcases as \"showcases: Json<Vec<ShowcaseData>>\",\n    crate_releases as \"crate_releases: Json<Vec<SqlCrateRelease>>\",\n    devlogs as \"devlogs: Json<Vec<SqlDevlog>>\",\n    educationals as \"educationals: Json<Vec<SqlEducational>>\",\n    new_github_issues as \"new_github_issues: Json<Vec<SqlNewGhIssue>>\",\n    new_pull_requests as \"new_pull_requests: Json<Vec<SqlNewPr>>\",\n    merged_pull_requests as \"merged_pull_requests: Json<Vec<SqlMergedPullRequest>>\"\nFROM\n    issue\n    LEFT JOIN (\n        SELECT\n            issue_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"title\",\n                    scase.title,\n                    \"url\",\n                    scase.url,\n                    \"discord_url\",\n                    scase.discord_url,\n                    \"description\",\n                    scase.description,\n                    \"images\",\n                    scase.images\n                )\n            ) AS showcases\n        FROM\n            issue__showcase\n            LEFT JOIN (\n                SELECT\n                    id,\n                    title,\n                    url,\n                    description,\n                    discord_url,\n                    images\n                from\n                    showcase\n                    LEFT JOIN (\n                        SELECT\n                            showcase_id,\n                            JSON_ARRAYAGG(\n                                JSON_OBJECT(\n                                    \"id\",\n                                    TO_BASE64(image.id),\n                                    \"description\",\n                                    description,\n                                    \"cloudinary_public_id\",\n                                    cloudinary_public_id\n                                )\n                            ) AS images\n                        FROM\n                            showcase__image\n                            LEFT JOIN image ON showcase__image.image_id = image.id\n                        GROUP BY\n                            showcase_id\n                    ) as i on i.showcase_id = showcase.id\n            ) as scase ON scase.id = issue__showcase.showcase_id\n        GROUP BY\n            issue_id\n    ) AS s ON s.issue_id = issue.id\n    LEFT JOIN (\n        SELECT\n            issue_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"title\",\n                    crelease.title,\n                    \"url\",\n                    crelease.url,\n                    \"discord_url\",\n                    crelease.discord_url,\n                    \"description\",\n                    crelease.description,\n                    \"images\",\n                    crelease.images\n                )\n            ) AS crate_releases\n        FROM\n            issue__crate_release\n            LEFT JOIN (\n                SELECT\n                    id,\n                    title,\n                    url,\n                    description,\n                    posted_date,\n                    discord_url,\n                    images\n                from\n                    crate_release\n                    LEFT JOIN (\n                        SELECT\n                            crate_release_id,\n                            JSON_ARRAYAGG(\n                                JSON_OBJECT(\n                                    \"id\",\n                                    TO_BASE64(image.id),\n                                    \"description\",\n                                    description,\n                                    \"cloudinary_public_id\",\n                                    cloudinary_public_id\n                                )\n                            ) AS images\n                        FROM\n                            crate_release__image\n                            LEFT JOIN image ON crate_release__image.image_id = image.id\n                        GROUP BY\n                            crate_release_id\n                    ) as i on i.crate_release_id = crate_release.id\n            ) as crelease ON crelease.id = issue__crate_release.crate_release_id\n        GROUP BY\n            issue_id\n    ) AS cr ON cr.issue_id = issue.id\n    LEFT JOIN (\n        SELECT\n            issue_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"title\",\n                    dlog.title,\n                    \"post_url\",\n                    dlog.post_url,\n                    \"video_url\",\n                    dlog.video_url,\n                    \"discord_url\",\n                    dlog.discord_url,\n                    \"description\",\n                    dlog.description,\n                    \"images\",\n                    dlog.images\n                )\n            ) AS devlogs\n        FROM\n            issue__devlog\n            LEFT JOIN (\n                SELECT\n                    id,\n                    title,\n                    post_url,\n                    video_url,\n                    description,\n                    discord_url,\n                    images\n                from\n                    devlog\n                    LEFT JOIN (\n                        SELECT\n                            devlog_id,\n                            JSON_ARRAYAGG(\n                                JSON_OBJECT(\n                                    \"id\",\n                                    TO_BASE64(image.id),\n                                    \"description\",\n                                    description,\n                                    \"cloudinary_public_id\",\n                                    cloudinary_public_id\n                                )\n                            ) AS images\n                        FROM\n                            devlog__image\n                            LEFT JOIN image ON devlog__image.image_id = image.id\n                        GROUP BY\n                            devlog_id\n                    ) as i on i.devlog_id = devlog.id\n            ) as dlog ON dlog.id = issue__devlog.devlog_id\n        GROUP BY\n            issue_id\n    ) AS d ON d.issue_id = issue.id\n    LEFT JOIN (\n        SELECT\n            issue_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"title\",\n                    edu.title,\n                    \"post_url\",\n                    edu.post_url,\n                    \"video_url\",\n                    edu.video_url,\n                    \"discord_url\",\n                    edu.discord_url,\n                    \"description\",\n                    edu.description,\n                    \"images\",\n                    edu.images\n                )\n            ) AS educationals\n        FROM\n            issue__educational\n            LEFT JOIN (\n                SELECT\n                    id,\n                    title,\n                    post_url,\n                    video_url,\n                    description,\n                    discord_url,\n                    images\n                from\n                    educational\n                    LEFT JOIN (\n                        SELECT\n                            educational_id,\n                            JSON_ARRAYAGG(\n                                JSON_OBJECT(\n                                    \"id\",\n                                    TO_BASE64(image.id),\n                                    \"description\",\n                                    description,\n                                    \"cloudinary_public_id\",\n                                    cloudinary_public_id\n                                )\n                            ) AS images\n                        FROM\n                            educational__image\n                            LEFT JOIN image ON educational__image.image_id = image.id\n                        GROUP BY\n                            educational_id\n                    ) as i on i.educational_id = educational.id\n            ) as edu ON edu.id = issue__educational.educational_id\n        GROUP BY\n            issue_id\n    ) AS e ON e.issue_id = issue.id\n    LEFT JOIN (\n        SELECT\n            issue_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"title\",\n                    title,\n                    \"url\",\n                    url,\n                    \"gh_created_at\",\n                    gh_created_at,\n                    \"author\",\n                    author,\n                    \"author_url\",\n                    author_url\n                )\n            ) AS new_github_issues\n        FROM\n            issue__new_github_issue\n            LEFT JOIN new_github_issue ON new_github_issue.id = issue__new_github_issue.github_issue_id\n        GROUP BY\n            issue_id\n    ) AS ngis ON ngis.issue_id = issue.id\n    LEFT JOIN (\n        SELECT\n            issue_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"title\",\n                    title,\n                    \"url\",\n                    url,\n                    \"gh_created_at\",\n                    gh_created_at,\n                    \"author\",\n                    author,\n                    \"author_url\",\n                    author_url\n                )\n            ) AS new_pull_requests\n        FROM\n            issue__new_pull_request\n            LEFT JOIN new_pull_request ON new_pull_request.id = issue__new_pull_request.pull_request_id\n        GROUP BY\n            issue_id\n    ) AS new_prs ON new_prs.issue_id = issue.id\n    LEFT JOIN (\n        SELECT\n            issue_id,\n            JSON_ARRAYAGG(\n                JSON_OBJECT(\n                    \"title\",\n                    title,\n                    \"url\",\n                    url,\n                    \"merged_at_date\",\n                    merged_at_date,\n                    \"author\",\n                    author,\n                    \"author_url\",\n                    author_url\n                )\n            ) AS merged_pull_requests\n        FROM\n            issue__merged_pull_request\n            LEFT JOIN merged_pull_request ON merged_pull_request.id = issue__merged_pull_request.merged_pull_request_id\n        GROUP BY\n            issue_id\n    ) AS merged_prs ON merged_prs.issue_id = issue.id\nWHERE\n    issue_date = ?;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "slug",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 800
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "issue_date",
+        "type_info": {
+          "type": "Date",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "cloudinary_public_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 800
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "display_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 400
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 20000
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "youtube_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL",
+          "char_set": 255,
+          "max_size": 400
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "showcases: Json<Vec<ShowcaseData>>",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "crate_releases: Json<Vec<SqlCrateRelease>>",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "devlogs: Json<Vec<SqlDevlog>>",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "educationals: Json<Vec<SqlEducational>>",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "new_github_issues: Json<Vec<SqlNewGhIssue>>",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "new_pull_requests: Json<Vec<SqlNewPr>>",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "merged_pull_requests: Json<Vec<SqlMergedPullRequest>>",
+        "type_info": {
+          "type": "Json",
+          "flags": "BLOB | BINARY",
+          "char_set": 63,
+          "max_size": 4294967295
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "f5738a7998e7aa0341a199073ef84973e0ceff159e593f9a71da91b457ca70b5"
+}
