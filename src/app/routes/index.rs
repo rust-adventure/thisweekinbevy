@@ -205,20 +205,46 @@ pub async fn fetch_issues(
 ) -> Result<Vec<IssueShort>, ServerFnError> {
     let pool = crate::sql::pool()?;
 
-    let issues: Vec<SqlIssueShort> = sqlx::query_as!(
-        SqlIssueShort,
-        "SELECT
-          id,
-          slug,
-          issue_date,
-          display_name,
-          description,
-          youtube_id
+    let issues: Vec<SqlIssueShort> =
+        match crate::sql::with_admin_access() {
+            Ok(_) => {
+                // logged in as admin, serve all issues
+                sqlx::query_as!(
+                    SqlIssueShort,
+                    "
+SELECT
+    id,
+    slug,
+    issue_date,
+    display_name,
+    description,
+    youtube_id
 FROM issue
 ORDER BY status, issue_date DESC"
-    )
-    .fetch_all(&pool)
-    .await?;
+                )
+                .fetch_all(&pool)
+                .await?
+            }
+            Err(_) => {
+                // not logged in, serve issues that
+                sqlx::query_as!(
+                    SqlIssueShort,
+                    r#"
+SELECT
+    id,
+    slug,
+    issue_date,
+    display_name,
+    description,
+    youtube_id
+FROM issue
+WHERE status = "publish"
+ORDER BY status, issue_date DESC"#
+                )
+                .fetch_all(&pool)
+                .await?
+            }
+        };
 
     Ok(issues.into_iter().map(IssueShort::from).collect())
 }
