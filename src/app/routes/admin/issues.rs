@@ -42,7 +42,7 @@ pub fn Issues() -> impl IntoView {
                 </div>
             </div>
             <Suspense fallback=move || view! { <p>"Loading (Suspense Fallback)..."</p> }>
-                <ul role="list" class="divide-y divide-gray-100">
+                <ul role="list" class="divide-y-4 divide-ctp-mantle">
                     {move || {
                         issues
                             .get()

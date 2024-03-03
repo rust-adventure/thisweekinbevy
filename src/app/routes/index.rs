@@ -107,7 +107,7 @@ pub fn Home() -> impl IntoView {
                 content="https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.avif"
             />
 
-            <div class="pt-16 lg:pt-12 sm:pb-4 lg:pb-8 bg-gradient-to-r from-ctp-mantle to-ctp-base">
+            <div class="pt-16 lg:pt-12 pb-4 lg:pb-8  bg-gradient-to-r from-ctp-mantle to-ctp-base">
                 <Container>
                     <h1 class="text-2xl font-bold leading-7 text-ctp-text">Issues</h1>
                 </Container>
@@ -122,7 +122,7 @@ pub fn Home() -> impl IntoView {
                             Err(_e) => view! { <div></div> },
                             Ok(issues) => {
                                 view! {
-                                    <div class="divide-y divide-ctp-mantle lg:border-y-4 lg:border-ctp-mantle">
+                                    <div class="divide-y-4 divide-ctp-mantle lg:border-y-4 lg:border-ctp-mantle">
 
                                         {issues
                                             .into_iter()

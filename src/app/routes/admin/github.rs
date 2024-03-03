@@ -275,6 +275,7 @@ pub async fn select_new_github_issues(
     let pool = crate::sql::pool()?;
     let _username = crate::sql::with_admin_access()?;
 
+    tracing::info!(issue_id, ?start_date, ?end_date, "select_new_github_issue");
     let issue_id: [u8; 16] = issue_id
         .parse::<rusty_ulid::Ulid>()
         .expect("a valid ulid to be returned from the form")

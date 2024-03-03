@@ -91,6 +91,7 @@ FROM
                     title,
                     url,
                     description,
+                    posted_date,
                     discord_url,
                     images
                 from
