@@ -853,7 +853,6 @@ fn CrateReleaseView(
     let mut it = crate_release.images.iter();
     let first_image = it.next();
 
-
     view! {
         {first_image
             .map(|image| {
