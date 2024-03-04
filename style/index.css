@@ -149,7 +149,7 @@
   --ctp-mantle: hsl(197, 33%, 95%);
   --ctp-crust: hsl(197, 33%, 90%);
 
-  --brand-discord: #5865F2;
+  --brand-discord: #5865f2;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -203,4 +203,13 @@
     rgba(112, 228, 112, 1) 50%,
     rgba(51, 183, 255, 1) 75%
   );
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2")
+    format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
 }
