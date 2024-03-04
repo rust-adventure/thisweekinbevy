@@ -569,7 +569,7 @@ pub fn Issue() -> impl IntoView {
                             <Meta name="twitter:image" content=issue.opengraph_image/>
 
                             <Container>
-                                <img class="w-full" src=issue.header_image alt=""/>
+                                <img loading="lazy" class="w-full" loading="lazy" src=issue.header_image alt=""/>
                                 <header class="flex flex-col pt-16">
                                     <div class="flex items-center gap-6">
                                         // <EpisodePlayButton
@@ -827,6 +827,7 @@ fn ActivityListComment(
             </div>
             <img
                 src="/this-week-in-bevydark"
+                loading="lazy"
                 alt=""
                 class="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
             />
@@ -860,6 +861,7 @@ fn CrateReleaseView(
                     <a href=&crate_release.url>
                         <img
                             class="w-full mt-12 w-full rounded-t-md"
+                            loading="lazy"
                             src=&image.url
                             alt=&image.description
                         />
@@ -878,6 +880,7 @@ fn CrateReleaseView(
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                 <img
                                     src=&image.url
+                                    loading="lazy"
                                     alt=&image.description
                                     class="pointer-events-none object-cover group-hover:opacity-75"
                                 />
@@ -907,6 +910,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
                     <a href=&devlog.post_url>
                         <img
                             class="w-full mt-12 w-full rounded-t-md"
+                            loading="lazy"
                             src=&image.url
                             alt=&image.description
                         />
@@ -926,6 +930,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                 <img
                                     src=&image.url
+                                    loading="lazy"
                                     alt=&image.description
                                     class="pointer-events-none object-cover group-hover:opacity-75"
                                 />
@@ -981,6 +986,7 @@ fn EducationalView(
                     <a href=&educational.post_url>
                         <img
                             class="w-full mt-12 w-full rounded-t-md"
+                            loading="lazy"
                             src=&image.url
                             alt=&image.description
                         />
@@ -1000,6 +1006,7 @@ fn EducationalView(
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                 <img
                                     src=&image.url
+                                    loading="lazy"
                                     alt=&image.description
                                     class="pointer-events-none object-cover group-hover:opacity-75"
                                 />
@@ -1051,7 +1058,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
             .map(|image| {
                 view! {
                     <a href=&showcase.url>
-                        <img class="w-full mt-12" src=&image.url alt=&image.description/>
+                        <img loading="lazy" class="w-full mt-12" src=&image.url alt=&image.description/>
                     </a>
                 }
             })}
@@ -1068,6 +1075,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                 <img
                                     src=&image.url
+                                    loading="lazy"
                                     alt=&image.description
                                     class="pointer-events-none object-cover group-hover:opacity-75"
                                 />
