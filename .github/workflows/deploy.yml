@@ -27,7 +27,7 @@ jobs:
       - name: copy fonts
         run: |
           mkdir target/site/pp-neue-montreal/
-          cp -r $GITHUB_WORKSPACE/fonts/pp-neue-montreal/* target/site/pp-neue-montreal/
+          cp $GITHUB_WORKSPACE/fonts/pp-neue-montreal/* target/site/pp-neue-montreal/
       - name: Publish to Netlify
         uses: netlify/actions/cli@master
         with:
