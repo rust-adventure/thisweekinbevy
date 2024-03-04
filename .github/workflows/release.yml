@@ -24,11 +24,8 @@ jobs:
           # and is stable over multiple jobs.
           # default: empty
           # shared-key: ""
-      # - run: cargo install cargo-binstall@^0.22
-      # - run: cargo install cargo-leptos@0.2.7
       - name: "Install cargo-leptos"
-        run: curl --proto '=https' --tlsv1.2 -LsSf https://leptos-rs.artifacts.axodotdev.host/cargo-leptos/v0.2.7/cargo-leptos-installer.sh | sh
-      # - run: cargo install --git https://github.com/leptos-rs/cargo-leptos/commit/1a8356ce3e4114d682eccdadc4ca5677e0a7d056
+        run: curl --proto '=https' --tlsv1.2 -LsSf https://leptos-rs.artifacts.axodotdev.host/cargo-leptos/v0.2.12/cargo-leptos-installer.sh | sh
       - run: cargo leptos test
       - run: cargo leptos build --release
         env:

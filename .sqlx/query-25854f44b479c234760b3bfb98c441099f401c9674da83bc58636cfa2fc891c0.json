@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n          id,\n          slug,\n          issue_date,\n          display_name,\n          description,\n          youtube_id\nFROM issue\nORDER BY status, issue_date DESC",
+  "query": "\nSELECT\n    id,\n    slug,\n    issue_date,\n    display_name,\n    description,\n    youtube_id\nFROM issue\nWHERE status = \"publish\"\nORDER BY status, issue_date DESC",
   "describe": {
     "columns": [
       {
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "84ccdd515916417544c21357047f5a53b692a9891ba77026a9b72f8de068d61e"
+  "hash": "25854f44b479c234760b3bfb98c441099f401c9674da83bc58636cfa2fc891c0"
 }
