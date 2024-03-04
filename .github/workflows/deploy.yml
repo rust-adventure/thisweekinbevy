@@ -18,6 +18,16 @@ jobs:
           file: "static-assets.tar.gz"
       - name: Un-tar static assets
         run: tar -xzvf static-assets.tar.gz
+      - name: Clone Fonts
+        uses: actions/checkout@master
+        with:
+          repository: rust-adventure/fonts
+          path: fonts/
+          token: ${{ secrets.FONTS_ACCESS }}
+      - name: copy fonts
+        run: |
+          mkdir target/site/pp-neue-montreal/
+          cp -r $GITHUB_WORKSPACE/fonts/pp-neue-montreal/* target/site/pp-neue-montreal/
       - name: Publish to Netlify
         uses: netlify/actions/cli@master
         with:
