@@ -10,4 +10,5 @@ ENV LEPTOS_OUTPUT_NAME="this-week-in-bevy"
 ENV LEPTOS_SITE_ROOT="site"
 ENV LEPTOS_SITE_PKG_DIR="pkg"
 ENV LEPTOS_SITE_ADDR="[::]:3000"
+ENV LEPTOS_HASH_FILES=true
 CMD ["this-week-in-bevy"]
