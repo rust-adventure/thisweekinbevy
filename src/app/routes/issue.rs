@@ -902,7 +902,25 @@ fn CrateReleaseView(
                 .collect_view()}
 
         </ul>
-        <h3 class="mt-2 text-xl font-bold text-ctp-text">{crate_release.title}</h3>
+        <div class="flex justify-between">
+            <h3 class="mt-2 text-xl font-bold text-ctp-text">{crate_release.title}</h3>
+            <div class="flex space-x-4">
+
+                {crate_release
+                    .url
+                    .trim()
+                    .is_empty()
+                    .not()
+                    .then_some(view! { <URLLink url=crate_release.url/> })}
+                {crate_release
+                    .discord_url
+                    .trim()
+                    .is_empty()
+                    .not()
+                    .then_some(view! { <DiscordLink discord_url=crate_release.discord_url/> })}
+
+            </div>
+        </div>
         <div class=format!("mt-3 {}", PROSE) inner_html=crate_release.description></div>
     }
 }
@@ -1175,6 +1193,33 @@ fn PostLink(url: String) -> impl IntoView {
             class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
         >
             Post
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                ></path>
+            </svg>
+
+        </a>
+    }
+}
+
+#[component]
+fn URLLink(url: String) -> impl IntoView {
+    view! {
+        <a
+            href=&url
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
+        >
+            URL
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
