@@ -35,6 +35,17 @@ pub fn App() -> impl IntoView {
         // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
         <Meta name="og:site_name" content="This Week in Bevy"/>
+        <Link rel="preconnect" href="https://cdn.thisweekinbevy.com" />
+        <Style>
+          r#"@font-face {
+    font-family: "PP Neue Montreal";
+    src: url("https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2")
+        format("woff2");
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: normal;
+}"#
+        </Style>
         <Router fallback=|| {
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);
@@ -187,7 +198,7 @@ fn Wrapper(children: Children) -> impl IntoView {
                                 media="(prefers-color-scheme: dark)"
                             />
                             <img
-                                class="w-full"
+                                class="w-full aspect-square"
                                 src="https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevylight_uddwes.avif"
                                 alt=""
                             />

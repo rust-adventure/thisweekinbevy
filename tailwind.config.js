@@ -10,7 +10,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ["PP Neue Montreal", "sans-serif"],
-        serif: ["Tiempos Text", "serif"],
+        // serif: ["Tiempos Text", "serif"],
       },
       backgroundColor: {
         "ctp-rosewater": "var(--ctp-rosewater)",
