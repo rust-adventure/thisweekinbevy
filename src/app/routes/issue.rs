@@ -569,7 +569,13 @@ pub fn Issue() -> impl IntoView {
                             <Meta name="twitter:image" content=issue.opengraph_image/>
 
                             <Container>
-                                <img loading="lazy" class="w-full" loading="lazy" src=issue.header_image alt=""/>
+                                <img
+                                    loading="lazy"
+                                    class="w-full"
+                                    loading="lazy"
+                                    src=issue.header_image
+                                    alt=""
+                                />
                                 <header class="flex flex-col pt-16">
                                     <div class="flex items-center gap-6">
                                         // <EpisodePlayButton
@@ -1058,7 +1064,12 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
             .map(|image| {
                 view! {
                     <a href=&showcase.url>
-                        <img loading="lazy" class="w-full mt-12" src=&image.url alt=&image.description/>
+                        <img
+                            loading="lazy"
+                            class="w-full mt-12"
+                            src=&image.url
+                            alt=&image.description
+                        />
                     </a>
                 }
             })}
