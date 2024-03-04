@@ -30,6 +30,7 @@ jobs:
       - run: cargo leptos build --release
         env:
           CDN_PKG_PATH: https://cdn.thisweekinbevy.com/pkg
+          LEPTOS_HASH_FILES: true
       - name: Get current date
         id: date
         run: |
@@ -55,4 +56,5 @@ jobs:
             Cargo.toml
             target/release/this-week-in-bevy
             static-assets.tar.gz
+            target/release/hash.txt
             fly.toml

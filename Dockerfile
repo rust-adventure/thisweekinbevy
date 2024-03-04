@@ -1,6 +1,7 @@
 FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY target/release/this-week-in-bevy /usr/local/bin/this-week-in-bevy
+COPY target/release/hash.txt /usr/local/bin/hash.txt
 COPY target/site /opt/
 # COPY Cargo.toml /opt/Cargo.toml
 WORKDIR /opt
