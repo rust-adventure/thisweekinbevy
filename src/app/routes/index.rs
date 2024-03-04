@@ -3,6 +3,7 @@ use leptos::*;
 use leptos_meta::*;
 use serde::{Deserialize, Serialize};
 use std::ops::Not;
+use crate::app::issue::PROSE;
 
 #[component]
 fn PauseIcon(
@@ -46,7 +47,7 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
                         {&issue.issue_date.map(|date| date.to_string()).unwrap_or("".to_string())}
                     </p>
                     <div
-                        class=r#"mt-1 text-base leading-7 text-ctp-text prose [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:list-['\2013\20'] [&>ul]:pl-5"#
+                        class=format!("mt-1 text-base leading-7 text-ctp-text {}", PROSE)
                         inner_html=issue.description.clone()
                     ></div>
                     <div class="mt-4 flex items-center gap-4">
