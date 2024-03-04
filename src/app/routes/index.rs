@@ -64,6 +64,7 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
                                             "https://youtube.com/watch?v={}",
                                             issue.youtube_id,
                                         )
+
                                         class="flex items-center gap-x-3 text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900"
                                     >
                                         <PlayIcon class="h-2.5 w-2.5 fill-current"/>
