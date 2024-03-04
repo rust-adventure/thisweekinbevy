@@ -20,6 +20,7 @@ pub struct Issue {
     slug: String,
     opengraph_image: String,
     header_image: String,
+    youtube_id: String,
     issue_date: time::Date,
     /// What is this issue about? Is there
     /// anything notable worth mentioning or
@@ -494,6 +495,7 @@ let header_image = CImage::new("dilgcuzda".into(), issue.cloudinary_public_id.in
         title: issue.display_name,
         issue_date: issue.issue_date,
         slug: issue.slug,
+        youtube_id: issue.youtube_id,
         opengraph_image: opengraph_image.to_string().replace(".avif", ".png"),
         header_image: header_image.to_string(),
         description: compile(&issue.description),

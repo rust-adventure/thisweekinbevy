@@ -234,7 +234,7 @@ fn Wrapper(children: Children) -> impl IntoView {
                                     view! {
                                         <li class="flex">
                                             <a
-                                                href="/"
+                                                href="https://www.youtube.com/playlist?list=PLWtPciJ1UMuAyAER9ASVEDRIz0DUspOeZ"
                                                 class="group flex items-center"
                                                 aria-label=label
                                             >

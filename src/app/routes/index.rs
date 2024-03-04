@@ -60,7 +60,7 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
                             .then_some(
                                 view! {
                                     <a
-                                        href=format!("https://youtube.com/watch?v=")
+                                        href=format!("https://youtube.com/watch?v={}", issue.youtube_id)
                                         class="flex items-center gap-x-3 text-sm font-bold leading-6 text-ctp-pink hover:text-pink-700 active:text-pink-900"
                                     >
                                         <PlayIcon class="h-2.5 w-2.5 fill-current"/>
@@ -105,8 +105,17 @@ pub fn Home() -> impl IntoView {
             <Meta property="og:url" content="https://thisweekinbevy.com/"/>
             <Meta
                 property="og:image"
-                content="https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.avif"
+                content="https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.png"
             />
+            <Meta name="twitter:card" content="summary_large_image"/>
+            <Meta name="twitter:creator" content="@chrisbiscardi"/>
+            <Meta name="twitter:title" content="This Week in the Bevy Game Engine"/>
+            <Meta
+                name="twitter:description"
+                content="What happened this week in the Bevy Game Engine ecosystem"
+            />
+
+            <Meta name="twitter:image" content="https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.png"/>
 
             <div class="pt-16 lg:pt-12 pb-4 lg:pb-8  bg-gradient-to-r from-ctp-mantle to-ctp-base">
                 <Container>
