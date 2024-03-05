@@ -3,7 +3,7 @@
     <img src="https://raw.githubusercontent.com/rust-adventure/thisweekinbevy/main/docs/logos/this-week-in-bevyopengraph-light.png" alt="This Week in Bevy Logo">
 </picture>
 
-# [This Week in Bevy website](https://www.thisweekinbevy.com)
+# [This Week in Bevy website](https://thisweekinbevy.com)
 
 This Week in Bevy is a weekly collection showcasing the Bevy community.
 
