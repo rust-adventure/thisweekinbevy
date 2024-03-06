@@ -24,5 +24,5 @@ Each issue collects a variety of links.
 - **Opened Issues**
   - Issues which have just been opened might need a reproduction or could be fixed by you!
 
-## Want to Help?
-See [our development docs](/docs/developing.md)
+## Want to Help Maintain the Site?
+See [our development docs](/docs/developing.md).
