@@ -23,3 +23,6 @@ Each issue collects a variety of links.
   - Some PRs get opened each week. These afford the community the opportunity to get involved by running the relevant code and reviewing the PRs so code can be merged.
 - **Opened Issues**
   - Issues which have just been opened might need a reproduction or could be fixed by you!
+
+## Want to Help?
+See [our development docs](/docs/developing.md)
