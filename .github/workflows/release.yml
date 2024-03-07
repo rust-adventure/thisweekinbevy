@@ -3,6 +3,13 @@ on:
   push:
     branches:
       - "main"
+    paths:
+      - "src/**"
+      - "Dockerfile"
+      - "style/**"
+      - "tailwind.config.js"
+      - "fly.toml"
+      - "public/**"
 
 jobs:
   release:
