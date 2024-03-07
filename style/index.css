@@ -150,6 +150,7 @@
   --ctp-crust: hsl(197, 33%, 90%);
 
   --brand-discord: #5865f2;
+  --brand-github: #1b1f23;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -180,6 +181,8 @@
     --ctp-base: rgb(30, 30, 46);
     --ctp-mantle: rgb(24, 24, 37);
     --ctp-crust: rgb(17, 17, 27);
+
+    --brand-github: #adbac7;
   }
 }
 
