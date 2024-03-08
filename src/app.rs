@@ -32,7 +32,6 @@ pub fn App() -> impl IntoView {
             attr:class="h-full bg-ctp-base antialiased"
         />
         <Body class="flex min-h-full"/>
-        // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Link rel="preconnect" href="https://cdn.thisweekinbevy.com"/>
         <Style>
             r#"@font-face {
@@ -45,6 +44,7 @@ pub fn App() -> impl IntoView {
             }"#
         </Style>
         <Link rel="preload" as_="font" type_="font/woff2" crossorigin="anonymous" href="https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2"/>
+        // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
         <Meta name="og:site_name" content="This Week in Bevy"/>
         <Router fallback=|| {
