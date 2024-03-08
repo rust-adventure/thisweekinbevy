@@ -33,8 +33,6 @@ pub fn App() -> impl IntoView {
         />
         <Body class="flex min-h-full"/>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
-        <Meta name="og:site_name" content="This Week in Bevy"/>
         <Link rel="preconnect" href="https://cdn.thisweekinbevy.com"/>
         <Style>
             r#"@font-face {
@@ -46,6 +44,9 @@ pub fn App() -> impl IntoView {
             font-style: normal;
             }"#
         </Style>
+        <Link rel="preload" as_="font" type_="font/woff2" crossorigin="anonymous" href="https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2"/>
+        <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
+        <Meta name="og:site_name" content="This Week in Bevy"/>
         <Router fallback=|| {
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);
