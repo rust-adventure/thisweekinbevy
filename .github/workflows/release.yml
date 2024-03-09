@@ -36,6 +36,7 @@ jobs:
       - run: cargo leptos test
       - run: cargo leptos build --release
         env:
+          CDN_PATH: https://cdn.thisweekinbevy.com
           CDN_PKG_PATH: https://cdn.thisweekinbevy.com/pkg
           LEPTOS_HASH_FILES: true
       - name: Get current date
