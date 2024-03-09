@@ -105,8 +105,9 @@ pub fn Home() -> impl IntoView {
                 content="What happened this week in the Bevy Game Engine ecosystem"
             />
 
+            <Link rel="canonical" href="https://thisweekinbevy.com"/>
             <Meta property="og:type" content="website"/>
-            <Meta property="og:url" content="https://thisweekinbevy.com/"/>
+            <Meta property="og:url" content="https://thisweekinbevy.com"/>
             <Meta
                 property="og:image"
                 content="https://res.cloudinary.com/dilgcuzda/image/upload/v1708310121/thisweekinbevy/this-week-in-bevyopengraph-light_zwqzqz.png"

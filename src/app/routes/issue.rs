@@ -556,6 +556,10 @@ pub fn Issue() -> impl IntoView {
                                 property="og:url"
                                 content=format!("https://thisweekinbevy.com/issue/{}", issue.slug)
                             />
+                            <Link
+                                rel="canonical"
+                                href=format!("https://thisweekinbevy.com/issue/{}", issue.slug)
+                            />
                             <Meta property="og:image" content=issue.opengraph_image.clone()/>
                             <Meta name="twitter:card" content="summary_large_image"/>
                             <Meta name="twitter:creator" content="@chrisbiscardi"/>
