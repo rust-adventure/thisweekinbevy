@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 use std::ops::Not;
 
-pub const PROSE: &str = r#"prose text-ctp-text prose-code:text-ctp-text prose-a:text-ctp-sky hover:prose-a:text-ctp-blue prose-blockquote:text-ctp-text [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-ctp-text [&>ul]:mt-6 [&>ul]:list-['⮡\20'] [&>ul]:pl-5"#;
+pub const PROSE: &str = r#"prose text-ctp-text prose-code:text-ctp-text prose-a:text-ctp-sky hover:prose-a:text-ctp-blue prose-blockquote:text-ctp-text [&>h2]:leading-7 [&>h2]:text-ctp-text [&>h2]:pl-4 [&>ul]:mt-6 [&>ul]:list-['⮡\20'] [&>ul]:pl-5"#;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {

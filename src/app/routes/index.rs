@@ -95,7 +95,7 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
 #[component]
 pub fn Home() -> impl IntoView {
     let issues =
-        create_resource(move || {}, |_| fetch_issues());
+        create_blocking_resource(move || {}, |_| fetch_issues());
 
     view! {
         <div class="pb-12 sm:pb-4">
@@ -131,7 +131,7 @@ pub fn Home() -> impl IntoView {
                 </Container>
             </div>
             <Suspense fallback=move || {
-                view! { <p>"Loading (Suspense Fallback)..."</p> }
+                view! { <p>"Loading..."</p> }
             }>
                 {move || {
                     issues

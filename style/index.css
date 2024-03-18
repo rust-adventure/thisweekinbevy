@@ -186,6 +186,28 @@
   }
 }
 
+.prose li:nth-child(1)::marker {
+  color: var(--ctp-mauve);
+}
+.prose li:nth-child(2)::marker {
+  color: var(--ctp-red);
+}
+.prose li:nth-child(3)::marker {
+  color: var(--ctp-yellow);
+}
+.prose li:nth-child(4)::marker {
+  color: var(--ctp-green);
+}
+.prose li:nth-child(5)::marker {
+  color: var(--ctp-sky);
+}
+.prose li:nth-child(6)::marker {
+  color: var(--ctp-lavender);
+}
+.prose li:nth-child(7)::marker {
+  color: var(--ctp-flamingo);
+}
+
 .rainbow-borders {
   border-image-source: linear-gradient(
     90deg,
