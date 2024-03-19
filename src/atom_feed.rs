@@ -1,23 +1,23 @@
-use serde::{Serialize, Deserialize};
+use crate::state::AppState;
+use atom_syndication::*;
 use axum::{
     extract::{Path, State},
     http::Request,
     response::{IntoResponse, Response},
     routing::get,
 };
-use atom_syndication::*;
-use crate::state::AppState;
+use serde::{Deserialize, Serialize};
 
 pub async fn atom_feed(
     State(app_state): State<AppState>,
 ) -> impl IntoResponse {
+    use atom_syndication::Feed;
     use std::fs::File;
-use std::io::{BufReader, sink};
-use atom_syndication::Feed;
+    use std::io::{sink, BufReader};
 
-let issues: Vec<SqlIssueShort> = sqlx::query_as!(
-    SqlIssueShort,
-    r#"
+    let issues: Vec<SqlIssueShort> = sqlx::query_as!(
+        SqlIssueShort,
+        r#"
 SELECT
 id,
 slug,
@@ -29,15 +29,17 @@ FROM issue
 WHERE status = "publish"
 ORDER BY status, issue_date DESC
 LIMIT 5"#
-)
-.fetch_all(&app_state.pool)
-.await.unwrap();
+    )
+    .fetch_all(&app_state.pool)
+    .await
+    .unwrap();
 
-let issues: Vec<IssueShort> = issues.into_iter().map(IssueShort::from).collect();
+    let issues: Vec<IssueShort> =
+        issues.into_iter().map(IssueShort::from).collect();
 
-let mut newest_issue_date = None;
+    let mut newest_issue_date = None;
 
-let entries: Vec<Entry> = issues.into_iter().filter_map(|issue| {
+    let entries: Vec<Entry> = issues.into_iter().filter_map(|issue| {
 let date = issue.issue_date.and_then(|v| {
     use atom_syndication::FixedDateTime;
     use std::str::FromStr;
@@ -82,39 +84,37 @@ Some(    EntryBuilder::default()
         content_type: Some("text/html".to_string()),
     })).build())
 }).collect();
-let mut feed = Feed::default();
+    let mut feed = Feed::default();
 
-feed.set_id("https://thisweekinbevy.com/".to_string());
-feed.set_updated(newest_issue_date.expect("having an issue should mean there is a most recent date"));
-feed.set_title("This Week in Bevy");
-feed
+    feed.set_id("https://thisweekinbevy.com/".to_string());
+    feed.set_updated(newest_issue_date.expect("having an issue should mean there is a most recent date"));
+    feed.set_title("This Week in Bevy");
+    feed
   .set_logo("https://res.cloudinary.com/dilgcuzda/image/upload/v1708481576/thisweekinbevy/this-week-in-bevylight_uddwes.avif".to_string());
-  feed
-  .set_icon("https://cdn.thisweekinbevy.com/favicon-32x32.png".to_string());
-  feed
-  .set_authors(vec![
-    Person {
-    name: "Chris Biscardi".to_string(),
-    email: None,
-    uri: Some("https://www.christopherbiscardi.com/".to_string())
-  }]);
-  feed
-  .set_links(vec![
-    Link {
+    feed.set_icon(
+        "https://cdn.thisweekinbevy.com/favicon-32x32.png"
+            .to_string(),
+    );
+    feed.set_authors(vec![Person {
+        name: "Chris Biscardi".to_string(),
+        email: None,
+        uri: Some(
+            "https://www.christopherbiscardi.com/"
+                .to_string(),
+        ),
+    }]);
+    feed.set_links(vec![Link {
         href: "https://thisweekinbevy.com".to_string(),
         rel: "alternate".to_string(),
         hreflang: Some("en".to_string()),
         mime_type: Some("text/html".to_string()),
         title: Some("This Week in Bevy".to_string()),
         length: None,
-    }
-  ]);
-  feed
+    }]);
+    feed
   .set_subtitle(Text::from("What happened this week in the Bevy Engine ecosystem"));
-  feed
-  .set_entries(entries);
-feed.to_string()
-
+    feed.set_entries(entries);
+    feed.to_string()
 }
 
 #[cfg(feature = "ssr")]
@@ -173,4 +173,3 @@ impl From<SqlIssueShort> for IssueShort {
         }
     }
 }
-

@@ -1,5 +1,7 @@
 pub mod app;
 #[cfg(feature = "ssr")]
+pub mod atom_feed;
+#[cfg(feature = "ssr")]
 pub mod auth;
 pub mod error_template;
 #[cfg(feature = "ssr")]
@@ -16,8 +18,6 @@ pub mod sql;
 pub mod state;
 #[cfg(feature = "ssr")]
 pub mod users;
-#[cfg(feature = "ssr")]
-pub mod atom_feed;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Username(pub String);
@@ -30,4 +30,3 @@ pub fn hydrate() {
     // leptos::mount_to_body(App);
     leptos::leptos_dom::HydrationCtx::stop_hydrating();
 }
-

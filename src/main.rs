@@ -173,7 +173,10 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .route("/feed.xml", get(this_week_in_bevy::atom_feed::atom_feed))
+        .route(
+            "/feed.xml",
+            get(this_week_in_bevy::atom_feed::atom_feed),
+        )
         .route(
             "/api/*fn_name",
             get(server_fn_handler).post(server_fn_handler),

@@ -94,8 +94,10 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let issues =
-        create_blocking_resource(move || {}, |_| fetch_issues());
+    let issues = create_blocking_resource(
+        move || {},
+        |_| fetch_issues(),
+    );
 
     view! {
         <div class="pb-12 sm:pb-4">
