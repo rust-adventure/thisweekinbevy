@@ -191,12 +191,17 @@ fn RSSIcon(
     #[prop(into, default = "".to_string())] class: String,
 ) -> impl IntoView {
     view! {
-        <svg aria-hidden="true" viewBox="0 0 32 32" class=class>
-            <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M8.5 4h15A4.5 4.5 0 0 1 28 8.5v15a4.5 4.5 0 0 1-4.5 4.5h-15A4.5 4.5 0 0 1 4 23.5v-15A4.5 4.5 0 0 1 8.5 4ZM13 22a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-6-6a9 9 0 0 1 9 9h3A12 12 0 0 0 7 13v3Zm5.74-4.858A15 15 0 0 0 7 10V7a18 18 0 0 1 18 18h-3a15 15 0 0 0-9.26-13.858Z"
-            ></path>
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class=class
+            width="256"
+            height="256"
+            viewBox="0 0 8 8"
+        >
+            <rect width="8" height="8" rx="1.5" style="stroke:none;fill:orange"></rect>
+            <circle cx="2" cy="6" r="1" class="symbol"></circle>
+            <path d="M1 4a3 3 0 0 1 3 3h1a4 4 0 0 0-4-4z" class="symbol"></path>
+            <path d="M1 2a5 5 0 0 1 5 5h1a6 6 0 0 0-6-6z" class="symbol"></path>
         </svg>
     }
 }
@@ -291,6 +296,16 @@ fn Wrapper(children: Children) -> impl IntoView {
                                 >
                                     <GitHubIcon class="h-8 w-8 fill-slate-400 group-hover:fill-slate-600"/>
                                     <span class="hidden sm:ml-3 sm:block">GitHub Repo</span>
+                                </a>
+                            </li>
+                            <li class="flex">
+                                <a
+                                    href="https://thisweekinbevy.com/feed.xml"
+                                    class="group flex items-center"
+                                    aria-label="Atom Feed"
+                                >
+                                    <RSSIcon class="h-8 w-8 fill-white group-hover:fill-white"/>
+                                    <span class="hidden sm:ml-3 sm:block">Atom Feed</span>
                                 </a>
                             </li>
                         </ul>
