@@ -55,9 +55,23 @@ pub fn App() -> impl IntoView {
         // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
         <Meta name="og:site_name" content="This Week in Bevy"/>
-        <Link rel="apple-touch-icon" sizes="180x180" href=format!("{cdn_path}/apple-touch-icon.png")/>
-        <Link rel="icon" type_="image/png" sizes="32x32" href=format!("{cdn_path}/favicon-32x32.png")/>
-        <Link rel="icon" type_="image/png" sizes="16x16" href=format!("{cdn_path}/favicon-16x16.png")/>
+        <Link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href=format!("{cdn_path}/apple-touch-icon.png")
+        />
+        <Link
+            rel="icon"
+            type_="image/png"
+            sizes="32x32"
+            href=format!("{cdn_path}/favicon-32x32.png")
+        />
+        <Link
+            rel="icon"
+            type_="image/png"
+            sizes="16x16"
+            href=format!("{cdn_path}/favicon-16x16.png")
+        />
         <Link rel="manifest" href=format!("{cdn_path}/site.webmanifest")/>
         <Meta name="msapplication-TileColor" content="#cdd6f4"/>
         <Meta name="theme-color" content="#cdd6f4"/>
