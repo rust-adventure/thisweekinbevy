@@ -2,7 +2,7 @@ use crate::state::AppState;
 use atom_syndication::*;
 use axum::{
     extract::{Path, State},
-    http::Request,
+    http::{header, Request},
     response::{IntoResponse, Response},
     routing::get,
 };
@@ -114,7 +114,12 @@ Some(    EntryBuilder::default()
     feed
   .set_subtitle(Text::from("What happened this week in the Bevy Engine ecosystem"));
     feed.set_entries(entries);
-    feed.to_string()
+
+    let headers = [(
+        header::CONTENT_TYPE,
+        "application/atom+xml; charset=utf-8".to_string(),
+    )];
+    (headers, feed.to_string())
 }
 
 #[cfg(feature = "ssr")]
