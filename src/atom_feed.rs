@@ -144,22 +144,6 @@ pub struct IssueShort {
 }
 
 #[cfg(feature = "ssr")]
-fn markdown_trim(input: &str) -> nom::IResult<&str, &str> {
-    use nom::{
-        character::complete::{anychar, line_ending},
-        combinator::consumed,
-        multi::many_till,
-        sequence::{pair, tuple},
-    };
-    let (input, (intro, _)) = consumed(tuple((
-        many_till(anychar, pair(line_ending, line_ending)),
-        many_till(anychar, pair(line_ending, line_ending)),
-        many_till(anychar, pair(line_ending, line_ending)),
-    )))(input)?;
-    Ok((input, intro))
-}
-
-#[cfg(feature = "ssr")]
 impl From<SqlIssueShort> for IssueShort {
     fn from(value: SqlIssueShort) -> Self {
         use crate::markdown::compile;
