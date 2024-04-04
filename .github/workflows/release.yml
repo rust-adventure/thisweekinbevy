@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: nightly-2024-02-09
+          toolchain: nightly-2024-04-03
           targets: "wasm32-unknown-unknown"
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - uses: Swatinem/rust-cache@v2
