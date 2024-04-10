@@ -257,6 +257,8 @@ FROM
             issue_id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
+                    "github_id",
+                    github_id,
                     "title",
                     title,
                     "url",
@@ -280,6 +282,8 @@ FROM
             issue_id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
+                    "github_id",
+                    github_id,
                     "title",
                     title,
                     "url",

@@ -109,6 +109,7 @@ pub fn App() -> impl IntoView {
                         <Route path="/devlog" view=admin::devlog::Devlog/>
                         <Route path="/devlog/:id" view=admin::devlog::id::Devlog/>
                         <Route path="/educational" view=admin::educational::Educational/>
+                        <Route path="/educational/:id" view=admin::educational::id::Educational/>
                         <Route path="/images" view=admin::image::Image/>
                         <Route path="/github" view=admin::github::GitHub/>
                     </ProtectedRoute>

@@ -68,6 +68,7 @@ pub struct Issue {
 /// could benefit from review this week.
 #[derive(Clone, Serialize, Deserialize)]
 struct NewPullRequest {
+    github_id: String,
     title: String,
     url: String,
     gh_created_at: String,
@@ -117,6 +118,7 @@ struct SqlNewGhIssue {
     sqlx::FromRow,
 )]
 struct SqlNewPr {
+    github_id: String,
     title: String,
     url: String,
     gh_created_at: String,
@@ -214,6 +216,7 @@ struct Showcase {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct MergedPullRequest {
+    github_id: String,
     title: String,
     url: String,
     merged_at_date: String,
@@ -229,6 +232,7 @@ struct MergedPullRequest {
     sqlx::FromRow,
 )]
 struct SqlMergedPullRequest {
+    github_id: String,
     title: String,
     url: String,
     merged_at_date: String,
@@ -454,15 +458,17 @@ author_url
 
 }).collect();
 
-let new_pull_requests = issue.new_pull_requests
+let new_pull_requests: Vec<NewPullRequest> = issue.new_pull_requests
 .map(|json| json.0)
 .unwrap_or_default()
 .into_iter().map(|SqlNewPr{
+    github_id,
     title,
     url,
     gh_created_at,
     author,
     author_url}| NewPullRequest{
+        github_id,
 title,
 url,
 gh_created_at,
@@ -471,15 +477,17 @@ author_url
 
 }).collect();
 
-let merged_pull_requests = issue.merged_pull_requests
+let merged_pull_requests: Vec<MergedPullRequest> = issue.merged_pull_requests
 .map(|json| json.0)
 .unwrap_or_default()
 .into_iter().map(|SqlMergedPullRequest{
+    github_id,
     title,
     url,
     merged_at_date,
     author,
     author_url}| MergedPullRequest{
+        github_id,
 title,
 url,
 merged_at_date,
@@ -487,6 +495,10 @@ author,
 author_url
 
 }).collect();
+
+let set_a = merged_pull_requests.clone().into_iter().map(|v| v.github_id).collect::<std::collections::HashSet<String>>();
+let set_b = new_pull_requests.clone().into_iter().map(|v| v.github_id).collect::<std::collections::HashSet<String>>();
+dbg!(set_a.intersection(&set_b));
 
 let opengraph_image = CImage::new("dilgcuzda".into(), (*issue.cloudinary_public_id).into());
 let header_image = CImage::new("dilgcuzda".into(), issue.cloudinary_public_id.into());
@@ -697,21 +709,32 @@ pub fn Issue() -> impl IntoView {
                                     Pull Requests Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
-                                    {issue
-                                        .new_pull_requests
-                                        .iter()
-                                        .sorted_by_key(|pr| &pr.gh_created_at)
-                                        .map(|pull_request| {
-                                            view! {
-                                                <ActivityListItem
-                                                    date=&pull_request.gh_created_at
-                                                    url=&pull_request.url
-                                                    title=&pull_request.title
-                                                    author=&pull_request.author
-                                                />
-                                            }
-                                        })
-                                        .collect_view()}
+                                    {
+                                        // build a HashSet of github_ids that were already shown
+                                        // in the merged_pull_requests section so that we don't show them twice
+                                        let merged_prs = issue
+                                            .merged_pull_requests
+                                            .iter()
+                                            .map(|v| v.github_id.as_str())
+                                            .collect::<std::collections::HashSet<&str>>();
+
+                                        issue
+                                            .new_pull_requests
+                                            .iter()
+                                            .sorted_by_key(|pr| &pr.gh_created_at)
+                                            .filter(|pr| !merged_prs.contains(&pr.github_id.as_str()))
+                                            .map(|pull_request| {
+                                                view! {
+                                                    <ActivityListItem
+                                                        date=&pull_request.gh_created_at
+                                                        url=&pull_request.url
+                                                        title=&pull_request.title
+                                                        author=&pull_request.author
+                                                    />
+                                                }
+                                            })
+                                            .collect_view()
+                                    }
 
                                 </ul>
                                 <h2 class="mt-6 text-2xl font-bold text-ctp-text">
@@ -1084,6 +1107,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
     let mut it = showcase.images.iter();
     let first_image = it.next();
     view! {
+        <div>
         {first_image
             .map(|image| {
                 view! {
@@ -1136,6 +1160,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
 
         </div>
         <div class=format!("mt-3, {}", PROSE) inner_html=showcase.description></div>
+        </div>
     }
 }
 
