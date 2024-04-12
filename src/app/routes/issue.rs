@@ -496,10 +496,6 @@ author_url
 
 }).collect();
 
-let set_a = merged_pull_requests.clone().into_iter().map(|v| v.github_id).collect::<std::collections::HashSet<String>>();
-let set_b = new_pull_requests.clone().into_iter().map(|v| v.github_id).collect::<std::collections::HashSet<String>>();
-dbg!(set_a.intersection(&set_b));
-
 let opengraph_image = CImage::new("dilgcuzda".into(), (*issue.cloudinary_public_id).into());
 let header_image = CImage::new("dilgcuzda".into(), issue.cloudinary_public_id.into());
 
@@ -1107,7 +1103,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
     let mut it = showcase.images.iter();
     let first_image = it.next();
     view! {
-        <div>
+        <div class="showcase">
         {first_image
             .map(|image| {
                 view! {
