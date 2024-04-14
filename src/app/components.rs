@@ -49,11 +49,12 @@ pub fn AboutSection(
 #[component]
 pub fn Container(
     #[prop(into, default = "".to_string())] class: String,
+    #[prop(optional, default = false)] center: bool,
     children: Children,
 ) -> impl IntoView {
     view! {
         <div class=format!("lg:px-8 {class}")>
-            <div class="lg:max-w-4xl">
+            <div class=format!("lg:max-w-4xl {}", if center {"mx-auto"} else {""})>
                 <div class="mx-auto px-4 sm:px-6 md:max-w-2xl md:px-4 lg:px-0">{children()}</div>
             </div>
         </div>
@@ -95,6 +96,64 @@ pub fn Divider(
                 <span class="bg-ctp-base px-3 text-base font-semibold leading-6 text-ctp-text">
                     {title}
                 </span>
+            </div>
+        </div>
+    }
+}
+
+pub enum DescriptionColor {
+    Blue,
+    Pink,
+    Lavender,
+    Teal,
+}
+impl DescriptionColor {
+    fn border_y(&self) -> &str {
+        match self {
+            DescriptionColor::Blue => "border-y-ctp-blue",
+            DescriptionColor::Pink => "border-y-ctp-pink",
+            DescriptionColor::Lavender => {
+                "border-y-ctp-lavender"
+            }
+            DescriptionColor::Teal => "border-y-ctp-teal",
+        }
+    }
+    fn border_t(&self) -> &str {
+        match self {
+            DescriptionColor::Blue => "border-t-ctp-blue",
+            DescriptionColor::Pink => "border-t-ctp-pink",
+            DescriptionColor::Lavender => {
+                "border-t-ctp-lavender"
+            }
+            DescriptionColor::Teal => "border-t-ctp-teal",
+        }
+    }
+}
+#[component]
+pub fn DividerWithDescription(
+    #[prop(into)] color: DescriptionColor,
+    #[prop(into)] title: String,
+    #[prop(into)] description: String,
+) -> impl IntoView {
+    view! {
+        <div class=format!(
+            "mt-8 relative isolate overflow-hidden bg-ctp-base px-6 py-24 sm:py-32 lg:px-8 border-y-8 {}",
+            color.border_y(),
+        )>
+            <img
+                src="https://res.cloudinary.com/dilgcuzda/image/upload/c_scale,w_600/thisweekinbevy/01HTAXBQ8H38BYVD3VEXCKVDS4.avif"
+                loading="lazy"
+                alt=""
+                class="absolute inset-0 -z-10 w-full aspect-h-7 aspect-w-10 object-cover opacity-30 blur"
+            />
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="text-4xl py-4 font-black tracking-tight text-ctp-text sm:text-6xl rounded-t-xl bg-gradient-to-bl from-50% from-ctp-base to-ctp-crust -skew-y-3 border border-t-ctp-surface0 border-r-ctp-surface0 border-b-ctp-crust border-l-ctp-crust">
+                    {title}
+                </h2>
+                <p class=format!(
+                    "-mt-[20px] p-4 text-lg leading-8 text-ctp-text bg-gradient-to-bl from-50% from-ctp-base to-ctp-crust border-t-[40px] {}",
+                    color.border_t(),
+                )>{description}</p>
             </div>
         </div>
     }

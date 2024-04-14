@@ -48,6 +48,7 @@ cloudinary = { version = "0.4.0", optional = true }
 data-encoding = { version = "2.5.0", optional = true }
 itertools = "0.12.1"
 atom_syndication = "0.12.2"
+url = "2.5.0"
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]

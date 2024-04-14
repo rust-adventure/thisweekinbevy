@@ -1,4 +1,4 @@
-use crate::app::components::{Container, Divider};
+use crate::app::components::{Container, Divider, DividerWithDescription, DescriptionColor};
 use itertools::Itertools;
 use leptos::*;
 use leptos_meta::*;
@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::types::Json;
 use std::ops::Not;
+mod cards;
+use cards::*;
 
 pub const PROSE: &str = r#"prose text-ctp-text prose-code:text-ctp-text prose-a:text-ctp-sky hover:prose-a:text-ctp-blue prose-blockquote:text-ctp-text [&>h2]:leading-7 [&>h2]:text-ctp-text [&>h2]:pl-4 [&>ul]:mt-6 [&>ul]:list-['⮡\20'] [&>ul]:pl-5"#;
 
@@ -582,7 +584,7 @@ pub fn Issue() -> impl IntoView {
 
                             <Meta name="twitter:image" content=issue.opengraph_image/>
 
-                            <Container>
+                            <Container center=true>
                                 <img
                                     loading="lazy"
                                     class="w-full"
@@ -619,54 +621,143 @@ pub fn Issue() -> impl IntoView {
                                         inner_html=issue.description.clone()
                                     ></div>
                                 </header>
-                                <Divider title="Showcase"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Showcase</h2>
+                            </Container>
+
+                            <DividerWithDescription
+                                color=DescriptionColor::Pink
+                                title="Showcase"
+                                description="Bevy work from the #showcase channel in Discord and around the internet. Use hashtag #bevyengine."
+                            />
+                            // image=issue.showcases.iter().last().map(|i|i.images.)
+                            // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Showcase</h2>
+                            <div class="divide-y-8 divide-ctp-pink">
                                 {issue
                                     .showcases
                                     .into_iter()
                                     .map(|showcase| {
-                                        view! { <ShowcaseView showcase=showcase/> }
+                                        view! {
+                                            <SideBySide
+                                                title=showcase.title
+                                                type_name="showcase".to_string()
+                                                posted_date=None
+                                                images=showcase.images
+                                                description=showcase.description
+                                                primary_url=showcase.url
+                                                discord_url=showcase.discord_url
+                                            />
+                                        }
                                     })
-                                    .collect::<Vec<_>>()}
-                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Crates</h2>
-                                <Divider title="Crates"/>
+                                    .collect_view()}
+                            </div>
+                            // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Crates</h2>
+                            // <Divider title="Crates"/>
+                            <DividerWithDescription
+                                color=DescriptionColor::Lavender
+                                title="Crates"
+                                description="New releases to crates.io and substantial updates to existing projects"
+                            />
 
+                            <div class="divide-y-8 divide-ctp-lavender">
                                 {issue
                                     .crate_releases
                                     .into_iter()
                                     .sorted_by_key(|cr| cr.posted_date.clone())
                                     .rev()
                                     .map(|crate_release| {
-                                        view! { <CrateReleaseView crate_release=crate_release/> }
+                                        view! {
+                                            <SideBySide
+                                                title=crate_release.title
+                                                type_name="crate_release".to_string()
+                                                posted_date=crate_release.posted_date
+                                                images=crate_release.images
+                                                description=crate_release.description
+                                                primary_url=crate_release.url
+                                                discord_url=crate_release.discord_url
+                                            />
+                                        }
                                     })
                                     .collect_view()}
+                            </div>
 
-                                <Divider title="Devlogs"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Devlogs</h2>
+                            {if issue.devlogs.is_empty() {
+                                view! {
+                                    <div class="border-y-8 border-y-ctp-teal text-center text-ctp-text">
+                                        No devlogs this week
+                                    </div>
+                                }
+                                    .into_view()
+                            } else {
+                                view!{
+                            <DividerWithDescription
+                                color=DescriptionColor::Teal
+                                title="Devlogs"
+                                description="vlog style updates from long-term projects"
+                            />
+                                }.into_view()}
+                            }
+                            <div class="divide-y-8 divide-ctp-teal">
+
                                 {issue
                                     .devlogs
                                     .into_iter()
                                     .map(|devlog| {
-                                        view! { <DevlogView devlog=devlog/> }
+                                        view! {
+                                            <SideBySide
+                                                title=devlog.title
+                                                type_name="devlog".to_string()
+                                                posted_date=None
+                                                images=devlog.images
+                                                description=devlog.description
+                                                primary_url=devlog.post_url
+                                                discord_url=devlog.discord_url
+                                                video_url=devlog.video_url
+                                            />
+                                        }
                                     })
                                     .collect_view()}
 
-                                <Divider title="Educational"/>
-                                {issue
-                                    .educationals
-                                    .into_iter()
-                                    .map(|educational| {
-                                        view! { <EducationalView educational=educational/> }
-                                    })
-                                    .collect_view()}
-                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Education</h2>
-                                // <Divider title="Fixes and Features"/>
-                                // <h2 class="mt-2 text-2xl font-bold text-ctp-text">
-                                // Pull Requests Merged this week
-                                // </h2>
+                            </div>
+
+                            {if issue.educationals.is_empty() {
+                                view! {
+                                    <div class="border-y-8 border-y-ctp-blue text-center text-ctp-text">
+                                        No Educational this week
+                                    </div>
+                                }
+                                    .into_view()
+                            } else {
+                                view! {
+                                    <DividerWithDescription
+                                        color=DescriptionColor::Blue
+                                        title="Educational"
+                                        description="Tutorials, deep dives, and other information on developing Bevy applications, games, and plugins"
+                                    />
+                                }
+                                    .into_view()
+                            }}
+
+                            {issue
+                                .educationals
+                                .into_iter()
+                                .map(|educational| {
+                                    view! {
+                                        <SideBySide
+                                            title=educational.title
+                                            type_name="educational".to_string()
+                                            posted_date=None
+                                            images=educational.images
+                                            description=educational.description
+                                            primary_url=educational.post_url
+                                            discord_url=educational.discord_url
+                                            video_url=educational.video_url
+                                        />
+                                    }
+                                })
+                                .collect_view()}
+
+                            <Container center=true>
                                 <Divider title="Pull Requests Merged This Week"/>
                                 <ul role="list" class="space-y-6 mt-6">
-
                                     {issue
                                         .merged_pull_requests
                                         .iter()
@@ -705,15 +796,13 @@ pub fn Issue() -> impl IntoView {
                                     Pull Requests Opened this week
                                 </h2>
                                 <ul role="list" class="space-y-6 mt-6">
+
                                     {
-                                        // build a HashSet of github_ids that were already shown
-                                        // in the merged_pull_requests section so that we don't show them twice
                                         let merged_prs = issue
                                             .merged_pull_requests
                                             .iter()
                                             .map(|v| v.github_id.as_str())
                                             .collect::<std::collections::HashSet<&str>>();
-
                                         issue
                                             .new_pull_requests
                                             .iter()
@@ -721,6 +810,9 @@ pub fn Issue() -> impl IntoView {
                                             .filter(|pr| !merged_prs.contains(&pr.github_id.as_str()))
                                             .map(|pull_request| {
                                                 view! {
+                                                    // build a HashSet of github_ids that were already shown
+                                                    // in the merged_pull_requests section so that we don't show them twice
+
                                                     <ActivityListItem
                                                         date=&pull_request.gh_created_at
                                                         url=&pull_request.url
@@ -875,76 +967,6 @@ fn ActivityListComment(
                 <p class="text-sm leading-6 text-ctp-text">{comment}</p>
             </div>
         </li>
-    }
-}
-
-#[component]
-fn CrateReleaseView(
-    crate_release: CrateRelease,
-) -> impl IntoView {
-    let mut it = crate_release.images.iter();
-    let first_image = it.next();
-
-    view! {
-        {first_image
-            .map(|image| {
-                view! {
-                    <a href=&crate_release.url>
-                        <img
-                            class="w-full mt-12 w-full rounded-t-md"
-                            loading="lazy"
-                            src=&image.url
-                            alt=&image.description
-                        />
-                    </a>
-                }
-            })}
-
-        <ul
-            role="list"
-            class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
-        >
-            {it
-                .map(|image| {
-                    view! {
-                        <li class="relative">
-                            <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                                <img
-                                    src=&image.url
-                                    loading="lazy"
-                                    alt=&image.description
-                                    class="pointer-events-none object-cover group-hover:opacity-75"
-                                />
-                                <button type="button" class="absolute inset-0 focus:outline-none">
-                                    <span class="sr-only">View details</span>
-                                </button>
-                            </div>
-                        </li>
-                    }
-                })
-                .collect_view()}
-
-        </ul>
-        <div class="flex justify-between">
-            <h3 class="mt-2 text-xl font-bold text-ctp-text">{crate_release.title}</h3>
-            <div class="flex space-x-4">
-
-                {crate_release
-                    .url
-                    .trim()
-                    .is_empty()
-                    .not()
-                    .then_some(view! { <URLLink url=crate_release.url/> })}
-                {crate_release
-                    .discord_url
-                    .trim()
-                    .is_empty()
-                    .not()
-                    .then_some(view! { <DiscordLink discord_url=crate_release.discord_url/> })}
-
-            </div>
-        </div>
-        <div class=format!("mt-3 {}", PROSE) inner_html=crate_release.description></div>
     }
 }
 
@@ -1104,58 +1126,58 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
     let first_image = it.next();
     view! {
         <div class="showcase">
-        {first_image
-            .map(|image| {
-                view! {
-                    <a href=&showcase.url>
-                        <img
-                            loading="lazy"
-                            class="w-full mt-12"
-                            src=&image.url
-                            alt=&image.description
-                        />
-                    </a>
-                }
-            })}
-
-        <ul
-            role="list"
-            class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
-        >
-
-            {it
+            {first_image
                 .map(|image| {
                     view! {
-                        <li class="relative">
-                            <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                                <img
-                                    src=&image.url
-                                    loading="lazy"
-                                    alt=&image.description
-                                    class="pointer-events-none object-cover group-hover:opacity-75"
-                                />
-                                <button type="button" class="absolute inset-0 focus:outline-none">
-                                    <span class="sr-only">View details for IMG_4985</span>
-                                </button>
-                            </div>
-                        </li>
+                        <a href=&showcase.url>
+                            <img
+                                loading="lazy"
+                                class="w-full mt-12"
+                                src=&image.url
+                                alt=&image.description
+                            />
+                        </a>
                     }
-                })
-                .collect::<Vec<_>>()}
+                })}
+            <ul
+                role="list"
+                class="mt-3 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+            >
 
-        </ul>
-        <div class="flex justify-between">
-            <h3 class="mt-2 text-xl font-bold text-ctp-text">{showcase.title}</h3>
+                {it
+                    .map(|image| {
+                        view! {
+                            <li class="relative">
+                                <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                                    <img
+                                        src=&image.url
+                                        loading="lazy"
+                                        alt=&image.description
+                                        class="pointer-events-none object-cover group-hover:opacity-75"
+                                    />
+                                    <button
+                                        type="button"
+                                        class="absolute inset-0 focus:outline-none"
+                                    >
+                                        <span class="sr-only">View details for IMG_4985</span>
+                                    </button>
+                                </div>
+                            </li>
+                        }
+                    })
+                    .collect::<Vec<_>>()}
 
-            {showcase
-                .discord_url
-                .trim()
-                .is_empty()
-                .not()
-                .then_some(view! { <DiscordLink discord_url=showcase.discord_url/> })}
+            </ul> <div class="flex justify-between">
+                <h3 class="mt-2 text-xl font-bold text-ctp-text">{showcase.title}</h3>
 
-        </div>
-        <div class=format!("mt-3, {}", PROSE) inner_html=showcase.description></div>
+                {showcase
+                    .discord_url
+                    .trim()
+                    .is_empty()
+                    .not()
+                    .then_some(view! { <DiscordLink discord_url=showcase.discord_url/> })}
+
+            </div> <div class=format!("mt-3, {}", PROSE) inner_html=showcase.description></div>
         </div>
     }
 }
