@@ -1,4 +1,7 @@
-use crate::app::components::{Container, Divider, DividerWithDescription, DescriptionColor};
+use crate::app::components::{
+    Container, DescriptionColor, Divider,
+    DividerWithDescription,
+};
 use itertools::Itertools;
 use leptos::*;
 use leptos_meta::*;

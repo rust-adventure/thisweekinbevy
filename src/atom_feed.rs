@@ -1,9 +1,7 @@
 use crate::state::AppState;
 use atom_syndication::*;
 use axum::{
-    extract::{State},
-    http::{header},
-    response::{IntoResponse},
+    extract::State, http::header, response::IntoResponse,
 };
 use serde::{Deserialize, Serialize};
 
@@ -11,8 +9,6 @@ pub async fn atom_feed(
     State(app_state): State<AppState>,
 ) -> impl IntoResponse {
     use atom_syndication::Feed;
-    
-    
 
     let issues: Vec<SqlIssueShort> = sqlx::query_as!(
         SqlIssueShort,
