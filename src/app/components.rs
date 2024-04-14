@@ -54,7 +54,7 @@ pub fn Container(
 ) -> impl IntoView {
     view! {
         <div class=format!("lg:px-8 {class}")>
-            <div class=format!("lg:max-w-4xl {}", if center {"mx-auto"} else {""})>
+            <div class=format!("lg:max-w-4xl {}", if center { "mx-auto" } else { "" })>
                 <div class="mx-auto px-4 sm:px-6 md:max-w-2xl md:px-4 lg:px-0">{children()}</div>
             </div>
         </div>

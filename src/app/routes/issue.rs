@@ -687,14 +687,16 @@ pub fn Issue() -> impl IntoView {
                                 }
                                     .into_view()
                             } else {
-                                view!{
-                            <DividerWithDescription
-                                color=DescriptionColor::Teal
-                                title="Devlogs"
-                                description="vlog style updates from long-term projects"
-                            />
-                                }.into_view()}
-                            }
+                                view! {
+                                    <DividerWithDescription
+                                        color=DescriptionColor::Teal
+                                        title="Devlogs"
+                                        description="vlog style updates from long-term projects"
+                                    />
+                                }
+                                    .into_view()
+                            }}
+
                             <div class="divide-y-8 divide-ctp-teal">
 
                                 {issue
