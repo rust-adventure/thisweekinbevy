@@ -13,7 +13,7 @@ use std::ops::Not;
 mod cards;
 use cards::*;
 
-pub const PROSE: &str = r#"prose text-ctp-text prose-code:text-ctp-text prose-a:text-ctp-sky hover:prose-a:text-ctp-blue prose-blockquote:text-ctp-text [&>h2]:leading-7 [&>h2]:text-ctp-text [&>h3]:text-ctp-text [&>h2]:pl-4 [&>ul]:mt-6 [&>ul]:list-['⮡\20'] [&>ul]:pl-5"#;
+pub const PROSE: &str = r#"prose text-ctp-text dark:prose-strong:text-white prose-code:text-ctp-text prose-a:text-ctp-sky hover:prose-a:text-ctp-blue prose-blockquote:text-ctp-text [&>h2]:leading-7 [&>h2]:text-ctp-text [&>h3]:text-ctp-text [&>h2]:pl-4 [&>ul]:mt-6 [&>ul]:list-['⮡\20'] [&>ul]:pl-5"#;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {

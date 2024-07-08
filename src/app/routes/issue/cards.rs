@@ -18,6 +18,8 @@ pub fn SideBySide(
         <div class="bg-ctp-base">
             <div class="mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
+                { images.is_empty().not().then_some(
+                    view! {
                     <div class="lg:col-span-4 lg:row-end-1">
                         <div class="aspect-h-3 aspect-w-4 overflow-hidden rounded-lg bg-gray-100 divide-y-8">
 
@@ -38,7 +40,13 @@ pub fn SideBySide(
                         </div>
                     </div>
 
-                    <div class="mx-auto mt-14 max-w-2xl sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none">
+                            })}
+
+                    <div class=format!("mx-auto mt-14 max-w-2xl sm:mt-16 {} lg:mt-0 lg:max-w-none", if images.is_empty() {
+                        "col-span-7"
+                    } else {
+                        "lg:col-span-3 lg:row-span-2 lg:row-end-2"
+                    })>
                         <div class="flex flex-col-reverse">
                             <div class="mt-4">
                                 <h2 class="text-2xl font-bold tracking-tight text-ctp-text sm:text-3xl">
