@@ -1,6 +1,6 @@
 use crate::app::components::Divider;
 use crate::app::server_fn::error::NoCustomError;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 

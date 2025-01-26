@@ -1,7 +1,7 @@
 use crate::app::components::Divider;
 #[cfg(feature = "ssr")]
 use crate::app::server_fn::error::NoCustomError;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]

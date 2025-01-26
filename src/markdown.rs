@@ -2,10 +2,9 @@
 use comrak::plugins::syntect::SyntectAdapterBuilder;
 #[cfg(feature = "ssr")]
 use comrak::{
-    markdown_to_html_with_plugins, ComrakOptions,
-    ComrakPlugins,
+    markdown_to_html_with_plugins, ComrakPlugins, Options,
 };
-use leptos::*;
+use leptos::prelude::*;
 #[cfg(feature = "ssr")]
 use std::io::Cursor;
 #[cfg(feature = "ssr")]
@@ -37,9 +36,9 @@ pub fn compile(input: &str) -> String {
     let mut plugins = ComrakPlugins::default();
     plugins.render.codefence_syntax_highlighter =
         Some(&adapter);
-    let mut options = ComrakOptions::default();
+    let mut options = Options::default();
     // UNSAFE HTML TAGS!
-    options.render.unsafe_ = false;
+    options.render.unsafe_ = true;
     // extensions, like those on github
     options.extension.strikethrough = true;
     options.extension.tagfilter = true;

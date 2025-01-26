@@ -11,9 +11,9 @@ use crate::{
     error_template::{AppError, ErrorTemplate},
     Username,
 };
-use leptos::*;
+use leptos::prelude::*;
 use leptos_meta::*;
-use leptos_router::*;
+use leptos_router::components::*;
 mod components;
 mod routes;
 
@@ -82,12 +82,12 @@ pub fn App() -> impl IntoView {
         }>
             <Wrapper>
                 <Routes>
-                    <Route path="" view=Home/>
-                    <Route path="/issue/:slug" view=issue::Issue/>
-                    <Route path="/custom/:slug" view=custom::Issue/>
-                    <Route path="/login" view=Login/>
+                    <Route path=path!("") view=Home/>
+                    <Route path=path!("/issue/:slug") view=issue::Issue/>
+                    <Route path=path!("/custom/:slug") view=custom::Issue/>
+                    <Route path=path!("/login") view=Login/>
                     <ProtectedRoute
-                        path="/admin"
+                        path=path!("/admin")
                         redirect_path="/login"
                         condition=|| {
                             use_context::<Option<Username>>().flatten()
@@ -96,22 +96,22 @@ pub fn App() -> impl IntoView {
 
                         view=AdminWrapper
                     >
-                        <Route path="/" view=admin::AdminHomepage/>
-                        <Route path="/issue" view=admin::issues::Issues/>
-                        <Route path="/issue/:id" view=admin::issue::Issue/>
-                        <Route path="/showcase" view=admin::showcase::Showcase/>
-                        <Route path="/showcase/:id" view=admin::showcase::id::Showcase/>
-                        <Route path="/crate_release" view=admin::crate_release::CrateRelease/>
+                        <Route path=path!("/") view=admin::AdminHomepage/>
+                        <Route path=path!("/issue") view=admin::issues::Issues/>
+                        <Route path=path!("/issue/:id") view=admin::issue::Issue/>
+                        <Route path=path!("/showcase") view=admin::showcase::Showcase/>
+                        <Route path=path!("/showcase/:id") view=admin::showcase::id::Showcase/>
+                        <Route path=path!("/crate_release") view=admin::crate_release::CrateRelease/>
                         <Route
-                            path="/crate_release/:id"
+                            path=path!("/crate_release/:id")
                             view=admin::crate_release::id::CrateRelease
                         />
-                        <Route path="/devlog" view=admin::devlog::Devlog/>
-                        <Route path="/devlog/:id" view=admin::devlog::id::Devlog/>
-                        <Route path="/educational" view=admin::educational::Educational/>
-                        <Route path="/educational/:id" view=admin::educational::id::Educational/>
-                        <Route path="/images" view=admin::image::Image/>
-                        <Route path="/github" view=admin::github::GitHub/>
+                        <Route path=path!("/devlog") view=admin::devlog::Devlog/>
+                        <Route path=path!("/devlog/:id") view=admin::devlog::id::Devlog/>
+                        <Route path=path!("/educational") view=admin::educational::Educational/>
+                        <Route path=path!("/educational/:id") view=admin::educational::id::Educational/>
+                        <Route path=path!("/images") view=admin::image::Image/>
+                        <Route path=path!("/github") view=admin::github::GitHub/>
                     </ProtectedRoute>
                 </Routes>
             </Wrapper>

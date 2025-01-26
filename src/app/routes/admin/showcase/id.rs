@@ -1,6 +1,6 @@
 use crate::app::components::Divider;
-use leptos::*;
-use leptos_router::*;
+use leptos::{either::Either, prelude::*};
+use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "ssr")]
@@ -58,13 +58,11 @@ async fn update_showcase(
 pub fn Showcase() -> impl IntoView {
     let params = use_params_map();
 
-    let update_showcase =
-        create_server_action::<UpdateShowcase>();
-    let showcase = create_resource(
+    let update_showcase: ServerAction<UpdateShowcase> =
+        ServerAction::new();
+    let showcase = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_showcase_by_id,
     );
@@ -78,25 +76,25 @@ pub fn Showcase() -> impl IntoView {
                     .get()
                     .map(|data| match data {
                         Err(e) => {
-                            view! {
+                            Either::Left(view! {
                                 <div>
                                     <div>{e.to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         Ok(None) => {
-                            view! {
+                            Either::Left(view! {
                                 <div>
                                     <div>{"Unable to find Showcase".to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         Ok(Some(showcase)) => {
                             let showcase_id = showcase.id.clone();
-                            view! {
+                            Either::Right(view! {
                                 <div>
                                     <ActionForm
-                                        class="isolate -space-y-px rounded-md shadow-sm"
+                                        attr:class="isolate -space-y-px rounded-md shadow-sm"
                                         action=update_showcase
                                     >
                                         <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
@@ -153,7 +151,6 @@ pub fn Showcase() -> impl IntoView {
                                             />
                                         </div>
                                         <label
-                                            required
                                             for="posted_date"
                                             class="block text-sm font-medium leading-6 text-gray-900"
                                         >
@@ -161,6 +158,7 @@ pub fn Showcase() -> impl IntoView {
                                         </label>
                                         <div class="mt-2">
                                             <input
+                                                required
                                                 type="date"
                                                 id="posted_date"
                                                 name="posted_date"
@@ -169,7 +167,6 @@ pub fn Showcase() -> impl IntoView {
                                             />
                                         </div>
                                         <label
-                                            required
                                             for="description"
                                             class="block text-sm font-medium leading-6 text-gray-900"
                                         >
@@ -177,6 +174,7 @@ pub fn Showcase() -> impl IntoView {
                                         </label>
                                         <div class="mt-2">
                                             <textarea
+                                                required
                                                 rows="4"
                                                 name="description"
                                                 id="description"
@@ -210,13 +208,13 @@ pub fn Showcase() -> impl IntoView {
                                         </For>
                                     </ul>
                                 </div>
-                            }
+                            })
                         }
                     })}
 
             </Suspense>
             <Divider title="All Images"/>
-            <Images showcase_id=params.with(|p| { p.get("id").cloned().unwrap_or_default() })/>
+            <Images showcase_id=params.with(|p| { p.get("id").unwrap_or_default() })/>
         </div>
     }
 }
@@ -465,7 +463,7 @@ async fn remove_image_from_showcase(
 #[component]
 fn Images(showcase_id: String) -> impl IntoView {
     let images =
-        create_resource(move || {}, |_| fetch_images());
+        Resource::new(move || {}, |_| fetch_images());
 
     view! {
         <Suspense fallback=move || {
@@ -477,9 +475,9 @@ fn Images(showcase_id: String) -> impl IntoView {
                 images
                     .get()
                     .map(move |data| match (showcase_id, data) {
-                        (_, Err(e)) => view! { <div>{e.to_string()}</div> }.into_view(),
+                        (_, Err(e)) => Either::Left(view! { <div>{e.to_string()}</div> }),
                         (showcase_id, Ok(images)) => {
-                            view! {
+                            Either::Right(view! {
                                 <ul
                                     role="list"
                                     class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
@@ -497,8 +495,7 @@ fn Images(showcase_id: String) -> impl IntoView {
                                         />
                                     </For>
                                 </ul>
-                            }
-                                .into_view()
+                            })
                         }
                     })
             }
@@ -513,8 +510,9 @@ fn ShowcaseImageLi(
     id: String,
     url: String,
 ) -> impl IntoView {
-    let remove_image_from_showcase =
-        create_server_action::<RemoveImageFromShowcase>();
+    let remove_image_from_showcase: ServerAction<
+        RemoveImageFromShowcase,
+    > = ServerAction::new();
 
     view! {
         <li class="relative">
@@ -529,7 +527,7 @@ fn ShowcaseImageLi(
                 </button>
             </div>
             <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {&id}
+                {id.clone()}
             </p>
             // <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
             <ActionForm action=remove_image_from_showcase>
@@ -553,9 +551,9 @@ fn ImageLi(
     url: String,
     description: String,
 ) -> impl IntoView {
-    let associate_image_with_showcase =
-        create_server_action::<AssociateImageWithShowcase>(
-        );
+    let associate_image_with_showcase: ServerAction<
+        AssociateImageWithShowcase,
+    > = ServerAction::new();
 
     view! {
         <li class="relative">
@@ -570,7 +568,7 @@ fn ImageLi(
                 </button>
             </div>
             <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {&id}
+                {id.clone()}
             </p>
             <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
             <ActionForm action=associate_image_with_showcase>

@@ -1,6 +1,6 @@
 use crate::app::components::Divider;
 use futures::future::join;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 pub mod id;

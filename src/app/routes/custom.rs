@@ -2,7 +2,7 @@ use std::ops::Not;
 
 use crate::app::components::{Container, Divider};
 use futures::future::join4;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 
@@ -171,7 +171,7 @@ pub fn Issue() -> impl IntoView {
     // unique id. the rest of the slug can be
     // changed any time.
     // 2024-02-11-the-one-before-bevy-0-13
-    let issue = create_resource(
+    let issue = Resource::new(
         move || {
             params.with(|p| {
                 p.get("slug").cloned().and_then(|slug|

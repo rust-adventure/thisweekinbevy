@@ -1,6 +1,6 @@
 use crate::app::components::Divider;
-use leptos::*;
-use leptos_router::*;
+use leptos::{either::Either, prelude::*};
+use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "ssr")]
@@ -59,13 +59,12 @@ async fn update_educational(
 pub fn Educational() -> impl IntoView {
     let params = use_params_map();
 
-    let update_educational =
-        create_server_action::<UpdateEducational>();
-    let educational = create_resource(
+    let update_educational: ServerAction<
+        UpdateEducational,
+    > = ServerAction::new();
+    let educational = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_educational_by_id,
     );
@@ -79,25 +78,25 @@ pub fn Educational() -> impl IntoView {
                     .get()
                     .map(|data| match data {
                         Err(e) => {
-                            view! {
+                            Either::Left(view! {
                                 <div>
                                     <div>{e.to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         Ok(None) => {
-                            view! {
+                            Either::Left(view! {
                                 <div>
                                     <div>{"Unable to find Crate Release".to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         Ok(Some(educational)) => {
                             let educational_id = educational.id.clone();
-                            view! {
+                            Either::Right(view! {
                                 <div>
                                     <ActionForm
-                                        class="isolate -space-y-px rounded-md shadow-sm"
+                                        attr:class="isolate -space-y-px rounded-md shadow-sm"
                                         action=update_educational
                                     >
                                         <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
@@ -170,7 +169,6 @@ pub fn Educational() -> impl IntoView {
                                             />
                                         </div>
                                         <label
-                                            required
                                             for="posted_date"
                                             class="block text-sm font-medium leading-6 text-gray-900"
                                         >
@@ -179,6 +177,7 @@ pub fn Educational() -> impl IntoView {
                                         <div class="mt-2">
                                             <input
                                                 type="date"
+                                                required
                                                 id="posted_date"
                                                 name="posted_date"
                                                 min="2024-01-01"
@@ -186,7 +185,6 @@ pub fn Educational() -> impl IntoView {
                                             />
                                         </div>
                                         <label
-                                            required
                                             for="description"
                                             class="block text-sm font-medium leading-6 text-gray-900"
                                         >
@@ -194,6 +192,7 @@ pub fn Educational() -> impl IntoView {
                                         </label>
                                         <div class="mt-2">
                                             <textarea
+                                                required
                                                 rows="4"
                                                 name="description"
                                                 id="description"
@@ -227,13 +226,13 @@ pub fn Educational() -> impl IntoView {
                                         </For>
                                     </ul>
                                 </div>
-                            }
+                            })
                         }
                     })}
 
             </Suspense>
             <Divider title="All Images"/>
-            <Images educational_id=params.with(|p| { p.get("id").cloned().unwrap_or_default() })/>
+            <Images educational_id=params.with(|p| { p.get("id").unwrap_or_default() })/>
         </div>
     }
 }
@@ -488,21 +487,20 @@ async fn remove_image_from_educational(
 #[component]
 fn Images(educational_id: String) -> impl IntoView {
     let images =
-        create_resource(move || {}, |_| fetch_images());
+        Resource::new(move || {}, |_| fetch_images());
 
     view! {
         <Suspense fallback=move || {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
-
             {
                 let educational_id = educational_id.clone();
                 images
                     .get()
                     .map(move |data| match (educational_id, data) {
-                        (_, Err(e)) => view! { <div>{e.to_string()}</div> }.into_view(),
+                        (_, Err(e)) => Either::Left(view! { <div>{e.to_string()}</div> }),
                         (educational_id, Ok(images)) => {
-                            view! {
+                            Either::Right(view! {
                                 <ul
                                     role="list"
                                     class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
@@ -520,12 +518,10 @@ fn Images(educational_id: String) -> impl IntoView {
                                         />
                                     </For>
                                 </ul>
-                            }
-                                .into_view()
+                            })
                         }
                     })
             }
-
         </Suspense>
     }
 }
@@ -536,9 +532,9 @@ fn EducationalImageLi(
     id: String,
     url: String,
 ) -> impl IntoView {
-    let remove_image_from_educational =
-        create_server_action::<RemoveImageFromEducational>(
-        );
+    let remove_image_from_educational: ServerAction<
+        RemoveImageFromEducational,
+    > = ServerAction::new();
 
     view! {
         <li class="relative">
@@ -553,7 +549,7 @@ fn EducationalImageLi(
                 </button>
             </div>
             <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {&id}
+                {id.clone()}
             </p>
             // <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
             <ActionForm action=remove_image_from_educational>
@@ -577,9 +573,9 @@ fn ImageLi(
     url: String,
     description: String,
 ) -> impl IntoView {
-    let associate_image_with_educational =
-        create_server_action::<AssociateImageWithEducational>(
-        );
+    let associate_image_with_educational: ServerAction<
+        AssociateImageWithEducational,
+    > = ServerAction::new();
 
     view! {
         <li class="relative">
@@ -594,7 +590,7 @@ fn ImageLi(
                 </button>
             </div>
             <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {&id}
+                {id.clone()}
             </p>
             <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
             <ActionForm action=associate_image_with_educational>

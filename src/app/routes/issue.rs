@@ -3,9 +3,9 @@ use crate::app::components::{
     DividerWithDescription,
 };
 use itertools::Itertools;
-use leptos::*;
+use leptos::{either::{Either, EitherOf4}, prelude::*};
 use leptos_meta::*;
-use leptos_router::*;
+use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::types::Json;
@@ -305,7 +305,7 @@ struct ImgDataTransformed {
 #[server]
 async fn fetch_issue(
     date: time::Date,
-) -> Result<Option<Issue>, leptos::ServerFnError> {
+) -> Result<Option<Issue>, leptos::prelude::ServerFnError> {
     use crate::markdown::compile;
     use cloudinary::transformation::{
         resize_mode::ResizeMode::ScaleByWidth,
@@ -532,10 +532,10 @@ pub fn Issue() -> impl IntoView {
     // unique id. the rest of the slug can be
     // changed any time.
     // 2024-02-11-the-one-before-bevy-0-13
-    let issue = create_blocking_resource(
+    let issue = Resource::new_blocking(
         move || {
             params.with(|p| {
-                p.get("slug").cloned().and_then(|slug|
+                p.get("slug").and_then(|slug|
                 crate::issue_date::parse_issue_date_from_slug(&slug)
             )
             })
@@ -551,9 +551,9 @@ pub fn Issue() -> impl IntoView {
             view! { <p>"Loading..."</p> }
         }>
             {move || match issue.get() {
-                None | Some(None) => view! { <article>"404"</article> },
+                None | Some(None) => Either::Left(view! { <article>"404"</article> }),
                 Some(Some(issue)) => {
-                    view! {
+                    Either::Right(view! {
                         <article class="py-16 lg:py-16">
                             <Title text=issue.title.clone()/>
                             <Meta
@@ -591,7 +591,6 @@ pub fn Issue() -> impl IntoView {
                                 <img
                                     loading="lazy"
                                     class="w-full"
-                                    loading="lazy"
                                     src=issue.header_image
                                     alt=""
                                 />
@@ -683,21 +682,19 @@ pub fn Issue() -> impl IntoView {
                             </div>
 
                             {if issue.devlogs.is_empty() {
-                                view! {
+                                Either::Left(view! {
                                     <div class="border-y-8 border-y-ctp-teal text-center text-ctp-text">
                                         No devlogs this week
                                     </div>
-                                }
-                                    .into_view()
+                                })
                             } else {
-                                view! {
+                                Either::Right(view! {
                                     <DividerWithDescription
                                         color=DescriptionColor::Teal
                                         title="Devlogs"
                                         description="vlog style updates from long-term projects"
                                     />
-                                }
-                                    .into_view()
+                                })
                             }}
 
                             <div class="divide-y-8 divide-ctp-teal">
@@ -724,21 +721,19 @@ pub fn Issue() -> impl IntoView {
                             </div>
 
                             {if issue.educationals.is_empty() {
-                                view! {
+                                Either::Left(view! {
                                     <div class="border-y-8 border-y-ctp-blue text-center text-ctp-text">
                                         No Educational this week
                                     </div>
-                                }
-                                    .into_view()
+                                })
                             } else {
-                                view! {
+                                Either::Right(view! {
                                     <DividerWithDescription
                                         color=DescriptionColor::Blue
                                         title="Educational"
                                         description="Tutorials, deep dives, and other information on developing Bevy applications, games, and plugins"
                                     />
-                                }
-                                    .into_view()
+                                })
                             }}
 
                             {issue
@@ -853,7 +848,7 @@ pub fn Issue() -> impl IntoView {
                                 </ul>
                             </Container>
                         </article>
-                    }
+                    })
                 }
             }}
 
@@ -878,6 +873,7 @@ fn ActivityListItem(
     #[prop(default=ActivityListIcon::Default)]
     icon: ActivityListIcon,
 ) -> impl IntoView {
+    let is_dependabot = author.starts_with("dependabot");
     view! {
         <li class="relative flex gap-x-4">
             <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
@@ -887,14 +883,14 @@ fn ActivityListItem(
 
                 {match icon {
                     ActivityListIcon::Default => {
-                        view! {
+                        Either::Left(view! {
                             <>
                                 <div class="h-1.5 w-1.5 rounded-full bg-ctp-overlay1 ring-1 ring-ctp-overlay-2"></div>
                             </>
-                        }
+                        })
                     }
                     ActivityListIcon::Check => {
-                        view! {
+                        Either::Right(view! {
                             <>
                                 <svg
                                     class="h-6 w-6 text-green-600"
@@ -909,14 +905,14 @@ fn ActivityListItem(
                                     ></path>
                                 </svg>
                             </>
-                        }
+                        })
                     }
                 }}
 
             </div>
             <p class=format!(
                 "flex-auto py-0.5 text-xs leading-5 {}",
-                if author.starts_with("dependabot") { "text-ctp-overlay1" } else { "text-ctp-text" },
+                if is_dependabot { "text-ctp-overlay1" } else { "text-ctp-text" },
             )>
                 <a href=url class="font-medium">
                     {title}
@@ -933,6 +929,7 @@ fn ActivityListItem(
         </li>
     }
 }
+
 #[component]
 fn ActivityListComment(
     /// datetime for the <time> element
@@ -977,18 +974,18 @@ fn ActivityListComment(
 
 #[component]
 fn DevlogView(devlog: Devlog) -> impl IntoView {
-    let mut it = devlog.images.iter();
+    let mut it = devlog.images.into_iter();
     let first_image = it.next();
     view! {
         {first_image
             .map(|image| {
                 view! {
-                    <a href=&devlog.post_url>
+                    <a href=devlog.post_url.clone()>
                         <img
                             class="w-full mt-12 w-full rounded-t-md"
                             loading="lazy"
-                            src=&image.url
-                            alt=&image.description
+                            src=image.url
+                            alt=image.description
                         />
                     </a>
                 }
@@ -1005,9 +1002,9 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
                         <li class="relative">
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                 <img
-                                    src=&image.url
+                                    src=image.url
                                     loading="lazy"
-                                    alt=&image.description
+                                    alt=image.description
                                     class="pointer-events-none object-cover group-hover:opacity-75"
                                 />
                                 <button type="button" class="absolute inset-0 focus:outline-none">
@@ -1025,7 +1022,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
             <div class="flex space-x-4">
 
                 {devlog
-                    .post_url
+                    .post_url.clone()
                     .trim()
                     .is_empty()
                     .not()
@@ -1053,18 +1050,18 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
 fn EducationalView(
     educational: Educational,
 ) -> impl IntoView {
-    let mut it = educational.images.iter();
+    let mut it = educational.images.into_iter();
     let first_image = it.next();
     view! {
         {first_image
             .map(|image| {
                 view! {
-                    <a href=&educational.post_url>
+                    <a href=educational.post_url.clone()>
                         <img
                             class="w-full mt-12 w-full rounded-t-md"
                             loading="lazy"
-                            src=&image.url
-                            alt=&image.description
+                            src=image.url
+                            alt=image.description
                         />
                     </a>
                 }
@@ -1081,9 +1078,9 @@ fn EducationalView(
                         <li class="relative">
                             <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                 <img
-                                    src=&image.url
+                                    src=image.url
                                     loading="lazy"
-                                    alt=&image.description
+                                    alt=image.description
                                     class="pointer-events-none object-cover group-hover:opacity-75"
                                 />
                                 <button type="button" class="absolute inset-0 focus:outline-none">
@@ -1127,19 +1124,19 @@ fn EducationalView(
 
 #[component]
 fn ShowcaseView(showcase: Showcase) -> impl IntoView {
-    let mut it = showcase.images.iter();
+    let mut it = showcase.images.into_iter();
     let first_image = it.next();
     view! {
         <div class="showcase">
             {first_image
                 .map(|image| {
                     view! {
-                        <a href=&showcase.url>
+                        <a href=showcase.url.clone()>
                             <img
                                 loading="lazy"
                                 class="w-full mt-12"
-                                src=&image.url
-                                alt=&image.description
+                                src=image.url
+                                alt=image.description
                             />
                         </a>
                     }
@@ -1155,9 +1152,9 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
                             <li class="relative">
                                 <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                     <img
-                                        src=&image.url
+                                        src=image.url
                                         loading="lazy"
-                                        alt=&image.description
+                                        alt=image.description
                                         class="pointer-events-none object-cover group-hover:opacity-75"
                                     />
                                     <button
@@ -1191,7 +1188,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
 fn DiscordLink(discord_url: String) -> impl IntoView {
     view! {
         <a
-            href=&discord_url
+            href=discord_url
             class="inline-flex items-center gap-x-1.5 rounded-md bg-brand-discord px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-discord focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-discord"
         >
             Discord
@@ -1217,7 +1214,7 @@ fn DiscordLink(discord_url: String) -> impl IntoView {
 fn VideoLink(url: String) -> impl IntoView {
     view! {
         <a
-            href=&url
+            href=url
             class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
         >
             Video
@@ -1241,7 +1238,7 @@ fn VideoLink(url: String) -> impl IntoView {
 fn PostLink(url: String) -> impl IntoView {
     view! {
         <a
-            href=&url
+            href=url
             class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
         >
             Post
@@ -1268,7 +1265,7 @@ fn PostLink(url: String) -> impl IntoView {
 fn URLLink(url: String) -> impl IntoView {
     view! {
         <a
-            href=&url
+            href=url
             class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
         >
             URL
@@ -1325,7 +1322,7 @@ impl CalloutType {
     }
     fn icon_svg(&self) -> impl IntoView {
         match self {
-            CalloutType::Info => view! {
+            CalloutType::Info => EitherOf4::A(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -1338,8 +1335,8 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
-            CalloutType::Caution => view! {
+            }),
+            CalloutType::Caution => EitherOf4::B(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -1352,8 +1349,8 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
-            CalloutType::Warning => view! {
+            }),
+            CalloutType::Warning => EitherOf4::C(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -1366,8 +1363,8 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
-            CalloutType::Success => view! {
+            }),
+            CalloutType::Success => EitherOf4::D(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -1380,7 +1377,7 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
+            }),
         }
     }
     fn title(&self) -> &str {
@@ -1409,6 +1406,7 @@ impl CalloutType {
     }
 }
 
+#[derive(Clone)]
 struct CalloutLink {
     href: String,
     label: String,
@@ -1423,6 +1421,7 @@ fn CalloutInfo(
     >,
     children: Children,
 ) -> impl IntoView {
+    let has_link = link.is_none();
     view! {
         <div class=format!("rounded-md p-4 {}", r#type.bg())>
             <div class="flex">
@@ -1445,7 +1444,7 @@ fn CalloutInfo(
                                 )>{title}</h3>
                             },
                         )}
-                    <div class=if link.is_none() {
+                    <div class=if has_link {
                         format!("mt-2 text-sm {} {}", r#type.content(), r#type.child_links())
                     } else {
                         format!(

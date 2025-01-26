@@ -1,11 +1,10 @@
-use leptos::*;
+use leptos::prelude::*;
 
 #[component]
 pub fn AboutSection(
     #[prop(into, default = "".to_string())] class: String,
 ) -> impl IntoView {
-    let (is_expanded, set_is_expanded) =
-        create_signal(false);
+    let (is_expanded, set_is_expanded) = signal(false);
 
     view! {
         <section class=class>

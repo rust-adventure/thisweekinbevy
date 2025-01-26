@@ -81,6 +81,7 @@ async fn main() {
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use this_week_in_bevy::app::*;
     use this_week_in_bevy::fileserv::file_and_error_handler;
+    use tracing::warn;
 
     tracing_subscriber::fmt::init();
 
@@ -95,9 +96,15 @@ async fn main() {
     let client_id = env::var("GITHUB_CLIENT_ID")
         .map(ClientId::new)
         .expect("GITHUB_CLIENT_ID should be provided.");
+    if client_id.starts_with("op://") {
+        warn!("GITHUB_CLIENT_ID starts with one password prefix. Did you use `op run`?")
+    }
     let client_secret = env::var("GITHUB_CLIENT_SECRET")
         .map(ClientSecret::new)
         .expect("GITHUB_CLIENT_SECRET should be provided");
+    if client_id.starts_with("op://") {
+        warn!("GITHUB_CLIENT_SECRET starts with one password prefix. Did you use `op run`?")
+    }
 
     let auth_url = AuthUrl::new(
         "https://github.com/login/oauth/authorize"

@@ -1,6 +1,6 @@
 use super::PROSE;
 use crate::app::issue::ImgDataTransformed;
-use leptos::*;
+use leptos::prelude::*;
 use std::ops::Not;
 
 #[component]
@@ -27,6 +27,7 @@ pub fn SideBySide(
                                     <div class="aspect-h-3 aspect-w-4 overflow-hidden rounded-lg bg-gray-100 divide-y-8">
 
                                         {images
+                                            .clone()
                                             .iter()
                                             .map(|image| {
                                                 view! {

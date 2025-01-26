@@ -1,6 +1,6 @@
 use crate::app::components::Divider;
-use leptos::*;
-use leptos_router::*;
+use leptos::{either::Either, prelude::*};
+use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "ssr")]
@@ -58,13 +58,11 @@ async fn update_devlog(
 pub fn Devlog() -> impl IntoView {
     let params = use_params_map();
 
-    let update_devlog =
-        create_server_action::<UpdateDevlog>();
-    let devlog = create_resource(
+    let update_devlog: ServerAction<UpdateDevlog> =
+        ServerAction::new();
+    let devlog = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_devlog_by_id,
     );
@@ -78,25 +76,25 @@ pub fn Devlog() -> impl IntoView {
                     .get()
                     .map(|data| match data {
                         Err(e) => {
-                            view! {
+                            Either::Left(view! {
                                 <div>
                                     <div>{e.to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         Ok(None) => {
-                            view! {
+                            Either::Left(view! {
                                 <div>
                                     <div>{"Unable to find Crate Release".to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         Ok(Some(devlog)) => {
                             let devlog_id = devlog.id.clone();
-                            view! {
+                            Either::Right(view! {
                                 <div>
                                     <ActionForm
-                                        class="isolate -space-y-px rounded-md shadow-sm"
+                                        attr:class="isolate -space-y-px rounded-md shadow-sm"
                                         action=update_devlog
                                     >
                                         <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
@@ -169,7 +167,6 @@ pub fn Devlog() -> impl IntoView {
                                             />
                                         </div>
                                         <label
-                                            required
                                             for="posted_date"
                                             class="block text-sm font-medium leading-6 text-gray-900"
                                         >
@@ -178,6 +175,7 @@ pub fn Devlog() -> impl IntoView {
                                         <div class="mt-2">
                                             <input
                                                 type="date"
+                                                required
                                                 id="posted_date"
                                                 name="posted_date"
                                                 min="2024-01-01"
@@ -185,7 +183,6 @@ pub fn Devlog() -> impl IntoView {
                                             />
                                         </div>
                                         <label
-                                            required
                                             for="description"
                                             class="block text-sm font-medium leading-6 text-gray-900"
                                         >
@@ -196,6 +193,7 @@ pub fn Devlog() -> impl IntoView {
                                                 rows="4"
                                                 name="description"
                                                 id="description"
+                                                required
                                                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                             >
                                                 {devlog.description}
@@ -226,13 +224,13 @@ pub fn Devlog() -> impl IntoView {
                                         </For>
                                     </ul>
                                 </div>
-                            }
+                            })
                         }
                     })}
 
             </Suspense>
             <Divider title="All Images"/>
-            <Images devlog_id=params.with(|p| { p.get("id").cloned().unwrap_or_default() })/>
+            <Images devlog_id=params.with(|p| { p.get("id").unwrap_or_default() })/>
         </div>
     }
 }
@@ -485,7 +483,7 @@ async fn remove_image_from_devlog(
 #[component]
 fn Images(devlog_id: String) -> impl IntoView {
     let images =
-        create_resource(move || {}, |_| fetch_images());
+        Resource::new(move || {}, |_| fetch_images());
 
     view! {
         <Suspense fallback=move || {
@@ -497,9 +495,9 @@ fn Images(devlog_id: String) -> impl IntoView {
                 images
                     .get()
                     .map(move |data| match (devlog_id, data) {
-                        (_, Err(e)) => view! { <div>{e.to_string()}</div> }.into_view(),
+                        (_, Err(e)) => Either::Left(view! { <div>{e.to_string()}</div> }),
                         (devlog_id, Ok(images)) => {
-                            view! {
+                            Either::Right(view! {
                                 <ul
                                     role="list"
                                     class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
@@ -517,8 +515,7 @@ fn Images(devlog_id: String) -> impl IntoView {
                                         />
                                     </For>
                                 </ul>
-                            }
-                                .into_view()
+                            })
                         }
                     })
             }
@@ -533,8 +530,9 @@ fn DevlogImageLi(
     id: String,
     url: String,
 ) -> impl IntoView {
-    let remove_image_from_devlog =
-        create_server_action::<RemoveImageFromDevlog>();
+    let remove_image_from_devlog: ServerAction<
+        RemoveImageFromDevlog,
+    > = ServerAction::new();
 
     view! {
         <li class="relative">
@@ -549,7 +547,7 @@ fn DevlogImageLi(
                 </button>
             </div>
             <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {&id}
+                {id.clone()}
             </p>
             // <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
             <ActionForm action=remove_image_from_devlog>
@@ -573,8 +571,9 @@ fn ImageLi(
     url: String,
     description: String,
 ) -> impl IntoView {
-    let associate_image_with_devlog =
-        create_server_action::<AssociateImageWithDevlog>();
+    let associate_image_with_devlog: ServerAction<
+        AssociateImageWithDevlog,
+    > = ServerAction::new();
 
     view! {
         <li class="relative">
@@ -589,7 +588,7 @@ fn ImageLi(
                 </button>
             </div>
             <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {&id}
+                {id.clone()}
             </p>
             <p class="pointer-events-none block text-sm font-medium text-gray-500">{description}</p>
             <ActionForm action=associate_image_with_devlog>
