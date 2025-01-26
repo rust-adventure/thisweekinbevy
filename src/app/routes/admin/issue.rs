@@ -1,16 +1,14 @@
 use crate::app::components::Divider;
-use leptos::prelude::*;
-use leptos_router::*;
+use leptos::{either::Either, prelude::*};
+use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 
 #[component]
 pub fn Issue() -> impl IntoView {
     let params = use_params_map();
-    let issue = create_resource(
+    let issue = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_issue,
     );
@@ -23,13 +21,13 @@ pub fn Issue() -> impl IntoView {
                     issue
                         .get()
                         .map(|data| match data {
-                            Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                            Err(e) => Either::Left(view! { <pre>{e.to_string()}</pre> }),
                             Ok(issue) => {
-                                issue
+                                Either::Right(issue
                                     .map(|issue| {
                                         view! { <IssueForm issue=issue/> }
                                     })
-                                    .collect_view()
+                                    .collect_view())
                             }
                         })
                 }}
@@ -173,18 +171,19 @@ pub async fn update_issue_metadata(
 
 #[component]
 fn IssueForm(issue: IssueData) -> impl IntoView {
-    let update_issue_metadata =
-        create_server_action::<UpdateIssueMetadata>();
+    let update_issue_metadata: ServerAction<
+        UpdateIssueMetadata,
+    > = ServerAction::new();
     view! {
         <div class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
                 <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                    {&issue.issue_date.to_string()}
+                    {issue.issue_date.to_string()}
                 </h2>
-                <p class="mt-2 text-lg leading-8 text-gray-600">{&issue.status}</p>
+                <p class="mt-2 text-lg leading-8 text-gray-600">{issue.status}</p>
             </div>
-            <ActionForm class="mx-auto mt-16 max-w-xl sm:mt-20" action=update_issue_metadata>
-                <input type="hidden" name="issue_id" id="issue_id" value=&issue.id/>
+            <ActionForm attr:class="mx-auto mt-16 max-w-xl sm:mt-20" action=update_issue_metadata>
+                <input type="hidden" name="issue_id" id="issue_id" value=issue.id/>
                 <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
                     <div>
                         <label
@@ -199,7 +198,7 @@ fn IssueForm(issue: IssueData) -> impl IntoView {
                                 name="display_name"
                                 id="display_name"
                                 class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                value=&issue.display_name
+                                value=issue.display_name
                             />
                         </div>
                     </div>
@@ -216,7 +215,7 @@ fn IssueForm(issue: IssueData) -> impl IntoView {
                                 name="slug"
                                 id="slug"
                                 class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                value=&issue.slug
+                                value=issue.slug
                             />
                         </div>
                     </div>
@@ -233,7 +232,7 @@ fn IssueForm(issue: IssueData) -> impl IntoView {
                                 name="cloudinary_public_id"
                                 id="cloudinary_public_id"
                                 class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                value=&issue.cloudinary_public_id
+                                value=issue.cloudinary_public_id
                             />
                         </div>
                     </div>
@@ -250,7 +249,7 @@ fn IssueForm(issue: IssueData) -> impl IntoView {
                                 name="youtube_id"
                                 id="youtube_id"
                                 class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                value=&issue.youtube_id
+                                value=issue.youtube_id
                             />
                         </div>
                     </div>
@@ -269,7 +268,7 @@ fn IssueForm(issue: IssueData) -> impl IntoView {
                                 rows="4"
                                 class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             >
-                                {&issue.description}
+                                {issue.description}
                             </textarea>
                         </div>
                     </div>
@@ -291,11 +290,9 @@ fn IssueForm(issue: IssueData) -> impl IntoView {
 fn Showcases() -> impl IntoView {
     let params = use_params_map();
 
-    let showcases = create_resource(
+    let showcases = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_showcases_for_issue_id,
     );
@@ -312,14 +309,14 @@ fn Showcases() -> impl IntoView {
                     showcases
                         .get()
                         .map(|data| match data {
-                            Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                            Err(e) => Either::Left(view! { <pre>{e.to_string()}</pre> }),
                             Ok(showcases) => {
-                                showcases
+                                Either::Right(showcases
                                     .iter()
                                     .map(|showcase| {
                                         view! { <ShowcaseLi showcase=showcase.clone()/> }
                                     })
-                                    .collect_view()
+                                    .collect_view())
                             }
                         })
                 }}
@@ -461,11 +458,9 @@ issue_id.as_slice()
 fn CrateReleases() -> impl IntoView {
     let params = use_params_map();
 
-    let crate_releases = create_resource(
+    let crate_releases = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_crate_releases_for_issue_id,
     );
@@ -482,16 +477,16 @@ fn CrateReleases() -> impl IntoView {
                     crate_releases
                         .get()
                         .map(|data| match data {
-                            Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                            Err(e) => Either::Left(view! { <pre>{e.to_string()}</pre> }),
                             Ok(crate_releases) => {
-                                crate_releases
+                                Either::Right(crate_releases
                                     .iter()
                                     .map(|crate_release| {
                                         view! {
                                             <CrateReleaseLi crate_release=crate_release.clone()/>
                                         }
                                     })
-                                    .collect_view()
+                                    .collect_view())
                             }
                         })
                 }}
@@ -637,11 +632,9 @@ issue_id.as_slice()
 fn Devlogs() -> impl IntoView {
     let params = use_params_map();
 
-    let devlogs = create_resource(
+    let devlogs = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_devlogs_for_issue_id,
     );
@@ -658,14 +651,14 @@ fn Devlogs() -> impl IntoView {
                     devlogs
                         .get()
                         .map(|data| match data {
-                            Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                            Err(e) => Either::Left(view! { <pre>{e.to_string()}</pre> }),
                             Ok(devlogs) => {
-                                devlogs
+                                Either::Right(devlogs
                                     .iter()
                                     .map(|devlog| {
                                         view! { <DevlogLi devlog=devlog.clone()/> }
                                     })
-                                    .collect_view()
+                                    .collect_view())
                             }
                         })
                 }}
@@ -804,11 +797,9 @@ ORDER BY devlog.posted_date",
 fn Educationals() -> impl IntoView {
     let params = use_params_map();
 
-    let educationals = create_resource(
+    let educationals = Resource::new(
         move || {
-            params.with(|p| {
-                p.get("id").cloned().unwrap_or_default()
-            })
+            params.with(|p| p.get("id").unwrap_or_default())
         },
         fetch_educationals_for_issue_id,
     );
@@ -825,14 +816,14 @@ fn Educationals() -> impl IntoView {
                     educationals
                         .get()
                         .map(|data| match data {
-                            Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                            Err(e) => Either::Left(view! { <pre>{e.to_string()}</pre> }),
                             Ok(educationals) => {
-                                educationals
+                                Either::Right(educationals
                                     .iter()
                                     .map(|educational| {
                                         view! { <EducationalLi educational=educational.clone()/> }
                                     })
-                                    .collect_view()
+                                    .collect_view())
                             }
                         })
                 }}

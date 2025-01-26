@@ -1,3 +1,5 @@
+#![recursion_limit = "512"]
+
 use axum::{
     body::Body as AxumBody,
     extract::{Path, State},
@@ -11,7 +13,7 @@ use axum_login::{
     },
     AuthManagerLayerBuilder,
 };
-use leptos::provide_context;
+use leptos::prelude::provide_context;
 use leptos_axum::handle_server_fns_with_context;
 use oauth2::{
     basic::BasicClient, AuthUrl, ClientId, ClientSecret,
@@ -20,7 +22,10 @@ use oauth2::{
 use sqlx::mysql::MySqlPoolOptions;
 use std::env;
 use this_week_in_bevy::{
-    app::App, auth, oauth, state::AppState, users::Backend,
+    app::{shell, App},
+    auth, oauth,
+    state::AppState,
+    users::Backend,
 };
 use this_week_in_bevy::{
     session_store, users::AuthSession, Username,
@@ -57,8 +62,8 @@ async fn leptos_routes_handler(
     auth_session: AuthSession,
     req: Request<AxumBody>,
 ) -> Response {
+    let state = app_state.clone();
     let handler = leptos_axum::render_route_with_context(
-        app_state.leptos_options.clone(),
         app_state.routes.clone(),
         move || {
             provide_context(app_state.pool.clone());
@@ -68,19 +73,23 @@ async fn leptos_routes_handler(
                 }),
             );
         },
-        App,
+        move || shell(app_state.leptos_options.clone()),
     );
-    handler(req).await.into_response()
+    handler(State(state), req).await.into_response()
 }
 
 #[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
     use axum::Router;
+    use config::get_configuration;
     use leptos::*;
-    use leptos_axum::{generate_route_list, LeptosRoutes};
+    use leptos_axum::{
+        file_and_error_handler, generate_route_list,
+        LeptosRoutes,
+    };
     use this_week_in_bevy::app::*;
-    use this_week_in_bevy::fileserv::file_and_error_handler;
+    // use this_week_in_bevy::fileserv::file_and_error_handler;
     use tracing::warn;
 
     tracing_subscriber::fmt::init();
@@ -167,7 +176,7 @@ async fn main() {
     // Some("Cargo.toml") The file would need to
     // be included with the executable when moved to
     // deployment
-    let conf = get_configuration(None).await.unwrap();
+    let conf = get_configuration(None).unwrap();
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
     let routes = generate_route_list(App);
@@ -193,7 +202,10 @@ async fn main() {
             get(leptos_routes_handler),
         )
         // .leptos_routes(&leptos_options, routes, App)
-        .fallback(file_and_error_handler)
+        .fallback(leptos_axum::file_and_error_handler::<
+            AppState,
+            _,
+        >(shell))
         .merge(auth::router())
         .merge(oauth::router())
         .layer(auth_layer)

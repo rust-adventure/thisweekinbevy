@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_router::*;
+use leptos_router::components::{Outlet, A};
 
 pub mod crate_release;
 pub mod devlog;
@@ -173,42 +173,42 @@ pub fn AdminWrapper() -> impl IntoView {
                         class="flex min-w-full flex-none gap-x-6 px-4 text-sm font-semibold leading-6 text-gray-600 sm:px-6 lg:px-8"
                     >
                         <li>
-                            <A href="/admin" exact=true active_class="text-blue-600">
+                            <A href="/admin" exact=true attr:class="active:text-blue-600">
                                 Home
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/issue" exact=true active_class="text-blue-600">
+                            <A href="/admin/issue" exact=true attr:class="active:text-blue-600">
                                 Issue
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/showcase" exact=true active_class="text-blue-600">
+                            <A href="/admin/showcase" exact=true attr:class="active:text-blue-600">
                                 Showcase
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/crate_release" exact=true active_class="text-blue-600">
+                            <A href="/admin/crate_release" exact=true attr:class="active:text-blue-600">
                                 Crate Release
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/devlog" exact=true active_class="text-blue-600">
+                            <A href="/admin/devlog" exact=true attr:class="active:text-blue-600">
                                 Devlog
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/educational" active_class="text-blue-600">
+                            <A href="/admin/educational" attr:class="active:text-blue-600">
                                 Educational
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/images" active_class="text-blue-600">
+                            <A href="/admin/images" attr:class="active:text-blue-600">
                                 Images
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/github" active_class="text-blue-600">
+                            <A href="/admin/github" attr:class="active:text-blue-600">
                                 GitHub
                             </A>
                         </li>

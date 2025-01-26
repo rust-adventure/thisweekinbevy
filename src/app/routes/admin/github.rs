@@ -1,36 +1,38 @@
 use crate::app::components::Divider;
 use crate::app::server_fn::error::NoCustomError;
-use leptos::prelude::*;
-use leptos_router::*;
+use leptos::{either::EitherOf3, prelude::*};
 use serde::{Deserialize, Serialize};
 
 #[component]
 pub fn GitHub() -> impl IntoView {
-    let select_new_github_issues =
-        create_server_action::<SelectNewGithubIssues>();
-    let select_new_pull_requests =
-        create_server_action::<SelectNewPullRequests>();
-    let select_merged_pull_requests =
-        create_server_action::<SelectMergedPullRequests>();
+    let select_new_github_issues: ServerAction<
+        SelectNewGithubIssues,
+    > = ServerAction::new();
+    let select_new_pull_requests: ServerAction<
+        SelectNewPullRequests,
+    > = ServerAction::new();
+    let select_merged_pull_requests: ServerAction<
+        SelectMergedPullRequests,
+    > = ServerAction::new();
     let issues =
-        create_resource(move || {}, |_| fetch_issues());
+        Resource::new(move || {}, |_| fetch_issues());
     view! {
         <Suspense fallback=move || {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
             {match issues.get() {
-                None => view! { <div>error</div> },
-                Some(Err(e)) => view! { <div>{e.to_string()}</div> },
+                None => EitherOf3::A(view! { <div>error</div> }),
+                Some(Err(e)) => EitherOf3::B(view! { <div>{e.to_string()}</div> }),
                 Some(Ok(issues)) => {
                     let issues_a = issues.clone();
                     let issues_b = issues.clone();
-                    view! {
+                    EitherOf3::C(view! {
                         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                             <Divider title="new github issues"/>
 
                             <ActionForm
                                 action=select_new_github_issues
-                                class="isolate -space-y-px rounded-md shadow-sm"
+                                attr:class="isolate -space-y-px rounded-md shadow-sm"
                             >
                                 <label
                                     for="issue_id"
@@ -46,9 +48,8 @@ pub fn GitHub() -> impl IntoView {
                                         .iter()
                                         .map(|issue| {
                                             view! {
-                                                <option value=&issue
-                                                    .id>
-                                                    {issue.issue_date.to_string()} - {&issue.display_name}
+                                                <option value=issue.id.clone()>
+                                                    {issue.issue_date.to_string()} - {issue.display_name.clone()}
                                                 </option>
                                             }
                                         })
@@ -89,7 +90,7 @@ pub fn GitHub() -> impl IntoView {
 
                             <ActionForm
                                 action=select_new_pull_requests
-                                class="isolate -space-y-px rounded-md shadow-sm"
+                                attr:class="isolate -space-y-px rounded-md shadow-sm"
                             >
                                 <label
                                     for="issue_id"
@@ -106,9 +107,8 @@ pub fn GitHub() -> impl IntoView {
                                         .iter()
                                         .map(|issue| {
                                             view! {
-                                                <option value=&issue
-                                                    .id>
-                                                    {issue.issue_date.to_string()} - {&issue.display_name}
+                                                <option value=issue.id.clone()>
+                                                    {issue.issue_date.to_string()} - {issue.display_name.clone()}
                                                 </option>
                                             }
                                         })
@@ -149,7 +149,7 @@ pub fn GitHub() -> impl IntoView {
 
                             <ActionForm
                                 action=select_merged_pull_requests
-                                class="isolate -space-y-px rounded-md shadow-sm"
+                                attr:class="isolate -space-y-px rounded-md shadow-sm"
                             >
                                 <label
                                     for="issue_id"
@@ -166,9 +166,8 @@ pub fn GitHub() -> impl IntoView {
                                         .iter()
                                         .map(|issue| {
                                             view! {
-                                                <option value=&issue
-                                                    .id>
-                                                    {issue.issue_date.to_string()} - {&issue.display_name}
+                                                <option value=issue.id.clone()>
+                                                    {issue.issue_date.to_string()} - {issue.display_name.clone()}
                                                 </option>
                                             }
                                         })
@@ -205,7 +204,7 @@ pub fn GitHub() -> impl IntoView {
                                 <button type="submit">Add to Issue</button>
                             </ActionForm>
                         </div>
-                    }
+                    })
                 }
             }}
 

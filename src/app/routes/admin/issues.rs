@@ -1,13 +1,12 @@
-use leptos::prelude::*;
-use leptos_router::*;
+use leptos::{either::Either, prelude::*};
 use serde::{Deserialize, Serialize};
 
 #[component]
 pub fn Issues() -> impl IntoView {
-    let create_draft_issue =
-        create_server_action::<CreateDraftIssue>();
+    let create_draft_issue: ServerAction<CreateDraftIssue> =
+        ServerAction::new();
     let issues =
-        create_resource(move || {}, |_| fetch_issues());
+        Resource::new(move || {}, |_| fetch_issues());
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="bg-white shadow sm:rounded-lg">
@@ -20,7 +19,7 @@ pub fn Issues() -> impl IntoView {
                             Creates a new draft issue that content can be attached to. Pick a Monday for the issue date.
                         </p>
                     </div>
-                    <ActionForm class="mt-5 sm:flex sm:items-center" action=create_draft_issue>
+                    <ActionForm attr:class="mt-5 sm:flex sm:items-center" action=create_draft_issue>
                         <div class="w-full sm:max-w-xs">
                             <label for="issue_date" class="sr-only">
                                 issue_date
@@ -47,9 +46,9 @@ pub fn Issues() -> impl IntoView {
                         issues
                             .get()
                             .map(|data| match data {
-                                Err(e) => view! { <pre>{e.to_string()}</pre> }.into_view(),
+                                Err(e) => Either::Left(view! { <pre>{e.to_string()}</pre> }),
                                 Ok(issues) => {
-                                    issues
+                                    Either::Right(issues
                                         .iter()
                                         .map(|issue| {
                                             let status_style = match issue.status.as_ref() {
@@ -70,11 +69,11 @@ pub fn Issues() -> impl IntoView {
                                                                 href=format!("/admin/issue/{}", &issue.id)
                                                                 class="text-sm font-semibold leading-6 text-gray-900"
                                                             >
-                                                                {&issue.display_name}
+                                                                {issue.display_name.clone()}
                                                             </a>
-                                                            <time datetime=&issue
+                                                            <time datetime=issue
                                                                 .issue_date
-                                                                .to_string()>{&issue.issue_date.to_string()}</time>
+                                                                .to_string()>{issue.issue_date.to_string()}</time>
                                                             <p class="flex-none text-xs text-gray-600">
                                                                 something here
                                                             </p>
@@ -83,7 +82,7 @@ pub fn Issues() -> impl IntoView {
                                                 </li>
                                             }
                                         })
-                                        .collect_view()
+                                        .collect_view())
                                 }
                             })
                     }}

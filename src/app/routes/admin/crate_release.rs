@@ -1,7 +1,6 @@
 use crate::app::components::Divider;
 use futures::future::join;
-use leptos::{either::Either, prelude::*};
-use leptos_router::hooks::use_params_map;
+use leptos::{either::EitherOf3, prelude::*};
 use serde::{Deserialize, Serialize};
 pub mod id;
 
@@ -40,16 +39,16 @@ async fn add_crate_release(
 
 #[component]
 pub fn CrateRelease() -> impl IntoView {
-    let add_crate_release =
-        create_server_action::<AddCrateRelease>();
-    let crate_releases = create_resource(
+    let add_crate_release: ServerAction<AddCrateRelease> =
+        ServerAction::new();
+    let crate_releases = Resource::new(
         move || {},
         |_| join(fetch_crate_releases(), fetch_issues()),
     );
 
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <ActionForm class="isolate -space-y-px rounded-md shadow-sm" action=add_crate_release>
+            <ActionForm attr:class="isolate -space-y-px rounded-md shadow-sm" action=add_crate_release>
                 <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
                     <label for="title" class="block text-xs font-medium text-gray-900">
                         Title
@@ -89,17 +88,15 @@ pub fn CrateRelease() -> impl IntoView {
                     />
                 </div>
                 <label
-                    required
                     for="posted_date"
                     class="block text-sm font-medium leading-6 text-gray-900"
                 >
                     Posted At
                 </label>
                 <div class="mt-2">
-                    <input type="date" id="posted_date" name="posted_date" min="2024-01-01"/>
+                    <input type="date" required id="posted_date" name="posted_date" min="2024-01-01"/>
                 </div>
                 <label
-                    required
                     for="description"
                     class="block text-sm font-medium leading-6 text-gray-900"
                 >
@@ -107,6 +104,7 @@ pub fn CrateRelease() -> impl IntoView {
                 </label>
                 <div class="mt-2">
                     <textarea
+                        required
                         rows="4"
                         name="description"
                         id="description"
@@ -128,22 +126,22 @@ pub fn CrateRelease() -> impl IntoView {
                     .get()
                     .map(|data| match data {
                         (Err(e), Err(e2)) => {
-                            view! {
+                            EitherOf3::A(view! {
                                 <div>
                                     <div>{e.to_string()}</div>
                                     <div>{e2.to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         (_, Err(e)) | (Err(e), _) => {
-                            view! {
+                            EitherOf3::B(view! {
                                 <div>
                                     <div>{e.to_string()}</div>
                                 </div>
-                            }
+                            })
                         }
                         (Ok(crate_releases), Ok(issues)) => {
-                            view! {
+                            EitherOf3::C(view! {
                                 <div>
                                     <ul role="list" class="divide-y divide-gray-100">
                                         <For
@@ -158,7 +156,7 @@ pub fn CrateRelease() -> impl IntoView {
                                         </For>
                                     </ul>
                                 </div>
-                            }
+                            })
                         }
                     })}
 
@@ -172,10 +170,9 @@ fn AddCrateReleaseToIssueForm(
     crate_release: CrateReleaseData,
     issue_id: Option<String>,
 ) -> impl IntoView {
-    let associate_crate_release_with_issue =
-        create_server_action::<
-            AssociateCrateReleaseWithIssue,
-        >();
+    let associate_crate_release_with_issue: ServerAction<
+        AssociateCrateReleaseWithIssue,
+    > = ServerAction::new();
 
     view! {
         <li class="flex items-center justify-between gap-x-6 py-5">

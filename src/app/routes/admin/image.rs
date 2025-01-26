@@ -1,19 +1,22 @@
 use crate::app::components::Divider;
 #[cfg(feature = "ssr")]
 use crate::app::server_fn::error::NoCustomError;
-use leptos::prelude::*;
-use leptos_router::*;
+use leptos::{
+    either::{Either, EitherOf3},
+    prelude::*,
+};
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use tracing::error;
 
 #[component]
 pub fn Image() -> impl IntoView {
-    let add_image = create_server_action::<AddImage>();
+    let add_image: ServerAction<AddImage> =
+        ServerAction::new();
 
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <ActionForm class="isolate -space-y-px rounded-md shadow-sm" action=add_image>
+            <ActionForm attr:class="isolate -space-y-px rounded-md shadow-sm" action=add_image>
                 <div class="relative rounded-md px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
                     <label
                         for="cloudinary_public_id"
@@ -30,7 +33,6 @@ pub fn Image() -> impl IntoView {
                     />
                 </div>
                 <label
-                    required
                     for="description"
                     class="block text-sm font-medium leading-6 text-gray-900"
                 >
@@ -38,6 +40,7 @@ pub fn Image() -> impl IntoView {
                 </label>
                 <div class="mt-2">
                     <textarea
+                        required
                         rows="4"
                         name="description"
                         id="description"
@@ -89,7 +92,7 @@ async fn add_image(
 #[component]
 fn Images() -> impl IntoView {
     let images =
-        create_resource(move || {}, |_| fetch_images());
+        Resource::new(move || {}, |_| fetch_images());
 
     view! {
         <Suspense fallback=move || {
@@ -98,9 +101,9 @@ fn Images() -> impl IntoView {
             {images
                 .get()
                 .map(|data| match data {
-                    Err(e) => view! { <div>{e.to_string()}</div> }.into_view(),
+                    Err(e) => Either::Left(view! { <div>{e.to_string()}</div> }),
                     Ok(images) => {
-                        view! {
+                        Either::Right(view! {
                             <ul
                                 role="list"
                                 class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
@@ -117,8 +120,7 @@ fn Images() -> impl IntoView {
                                     />
                                 </For>
                             </ul>
-                        }
-                            .into_view()
+                        })
                     }
                 })}
 

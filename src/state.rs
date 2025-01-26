@@ -1,6 +1,7 @@
 use axum::extract::FromRef;
-use leptos::LeptosOptions;
-use leptos_router::RouteListing;
+use leptos::prelude::LeptosOptions;
+use leptos_axum::AxumRouteListing;
+// use leptos_router::RouteListing;
 use sqlx::MySqlPool;
 
 /// This takes advantage of Axum's SubStates
@@ -13,5 +14,5 @@ use sqlx::MySqlPool;
 pub struct AppState {
     pub leptos_options: LeptosOptions,
     pub pool: MySqlPool,
-    pub routes: Vec<RouteListing>,
+    pub routes: Vec<AxumRouteListing>,
 }

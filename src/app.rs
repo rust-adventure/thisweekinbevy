@@ -11,11 +11,81 @@ use crate::{
     error_template::{AppError, ErrorTemplate},
     Username,
 };
-use leptos::prelude::*;
+use leptos::{either::Either, prelude::*};
 use leptos_meta::*;
-use leptos_router::components::*;
+use leptos_router::{components::*, path};
 mod components;
 mod routes;
+
+pub fn shell(options: LeptosOptions) -> impl IntoView {
+    let pkg_path: &'static str =
+        std::option_env!("CDN_PKG_PATH").unwrap_or("/pkg");
+    let cdn_path: &'static str =
+        std::option_env!("CDN_PATH").unwrap_or("/");
+
+    view! {
+        <!DOCTYPE html>
+        <html
+            lang="en"
+            class="h-full bg-ctp-base antialiased"
+            >
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <link rel="preconnect" href="https://cdn.thisweekinbevy.com"/>
+                <style>
+                    r#"@font-face {
+                    font-family: "PP Neue Montreal";
+                    src: url("https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2")
+                    format("woff2");
+                    font-weight: 100 900;
+                    font-display: swap;
+                    font-style: normal;
+                    }"#
+                </style>
+                <link
+                    rel="preload"
+                    as_="font"
+                    type_="font/woff2"
+                    crossorigin="anonymous"
+                    href="https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2"
+                />
+                <meta name="og:site_name" content="This Week in Bevy"/>
+
+                <AutoReload options=options.clone() />
+                <HydrationScripts options/>
+                <link rel="stylesheet" id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
+                // <link rel="shortcut icon" type="image/ico" href="/favicon.ico"/>
+                <link
+                    rel="apple-touch-icon"
+                    sizes="180x180"
+                    href=format!("{cdn_path}/apple-touch-icon.png")
+                />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="32x32"
+                    href=format!("{cdn_path}/favicon-32x32.png")
+                />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="16x16"
+                    href=format!("{cdn_path}/favicon-16x16.png")
+                />
+                <link rel="manifest" href=format!("{cdn_path}/site.webmanifest")/>
+                <meta name="msapplication-TileColor" content="#cdd6f4"/>
+                <meta name="theme-color" content="#cdd6f4"/>
+
+                <MetaTags/>
+
+            </head>
+            <body class="flex min-h-full">
+                <App/>
+            </body>
+        </html>
+    }
+}
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -23,75 +93,25 @@ pub fn App() -> impl IntoView {
     // titles, meta tags, etc.
     provide_meta_context();
 
-    let pkg_path: &'static str =
-        std::option_env!("CDN_PKG_PATH").unwrap_or("/pkg");
-    let cdn_path: &'static str =
-        std::option_env!("CDN_PATH").unwrap_or("/");
     view! {
-        <Html
-            lang="en"
-            // arbitrary additional attributes can be passed via `attr:`
-            attr:class="h-full bg-ctp-base antialiased"
-        />
-        <Body class="flex min-h-full"/>
-        <Link rel="preconnect" href="https://cdn.thisweekinbevy.com"/>
-        <Style>
-            r#"@font-face {
-            font-family: "PP Neue Montreal";
-            src: url("https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2")
-            format("woff2");
-            font-weight: 100 900;
-            font-display: swap;
-            font-style: normal;
-            }"#
-        </Style>
-        <Link
-            rel="preload"
-            as_="font"
-            type_="font/woff2"
-            crossorigin="anonymous"
-            href="https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2"
-        />
-        // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
-        <Meta name="og:site_name" content="This Week in Bevy"/>
-        <Link
-            rel="apple-touch-icon"
-            sizes="180x180"
-            href=format!("{cdn_path}/apple-touch-icon.png")
-        />
-        <Link
-            rel="icon"
-            type_="image/png"
-            sizes="32x32"
-            href=format!("{cdn_path}/favicon-32x32.png")
-        />
-        <Link
-            rel="icon"
-            type_="image/png"
-            sizes="16x16"
-            href=format!("{cdn_path}/favicon-16x16.png")
-        />
-        <Link rel="manifest" href=format!("{cdn_path}/site.webmanifest")/>
-        <Meta name="msapplication-TileColor" content="#cdd6f4"/>
-        <Meta name="theme-color" content="#cdd6f4"/>
-        <Router fallback=|| {
-            let mut outside_errors = Errors::default();
-            outside_errors.insert_with_default_key(AppError::NotFound);
-            view! { <ErrorTemplate outside_errors/> }.into_view()
-        }>
+        <Router>
             <Wrapper>
-                <Routes>
+                <Routes fallback=|| {
+                    let mut outside_errors = Errors::default();
+                    outside_errors.
+                insert_with_default_key(AppError::NotFound);
+                    view! { <ErrorTemplate outside_errors/>
+                }.into_view() }>
                     <Route path=path!("") view=Home/>
                     <Route path=path!("/issue/:slug") view=issue::Issue/>
                     <Route path=path!("/custom/:slug") view=custom::Issue/>
                     <Route path=path!("/login") view=Login/>
-                    <ProtectedRoute
+                    <ProtectedParentRoute
                         path=path!("/admin")
-                        redirect_path="/login"
-                        condition=|| {
-                            use_context::<Option<Username>>().flatten()
-                                == Some(Username("ChristopherBiscardi".to_string()))
+                        redirect_path=|| "/login"
+                        condition=move || {
+                            Some(use_context::<Option<Username>>().flatten()
+                                == Some(Username("ChristopherBiscardi".to_string())))
                         }
 
                         view=AdminWrapper
@@ -112,7 +132,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/educational/:id") view=admin::educational::id::Educational/>
                         <Route path=path!("/images") view=admin::image::Image/>
                         <Route path=path!("/github") view=admin::github::GitHub/>
-                    </ProtectedRoute>
+                    </ProtectedParentRoute>
                 </Routes>
             </Wrapper>
         </Router>
@@ -213,21 +233,21 @@ fn Wrapper(children: Children) -> impl IntoView {
     let maintainers =
         ["chris biscardi", "The Bevy Community"];
     let mntnrs = maintainers.iter().enumerate().map(|(i, cite)| {
-            if i == 0 {
-            view! {
+        if i == 0 {
+            Either::Left(view! {
                 <>
                     <span>{cite.to_string()}</span>
                 </>
-            }
+            })
         } else {
-            view! {
+            Either::Right(view! {
                 <>
                     <span aria-hidden="true" class="text-ctp-text">
                         "/"
                     </span>
                     <span>{cite.to_string()}</span>
                 </>
-            }
+            })
         }
         }).collect_view();
     view! {

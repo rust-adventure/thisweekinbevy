@@ -2,8 +2,11 @@ use std::ops::Not;
 
 use crate::app::components::{Container, Divider};
 use futures::future::join4;
-use leptos::prelude::*;
-use leptos_router::*;
+use leptos::{
+    either::{Either, EitherOf4},
+    prelude::*,
+};
+use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -120,7 +123,7 @@ struct Contributor;
 #[server]
 async fn fetch_issue(
     _date: time::Date,
-) -> Result<Issue, leptos::ServerFnError> {
+) -> Result<Issue, leptos::server_fn::ServerFnError> {
     use crate::markdown::compile;
     let crates = vec![CrateRelease {
             title: "Hexx 0.13.0".to_string(),
@@ -174,7 +177,7 @@ pub fn Issue() -> impl IntoView {
     let issue = Resource::new(
         move || {
             params.with(|p| {
-                p.get("slug").cloned().and_then(|slug|
+                p.get("slug").and_then(|slug|
                 crate::issue_date::parse_issue_date_from_slug(&slug)
             )
             })
@@ -202,9 +205,9 @@ pub fn Issue() -> impl IntoView {
             view! { <p>"Loading..."</p> }
         }>
             {move || match issue.get() {
-                None | Some(None) => view! { <article>"404"</article> },
+                None | Some(None) => Either::Left(view! { <article>"404"</article> }),
                 Some(Some((issue, merged_pull_requests, opened_pull_requests, opened_issues))) => {
-                    view! {
+                    Either::Right(view! {
                         <article class="py-16 lg:py-36">
                             <Container>
                                 <header class="flex flex-col">
@@ -253,9 +256,9 @@ pub fn Issue() -> impl IntoView {
                                     .map(|crate_release| {
                                         view! {
                                             <CrateRelease
-                                                title=&crate_release.title
-                                                description=&crate_release.description
-                                                url=&crate_release.url
+                                                title=crate_release.title.clone()
+                                                description=crate_release.description.clone()
+                                                url=crate_release.url.clone()
                                                 images=crate_release.images.clone()
                                             />
                                         }
@@ -276,10 +279,10 @@ pub fn Issue() -> impl IntoView {
                                         .map(|pull_request| {
                                             view! {
                                                 <ActivityListItem
-                                                    date=&pull_request.merged_at_date
-                                                    url=&pull_request.url
-                                                    title=&pull_request.title
-                                                    author=&pull_request.author
+                                                    date=pull_request.merged_at_date.clone()
+                                                    url=pull_request.url.clone()
+                                                    title=pull_request.title.clone()
+                                                    author=pull_request.author.clone()
                                                 />
                                             }
                                         })
@@ -310,10 +313,10 @@ pub fn Issue() -> impl IntoView {
                                         .map(|pull_request| {
                                             view! {
                                                 <ActivityListItem
-                                                    date=&pull_request.gh_created_at
-                                                    url=&pull_request.url
-                                                    title=&pull_request.title
-                                                    author=&pull_request.author
+                                                    date=pull_request.gh_created_at.clone()
+                                                    url=pull_request.url.clone()
+                                                    title=pull_request.title.clone()
+                                                    author=pull_request.author.clone()
                                                 />
                                             }
                                         })
@@ -331,10 +334,10 @@ pub fn Issue() -> impl IntoView {
                                         .map(|issue| {
                                             view! {
                                                 <ActivityListItem
-                                                    date=&issue.gh_created_at
-                                                    url=&issue.url
-                                                    title=&issue.title
-                                                    author=&issue.author
+                                                    date=issue.gh_created_at.clone()
+                                                    url=issue.url.clone()
+                                                    title=issue.title.clone()
+                                                    author=issue.author.clone()
                                                 />
                                             }
                                         })
@@ -343,7 +346,7 @@ pub fn Issue() -> impl IntoView {
                                 </ul>
                             </Container>
                         </article>
-                    }
+                    })
                 }
             }}
 
@@ -376,14 +379,14 @@ fn ActivityListItem(
 
                 {match icon {
                     ActivityListIcon::Default => {
-                        view! {
+                        Either::Left(view! {
                             <>
                                 <div class="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
                             </>
-                        }
+                        })
                     }
                     ActivityListIcon::Check => {
-                        view! {
+                        Either::Right(view! {
                             <>
                                 <svg
                                     class="h-6 w-6 text-green-600"
@@ -398,7 +401,7 @@ fn ActivityListItem(
                                     ></path>
                                 </svg>
                             </>
-                        }
+                        })
                     }
                 }}
 
@@ -410,8 +413,8 @@ fn ActivityListItem(
                 " authored by "
                 <span class="font-medium text-gray-900">{author}</span>
             </p>
-            <time datetime=&date class="flex-none py-0.5 text-xs leading-5 text-gray-500">
-                {date}
+            <time datetime=date class="flex-none py-0.5 text-xs leading-5 text-gray-500">
+                {date.clone()}
             </time>
         </li>
     }
@@ -474,7 +477,8 @@ fn CrateRelease(
         >
 
             {images
-                .iter()
+                .clone()
+                .into_iter()
                 .map(|image| {
                     view! {
                         <li class="relative">
@@ -527,7 +531,7 @@ impl CalloutType {
     }
     fn icon_svg(&self) -> impl IntoView {
         match self {
-            CalloutType::Info => view! {
+            CalloutType::Info => EitherOf4::A(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -540,8 +544,8 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
-            CalloutType::Caution => view! {
+            }),
+            CalloutType::Caution => EitherOf4::B(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -554,8 +558,8 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
-            CalloutType::Warning => view! {
+            }),
+            CalloutType::Warning => EitherOf4::C(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -568,8 +572,8 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
-            CalloutType::Success => view! {
+            }),
+            CalloutType::Success => EitherOf4::D(view! {
                 <svg
                     class=format!("h-5 w-5 {}", self.icon())
                     viewBox="0 0 20 20"
@@ -582,7 +586,7 @@ impl CalloutType {
                         clip-rule="evenodd"
                     ></path>
                 </svg>
-            },
+            }),
         }
     }
     fn title(&self) -> &str {
@@ -626,6 +630,7 @@ fn CalloutInfo(
     >,
     children: Children,
 ) -> impl IntoView {
+    let has_link = link.is_none();
     view! {
         <div class=format!("rounded-md p-4 {}", r#type.bg())>
             <div class="flex">
@@ -647,7 +652,7 @@ fn CalloutInfo(
                                 )>{title}</h3>
                             },
                         )}
-                    <div class=if link.is_none() {
+                    <div class=if has_link {
                         format!("mt-2 text-sm {} {}", r#type.content(), r#type.child_links())
                     } else {
                         format!(

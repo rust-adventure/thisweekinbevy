@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 pub mod admin;
 pub mod custom;
 pub mod index;

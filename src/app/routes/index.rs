@@ -1,6 +1,6 @@
 use crate::app::components::Container;
 use crate::app::issue::PROSE;
-use leptos::prelude::*;
+use leptos::{either::Either, prelude::*};
 use leptos_meta::*;
 use serde::{Deserialize, Serialize};
 use std::ops::Not;
@@ -33,18 +33,21 @@ fn PlayIcon(
 
 #[component]
 fn IssueEntry(issue: IssueShort) -> impl IntoView {
+    let aria_labelledby =
+        format!("issue-{}-title", issue.id.clone());
+    let aria_labelledby2 = aria_labelledby.clone();
     view! {
-        <article aria-labelledby=format!("issue-{}-title", issue.id) class="py-10 sm:py-12">
+        <article aria-labelledby=aria_labelledby2 class="py-10 sm:py-12">
             <Container>
                 <div class="flex flex-col items-start">
                     <h2
-                        id=format!("issue-{}-title", issue.id)
+                        id=aria_labelledby.clone()
                         class="mt-2 text-lg font-bold text-ctp-text"
                     >
-                        <a href=format!("/issue/{}", issue.slug)>{&issue.display_name}</a>
+                        <a href=format!("/issue/{}", issue.slug)>{issue.display_name.clone()}</a>
                     </h2>
                     <p class="order-first font-mono text-sm leading-7 text-ctp-text">
-                        {&issue.issue_date.map(|date| date.to_string()).unwrap_or("".to_string())}
+                        {issue.issue_date.map(|date| date.to_string()).unwrap_or("".to_string())}
                     </p>
                     <div
                         class=format!("mt-1 text-base leading-7 text-ctp-text {}", PROSE)
@@ -94,7 +97,7 @@ fn IssueEntry(issue: IssueShort) -> impl IntoView {
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let issues = create_blocking_resource(
+    let issues = Resource::new_blocking(
         move || {},
         |_| fetch_issues(),
     );
@@ -139,18 +142,16 @@ pub fn Home() -> impl IntoView {
                     issues
                         .get()
                         .map(|data| match data {
-                            Err(_e) => view! { <div></div> },
+                            Err(_e) => Either::Left(view! { <div></div> }),
                             Ok(issues) => {
-                                view! {
+                                Either::Right(view! {
                                     <div class="divide-y-4 divide-ctp-mantle lg:border-y-4 lg:border-ctp-mantle">
-
                                         {issues
                                             .into_iter()
                                             .map(|issue| view! { <IssueEntry issue=issue/> })
                                             .collect::<Vec<_>>()}
-
                                     </div>
-                                }
+                                })
                             }
                         })
                 }}

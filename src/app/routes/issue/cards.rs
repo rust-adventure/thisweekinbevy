@@ -1,6 +1,9 @@
 use super::PROSE;
 use crate::app::issue::ImgDataTransformed;
-use leptos::prelude::*;
+use leptos::{
+    either::{Either, EitherOf8},
+    prelude::*,
+};
 use std::ops::Not;
 
 #[component]
@@ -28,14 +31,14 @@ pub fn SideBySide(
 
                                         {images
                                             .clone()
-                                            .iter()
+                                            .into_iter()
                                             .map(|image| {
                                                 view! {
                                                     <img
                                                         loading="lazy"
                                                         class="w-full object-cover object-center"
-                                                        src=&image.url
-                                                        alt=&image.description
+                                                        src=image.url
+                                                        alt=image.description
                                                     />
                                                 }
                                             })
@@ -67,7 +70,7 @@ pub fn SideBySide(
                                     .map(|date| {
                                         view! {
                                             <p class="mt-2 text-sm text-gray-500">
-                                                "(Posted " <time datetime=date.clone()>{date}</time> ")"
+                                                "(Posted " <time datetime=date.clone()>{date.clone()}</time> ")"
                                             </p>
                                         }
                                     })}
@@ -89,7 +92,7 @@ pub fn SideBySide(
                                 .then_some(
                                     view! {
                                         <a
-                                            href=&discord_url
+                                            href=discord_url.clone()
                                             class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
                                         >
                                             <svg
@@ -128,17 +131,16 @@ pub fn SideBySide(
 
 #[component]
 fn PrimaryLink(url: String) -> impl IntoView {
-    let domain = domain_heuristic(&url);
     url
         .trim()
         .is_empty()
         .not()
         .then_some(view! {
             <a
-                href=&url
+                href=url
                 class=format!(
                     "flex w-full items-center justify-center rounded-md border border-transparent px-8 py-3 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 {}",
-                    match domain {
+                    match domain_heuristic(&url) {
                         Some(Domain::Discord) => {
                             "bg-brand-discord-faded1 text-brand-discord hover:bg-brand-discord-faded2 focus:ring-brand-discord"
                         }
@@ -164,10 +166,10 @@ fn PrimaryLink(url: String) -> impl IntoView {
                 )
             >
 
-                {match domain {
-                    Some(d) => d.icon(),
+                {match domain_heuristic(&url) {
+                    Some(d) => Either::Left(d.icon()),
                     None => {
-                        view! {
+                        Either::Right(view! {
                             <>
                                 <span>Visit</span>
                                 <svg
@@ -185,8 +187,7 @@ fn PrimaryLink(url: String) -> impl IntoView {
                                     ></path>
                                 </svg>
                             </>
-                        }
-                            .into_view()
+                        })
                     }
                 }}
 
@@ -207,9 +208,9 @@ enum Domain {
 }
 
 impl Domain {
-    fn icon(&self) -> View {
+    fn icon(&self) -> impl IntoView {
         match self {
-            Domain::Itchio => view! {
+            Domain::Itchio => EitherOf8::A(view! {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 774.778 198.926">
                     <g fill="#fff">
                         <path d="M253.95 174.12V70.95h34.81v103.17h-34.81zm17.614-111.56q-8.808 0-13.63-4.404-4.614-4.403-4.614-11.743 0-6.92 4.613-11.743 4.823-4.823 13.63-4.823 8.808 0 13.422 4.823 4.823 4.823 4.823 11.743 0 7.34-4.823 11.743-4.613 4.404-13.42 4.404zM340.7 176.22q-15.1 0-22.86-7.97-7.548-8.177-7.548-22.647v-48.86h-13.84V70.948h13.84V45.784h34.81V70.95h22.65v25.79H345.1v43.828q0 4.824 1.888 6.92 2.097 1.888 6.29 1.888 5.663 0 12.373-5.033l7.97 22.858q-6.08 4.2-13.84 6.71-7.76 2.31-19.08 2.31zm85.62 0q-23.907 0-37.747-13.63-13.63-13.632-13.63-39.635 0-18.873 7.758-31.665 7.97-13.21 19.93-17.825 12.58-4.823 23.28-4.823 13.42 0 22.44 5.452 9.02 5.243 13.21 11.534 4.41 6.29 6.29 9.856l-24.11 15.518q-3.35-6.92-7.34-10.905-3.98-3.984-9.64-3.984-7.97 0-12.58 6.29-4.61 6.292-4.61 19.084 0 13.84 5.45 20.34 5.45 6.502 15.52 6.502 7.97 0 13.21-2.94 5.45-2.94 10.277-7.55l11.115 26q-5.034 4.19-14.89 8.39-9.856 3.98-23.906 3.98zm50.65-2.1V34.04h35.02v42.57q4.403-3.146 10.694-5.452 6.29-2.517 15.1-2.517 18.453 0 27.47 10.49 9.227 10.49 9.227 29.57v65.43h-35.02v-61.24q0-8.8-3.35-12.79-3.35-4.19-8.81-4.19-4.61 0-8.6 2.1-3.98 2.1-6.71 4.41v71.72h-35.02zm124.4 2.1q-8.39 0-13.212-4.823-4.823-4.823-4.823-12.372 0-7.55 4.823-12.582 4.823-5.033 13.21-5.033 7.97 0 12.793 5.033 4.83 5.033 4.83 12.582 0 7.55-4.82 12.372-4.61 4.823-12.79 4.823zm25.75-2.1V70.95h34.81v103.17h-34.81zm17.61-111.54q-8.81 0-13.632-4.404-4.613-4.404-4.613-11.743 0-6.92 4.613-11.743 4.823-4.823 13.63-4.823 8.808 0 13.422 4.823 4.823 4.823 4.823 11.743 0 7.34-4.823 11.743-4.613 4.404-13.42 4.404zm78.67 113.64q-12.164 0-21.6-3.984-9.437-4.194-16.147-11.324-6.5-7.34-10.066-17.196-3.355-10.066-3.355-21.81 0-17.404 7.55-30.406 7.758-12.792 19.292-17.825 11.743-5.033 24.325-5.033 18.03 0 29.77 8.388 11.95 8.388 16.78 20.97 4.82 12.582 4.82 23.906 0 11.743-3.57 21.81-3.35 9.855-10.07 17.195-6.5 7.13-16.15 11.33-9.435 3.99-21.6 3.99zm0-26.842q8.807 0 12.79-7.34 3.985-7.55 3.985-20.13 0-11.954-4.194-19.084-4.19-7.13-12.58-7.13-8.18 0-12.37 7.13-4.19 7.13-4.19 19.083 0 12.582 3.99 20.13 4.2 7.34 12.58 7.34z"></path>
@@ -219,8 +220,8 @@ impl Domain {
                         ></path>
                     </g>
                 </svg>
-            }.into_view(),
-            Domain::YouTube => view! {
+            }),
+            Domain::YouTube => EitherOf8::B(view! {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="409.289 277.787 512 114.301">
                     <g class="style-scope yt-icon">
                         <g class="style-scope yt-icon">
@@ -259,8 +260,8 @@ impl Domain {
                         </g>
                     </g>
                 </svg>
-            }.into_view(),
-            Domain::Discord => view! {
+            }),
+            Domain::Discord => EitherOf8::C(view! {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 508.67 96.36">
                     <g fill="#fff">
                         <path d="M170.85 20.2h27.3q9.87 0 16.7 3.08a22.5 22.5 0 0 1 10.21 8.58 23.34 23.34 0 0 1 3.4 12.56A23.24 23.24 0 0 1 224.93 57a23.94 23.94 0 0 1-10.79 8.92q-7.24 3.3-17.95 3.29h-25.34Zm25.06 36.54q6.65 0 10.22-3.32a11.8 11.8 0 0 0 3.57-9.07 11.5 11.5 0 0 0-3.18-8.5q-3.2-3.18-9.63-3.19h-8.54v24.08ZM269.34 69.13a37 37 0 0 1-10.22-4.27V53.24a27.77 27.77 0 0 0 9.2 4.38 39.31 39.31 0 0 0 11.17 1.71 8.71 8.71 0 0 0 3.82-.66c.86-.44 1.29-1 1.29-1.58a2.37 2.37 0 0 0-.7-1.75 6.15 6.15 0 0 0-2.73-1.19l-8.4-1.89q-7.22-1.68-10.25-4.65a10.39 10.39 0 0 1-3-7.81 10.37 10.37 0 0 1 2.66-7.07 17.13 17.13 0 0 1 7.56-4.65 36 36 0 0 1 11.48-1.65A43.27 43.27 0 0 1 292 27.69a30.25 30.25 0 0 1 8.12 3.22v11a30 30 0 0 0-7.6-3.11 34 34 0 0 0-8.85-1.16q-6.58 0-6.58 2.24a1.69 1.69 0 0 0 1 1.58 16.14 16.14 0 0 0 3.74 1.08l7 1.26Q295.65 45 299 48t3.36 8.78a11.61 11.61 0 0 1-5.57 10.12q-5.53 3.71-15.79 3.7a46.41 46.41 0 0 1-11.66-1.47ZM318.9 67.66a21 21 0 0 1-9.07-8 21.59 21.59 0 0 1-3-11.34 20.62 20.62 0 0 1 3.15-11.27 21.16 21.16 0 0 1 9.24-7.8 34.25 34.25 0 0 1 14.56-2.84q10.5 0 17.43 4.41v12.83a21.84 21.84 0 0 0-5.7-2.73 22.65 22.65 0 0 0-7-1.05q-6.51 0-10.19 2.38a7.15 7.15 0 0 0-.1 12.43q3.57 2.41 10.36 2.41a23.91 23.91 0 0 0 6.9-1 25.71 25.71 0 0 0 5.84-2.49V66a34 34 0 0 1-17.85 4.62 32.93 32.93 0 0 1-14.57-2.96ZM368.64 67.66a21.77 21.77 0 0 1-9.25-8 21.14 21.14 0 0 1-3.18-11.41A20.27 20.27 0 0 1 359.39 37a21.42 21.42 0 0 1 9.21-7.74 38.17 38.17 0 0 1 28.7 0 21.25 21.25 0 0 1 9.17 7.7 20.41 20.41 0 0 1 3.15 11.27 21.29 21.29 0 0 1-3.15 11.41 21.51 21.51 0 0 1-9.2 8 36.32 36.32 0 0 1-28.63 0Zm21.27-12.42a9.12 9.12 0 0 0 2.56-6.76 8.87 8.87 0 0 0-2.56-6.68 9.53 9.53 0 0 0-7-2.49 9.67 9.67 0 0 0-7 2.49 8.9 8.9 0 0 0-2.55 6.68 9.15 9.15 0 0 0 2.55 6.76 9.53 9.53 0 0 0 7 2.55 9.4 9.4 0 0 0 7-2.55ZM451.69 29v15.14a12.47 12.47 0 0 0-6.93-1.75c-3.73 0-6.61 1.14-8.61 3.4s-3 5.77-3 10.53V69.2H416V28.25h16.8v13q1.4-7.14 4.52-10.53a10.38 10.38 0 0 1 8-3.4 11.71 11.71 0 0 1 6.37 1.68ZM508.67 18.8v50.4h-17.15V60a16.23 16.23 0 0 1-6.62 7.88A20.81 20.81 0 0 1 474 70.6a18.11 18.11 0 0 1-10.15-2.83 18.6 18.6 0 0 1-6.74-7.77 25.75 25.75 0 0 1-2.34-11.17 24.87 24.87 0 0 1 2.48-11.55 19.43 19.43 0 0 1 7.21-8 19.85 19.85 0 0 1 10.61-2.87q12.24 0 16.45 10.64V18.8ZM489 55a8.83 8.83 0 0 0 2.63-6.62A8.42 8.42 0 0 0 489 42a11 11 0 0 0-13.89 0 8.55 8.55 0 0 0-2.59 6.47 8.67 8.67 0 0 0 2.62 6.53 9.42 9.42 0 0 0 6.86 2.51 9.56 9.56 0 0 0 7-2.51ZM107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z"></path>
@@ -268,8 +269,8 @@ impl Domain {
                         <path d="M234.36 37.9a22.08 22.08 0 0 0 17.11 0v31.52h-17.11Z"></path>
                     </g>
                 </svg>
-            }.into_view(),
-            Domain::Apple => view! {
+            }),
+            Domain::Apple => EitherOf8::D(view! {
                 <>
                     <span>Apple</span>
                     <svg
@@ -283,8 +284,8 @@ impl Domain {
                         ></path>
                     </svg>
                 </>
-            }.into_view(),
-            Domain::GitHub => view! {
+            }),
+            Domain::GitHub => EitherOf8::E(view! {
                 <>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -299,8 +300,8 @@ impl Domain {
                     </svg>
                     <span class="text-[#1b1f23] ml-4 font-bold">GitHub</span>
                 </>
-            }.into_view(),
-            Domain::Mastodon => view! {
+            }),
+            Domain::Mastodon => EitherOf8::F(view! {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 314 80" fill="none">
                     <path
                         fill="url(#a)"
@@ -328,8 +329,8 @@ impl Domain {
                         </linearGradient>
                     </defs>
                 </svg>
-            }.into_view(),
-            Domain::Cratesio => view! {
+            }),
+            Domain::Cratesio => EitherOf8::G(view! {
                 <>
                     <img
                         src="https://res.cloudinary.com/dilgcuzda/image/upload/v1713066505/thisweekinbevy/cratesio_m7edlj.avif"
@@ -337,8 +338,8 @@ impl Domain {
                     />
                     <span class="ml-4">crates.io</span>
                 </>
-            }.into_view(),
-            Domain::Docsrs => view! {
+            }),
+            Domain::Docsrs => EitherOf8::H(view! {
                 <>
                     <svg
                         class="w-8 fill-white"
@@ -349,8 +350,8 @@ impl Domain {
                     </svg>
                     <span class="ml-4">docs.rs</span>
                 </>
-            }.into_view()
-        }
+            }),
+        }.into_view()
     }
 }
 
