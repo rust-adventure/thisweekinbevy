@@ -72,7 +72,7 @@ pub fn Devlog() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading Crate Release"</p> }
             }>
-                {devlog
+                {move || devlog
                     .get()
                     .map(|data| match data {
                         Err(e) => {
@@ -490,7 +490,7 @@ fn Images(devlog_id: String) -> impl IntoView {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
 
-            {
+            {move || {
                 let devlog_id = devlog_id.clone();
                 images
                     .get()
@@ -518,7 +518,7 @@ fn Images(devlog_id: String) -> impl IntoView {
                             })
                         }
                     })
-            }
+            }}
 
         </Suspense>
     }

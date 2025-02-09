@@ -98,7 +98,7 @@ fn Images() -> impl IntoView {
         <Suspense fallback=move || {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
-            {images
+            {move || images
                 .get()
                 .map(|data| match data {
                     Err(e) => Either::Left(view! { <div>{e.to_string()}</div> }),

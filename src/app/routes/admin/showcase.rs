@@ -122,7 +122,7 @@ pub fn Showcase() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading (Suspense Fallback)..."</p> }
             }>
-                {showcases
+                {move || showcases
                     .get()
                     .map(|data| match data {
                         (Err(e), Err(e2)) => {

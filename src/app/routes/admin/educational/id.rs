@@ -74,7 +74,7 @@ pub fn Educational() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading Crate Release"</p> }
             }>
-                {educational
+                {move || educational
                     .get()
                     .map(|data| match data {
                         Err(e) => {
@@ -493,7 +493,7 @@ fn Images(educational_id: String) -> impl IntoView {
         <Suspense fallback=move || {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
-            {
+            {move || {
                 let educational_id = educational_id.clone();
                 images
                     .get()
@@ -521,7 +521,7 @@ fn Images(educational_id: String) -> impl IntoView {
                             })
                         }
                     })
-            }
+            }}
         </Suspense>
     }
 }

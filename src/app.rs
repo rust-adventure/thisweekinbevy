@@ -11,7 +11,7 @@ use crate::{
     error_template::{AppError, ErrorTemplate},
     Username,
 };
-use leptos::{either::Either, prelude::*};
+use leptos::{either::Either, logging::log, prelude::*};
 use leptos_meta::*;
 use leptos_router::{components::*, path};
 mod components;
@@ -87,12 +87,11 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
     }
 }
 
-#[component]
+#[island]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets,
     // titles, meta tags, etc.
     provide_meta_context();
-
     view! {
         <Router>
             <Wrapper>
@@ -110,13 +109,12 @@ pub fn App() -> impl IntoView {
                         path=path!("/admin")
                         redirect_path=|| "/login"
                         condition=move || {
-                            Some(use_context::<Option<Username>>().flatten()
-                                == Some(Username("ChristopherBiscardi".to_string())))
+                            let logged_in_user = use_context::<Option<Username>>().flatten();
+                            Some(logged_in_user == Some(Username("ChristopherBiscardi".to_string())))
                         }
-
                         view=AdminWrapper
                     >
-                        <Route path=path!("/") view=admin::AdminHomepage/>
+                        <Route path=path!("") view=admin::AdminHomepage/>
                         <Route path=path!("/issue") view=admin::issues::Issues/>
                         <Route path=path!("/issue/:id") view=admin::issue::Issue/>
                         <Route path=path!("/showcase") view=admin::showcase::Showcase/>

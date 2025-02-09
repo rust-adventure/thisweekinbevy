@@ -72,7 +72,7 @@ pub fn Showcase() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading Showcase"</p> }
             }>
-                {showcase
+                {move || showcase
                     .get()
                     .map(|data| match data {
                         Err(e) => {
@@ -470,7 +470,7 @@ fn Images(showcase_id: String) -> impl IntoView {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
 
-            {
+            {move || {
                 let showcase_id = showcase_id.clone();
                 images
                     .get()
@@ -499,7 +499,7 @@ fn Images(showcase_id: String) -> impl IntoView {
                         }
                     })
             }
-
+        }
         </Suspense>
     }
 }

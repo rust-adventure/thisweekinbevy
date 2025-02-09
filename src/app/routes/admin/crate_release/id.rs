@@ -75,7 +75,7 @@ pub fn CrateRelease() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading Crate Release"</p> }
             }>
-                {crate_release
+                {move || crate_release
                     .get()
                     .map(|data| match data {
                         Err(e) => {
@@ -475,7 +475,7 @@ fn Images(crate_release_id: String) -> impl IntoView {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
 
-            {
+            {move || {
                 let crate_release_id = crate_release_id.clone();
                 images
                     .get()
@@ -503,7 +503,7 @@ fn Images(crate_release_id: String) -> impl IntoView {
                             })
                         }
                     })
-            }
+            }}
 
         </Suspense>
     }

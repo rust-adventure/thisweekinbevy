@@ -122,7 +122,7 @@ pub fn CrateRelease() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading (Suspense Fallback)..."</p> }
             }>
-                {crate_releases
+                {move || crate_releases
                     .get()
                     .map(|data| match data {
                         (Err(e), Err(e2)) => {

@@ -137,7 +137,7 @@ pub fn Educational() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading (Suspense Fallback)..."</p> }
             }>
-                {educationals
+                {move || educationals
                     .get()
                     .map(|data| match data {
                         (Err(e), Err(e2)) => {

@@ -651,8 +651,8 @@ pub fn Issue() -> impl IntoView {
                                     })
                                     .collect_view()}
                             </div>
-                            // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Crates</h2>
-                            // <Divider title="Crates"/>
+                            // // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Crates</h2>
+                            // // <Divider title="Crates"/>
                             <DividerWithDescription
                                 color=DescriptionColor::Lavender
                                 title="Crates"

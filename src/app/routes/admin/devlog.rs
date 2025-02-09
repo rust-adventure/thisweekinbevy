@@ -137,7 +137,7 @@ pub fn Devlog() -> impl IntoView {
             <Suspense fallback=move || {
                 view! { <p>"Loading (Suspense Fallback)..."</p> }
             }>
-                {devlogs
+                {move || devlogs
                     .get()
                     .map(|data| match data {
                         (Err(e), Err(e2)) => {

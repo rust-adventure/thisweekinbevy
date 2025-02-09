@@ -6,8 +6,6 @@ pub mod atom_feed;
 #[cfg(feature = "ssr")]
 pub mod auth;
 pub mod error_template;
-#[cfg(feature = "ssr")]
-pub mod fileserv;
 pub mod issue_date;
 #[cfg(feature = "ssr")]
 pub mod markdown;

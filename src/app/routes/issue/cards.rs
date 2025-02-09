@@ -167,9 +167,9 @@ fn PrimaryLink(url: String) -> impl IntoView {
             >
 
                 {match domain_heuristic(&url) {
-                    Some(d) => Either::Left(d.icon()),
+                    Some(d) => d.icon().into_any(),
                     None => {
-                        Either::Right(view! {
+                        view! {
                             <>
                                 <span>Visit</span>
                                 <svg
@@ -187,7 +187,7 @@ fn PrimaryLink(url: String) -> impl IntoView {
                                     ></path>
                                 </svg>
                             </>
-                        })
+                        }.into_any()
                     }
                 }}
 

@@ -20,7 +20,7 @@ pub fn GitHub() -> impl IntoView {
         <Suspense fallback=move || {
             view! { <p>"Loading (Suspense Fallback)..."</p> }
         }>
-            {match issues.get() {
+            {move || match issues.get() {
                 None => EitherOf3::A(view! { <div>error</div> }),
                 Some(Err(e)) => EitherOf3::B(view! { <div>{e.to_string()}</div> }),
                 Some(Ok(issues)) => {
