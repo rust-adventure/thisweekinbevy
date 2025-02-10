@@ -18,8 +18,18 @@ mod components;
 mod routes;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
+    // in --release, these must be provided
+    #[cfg(not(debug_assertions))]
+    let pkg_path: &'static str = std::env!("CDN_PKG_PATH");
+    #[cfg(not(debug_assertions))]
+    let cdn_path: &'static str = std::env!("CDN_PATH");
+
+    // in debug, we can use the defaults or the env
+    // vars
+    #[cfg(debug_assertions)]
     let pkg_path: &'static str =
         std::option_env!("CDN_PKG_PATH").unwrap_or("/pkg");
+    #[cfg(debug_assertions)]
     let cdn_path: &'static str =
         std::option_env!("CDN_PATH").unwrap_or("/");
 
