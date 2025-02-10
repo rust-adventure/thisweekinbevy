@@ -87,7 +87,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets,
     // titles, meta tags, etc.
