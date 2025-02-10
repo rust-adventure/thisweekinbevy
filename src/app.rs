@@ -63,8 +63,9 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <meta name="og:site_name" content="This Week in Bevy"/>
 
                 <AutoReload options=options.clone() />
-                <HydrationScripts options/>
-                <link rel="stylesheet" id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
+                <HydrationScripts options=options.clone() root=cdn_path islands=true/>
+                <HashedStylesheet options=options root=cdn_path/>
+                // <link rel="stylesheet" id="leptos" href=format!("{pkg_path}/this-week-in-bevy.css")/>
                 // <link rel="shortcut icon" type="image/ico" href="/favicon.ico"/>
                 <link
                     rel="apple-touch-icon"
