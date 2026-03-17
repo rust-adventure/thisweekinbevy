@@ -4,7 +4,6 @@ use axum::{
     routing::{get, post},
     Form, Router,
 };
-use axum_login::tower_sessions::Session;
 use serde::Deserialize;
 
 use crate::{
@@ -42,18 +41,19 @@ mod post {
     #[instrument]
     pub async fn login(
         auth_session: AuthSession,
-        session: Session,
         Form(NextUrl { next }): Form<NextUrl>,
     ) -> impl IntoResponse {
         let (auth_url, csrf_state) =
             auth_session.backend.authorize_url();
 
-        session
+        auth_session
+            .session
             .insert(CSRF_STATE_KEY, csrf_state.secret())
             .await
             .expect("Serialization should not fail.");
 
-        session
+        auth_session
+            .session
             .insert(NEXT_URL_KEY, next)
             .await
             .expect("Serialization should not fail.");

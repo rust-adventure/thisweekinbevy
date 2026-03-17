@@ -1,11 +1,12 @@
 use axum::{
-    extract::Query,
+    extract::{FromRequestParts, Query},
     http::StatusCode,
     response::{IntoResponse, Redirect},
     routing::get,
     Router,
 };
-use axum_login::tower_sessions::Session;
+use axum_login::{tower_sessions::Session, AuthnBackend};
+use http::request::Parts;
 use oauth2::CsrfToken;
 use serde::Deserialize;
 
@@ -35,17 +36,17 @@ mod get {
 
     use super::*;
 
-    #[instrument(skip(auth_session, session))]
+    #[axum::debug_handler]
+    #[instrument(skip(auth_session))]
     pub async fn callback(
         mut auth_session: AuthSession,
-        session: Session,
         Query(AuthzResp {
             code,
             state: new_state,
         }): Query<AuthzResp>,
     ) -> impl IntoResponse {
         let Ok(Some(old_state)) =
-            session.get(CSRF_STATE_KEY).await
+            auth_session.session.get(CSRF_STATE_KEY).await
         else {
             return StatusCode::BAD_REQUEST.into_response();
         };
@@ -87,8 +88,10 @@ mod get {
                 .into_response();
         }
 
-        if let Ok(Some(next)) =
-            session.remove::<String>(NEXT_URL_KEY).await
+        if let Ok(Some(next)) = auth_session
+            .session
+            .remove::<String>(NEXT_URL_KEY)
+            .await
         {
             Redirect::to(&next).into_response()
         } else {

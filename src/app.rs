@@ -1,6 +1,9 @@
 use crate::{
     app::{
-        components::{AboutSection, TinyWaveFormIcon},
+        components::{
+            sidebar::Sidebar, AboutSection,
+            TinyWaveFormIcon,
+        },
         routes::{
             admin::{self, AdminWrapper},
             custom,
@@ -32,7 +35,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
         <!DOCTYPE html>
         <html
             lang="en"
-            class="h-full bg-ctp-base antialiased"
+            class="h-full bg-slate-950 antialiased"
             >
             <head>
                 <meta charset="utf-8"/>
@@ -86,7 +89,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <MetaTags/>
 
             </head>
-            <body class="flex min-h-full">
+            <body class="min-h-full">
                 <App/>
             </body>
         </html>
@@ -100,7 +103,8 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
     view! {
         <Router>
-            <Wrapper>
+            // <Wrapper>
+            <Sidebar>
                 <Routes fallback=|| {
                     let mut outside_errors = Errors::default();
                     outside_errors.
@@ -138,7 +142,8 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/github") view=admin::github::GitHub/>
                     </ProtectedParentRoute>
                 </Routes>
-            </Wrapper>
+            // </Wrapper>
+            </Sidebar>
         </Router>
     }
 }
@@ -146,20 +151,31 @@ pub fn App() -> impl IntoView {
 #[component]
 fn Login(// Query(NextUrl { next }): Query<NextUrl>,
 ) -> impl IntoView {
-    let message = Some("hello!");
-    view! {
-        <div>
+    let logged_in_user =
+        use_context::<Option<Username>>().flatten();
 
-            {message
-                .map(|msg| {
-                    view! {
-                        <span>
-                            <strong>{msg}</strong>
+    view! {
+        <div class="p-12">
+            {
+                match logged_in_user {
+                    Some(Username(username)) => view! {
+                        <span class="text-slate-50">
+                            <span>Logged in as: </span><strong>{username}</strong>
+                        </span>
+                    },
+                    None => view! {
+                        <span class="text-slate-50">
+                            <strong>"Not Logged in."</strong>
                         </span>
                     }
-                })}
-            <form method="post">
-                <input type="submit" value="GitHub Login"/>
+                }
+            }
+            <form method="post" class="mt-5">
+                <input
+                    class="rounded-md bg-sky-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:bg-sky-500 dark:shadow-none dark:hover:bg-sky-400 dark:focus-visible:outline-sky-500"
+                    type="submit"
+                    value="GitHub Login"
+                />
 
             // {% if let Some(next) = next %}
             // <input type="hidden" name="next" value="{{next}}" />
@@ -239,18 +255,14 @@ fn Wrapper(children: Children) -> impl IntoView {
     let mntnrs = maintainers.iter().enumerate().map(|(i, cite)| {
         if i == 0 {
             Either::Left(view! {
-                <>
                     <span>{cite.to_string()}</span>
-                </>
             })
         } else {
             Either::Right(view! {
-                <>
                     <span aria-hidden="true" class="text-ctp-text">
                         "/"
                     </span>
                     <span>{cite.to_string()}</span>
-                </>
             })
         }
         }).collect_view();
@@ -259,7 +271,13 @@ fn Wrapper(children: Children) -> impl IntoView {
             <header class="bg-ctp-mantle lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120">
                 <div class="hidden lg:sticky lg:top-0 lg:flex lg:w-16 lg:flex-none lg:items-center lg:whitespace-nowrap lg:py-12 lg:text-sm lg:leading-7 lg:[writing-mode:vertical-rl]">
                     <span class="font-mono text-ctp-text">Curated by</span>
-                    <span class="mt-6 flex gap-6 font-bold text-ctp-text">{mntnrs.clone()}</span>
+                    <span class="mt-6 flex gap-6 font-bold text-ctp-text">
+                    <span>"chris biscardi"</span>
+                    <span aria-hidden="true" class="text-ctp-text">
+                        "/"
+                    </span>
+                    <span>"The Bevy Community"</span>
+                    </span>
                 </div>
                 <div class="relative z-10 mx-auto px-4 pb-4 pt-10 sm:px-6 md:max-w-2xl md:px-4 lg:min-h-full lg:flex-auto lg:border-x lg:border-ctp-crust lg:px-8 lg:py-12 xl:px-12">
                     <a

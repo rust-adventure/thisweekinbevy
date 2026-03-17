@@ -1,5 +1,7 @@
 use leptos::prelude::*;
 
+pub mod sidebar;
+
 #[component]
 pub fn AboutSection(
     #[prop(into, default = "".to_string())] class: String,

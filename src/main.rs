@@ -125,12 +125,10 @@ async fn main() {
             .to_string(),
     )
     .expect("it to have worked :: access_token");
-    let client = BasicClient::new(
-        client_id,
-        Some(client_secret),
-        auth_url,
-        Some(token_url),
-    );
+    let client = BasicClient::new(client_id)
+        .set_client_secret(client_secret)
+        .set_auth_uri(auth_url)
+        .set_token_uri(token_url);
 
     // Session layer.
     //
@@ -194,7 +192,7 @@ async fn main() {
             get(this_week_in_bevy::atom_feed::atom_feed),
         )
         .route(
-            "/api/*fn_name",
+            "/api/{*fn_name}",
             get(server_fn_handler).post(server_fn_handler),
         )
         .leptos_routes_with_handler(

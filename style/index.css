@@ -1,9 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* catppuccin variables */
-.ctp-latte {
+/* .ctp-latte {
   --ctp-rosewater: rgb(220, 138, 120);
   --ctp-flamingo: rgb(221, 120, 120);
   --ctp-pink: rgb(234, 118, 203);
@@ -114,10 +112,10 @@
   --ctp-base: rgb(30, 30, 46);
   --ctp-mantle: rgb(24, 24, 37);
   --ctp-crust: rgb(17, 17, 27);
-}
+} */
 
 :root {
-  --ctp-rosewater: rgb(220, 138, 120);
+  /* --ctp-rosewater: rgb(220, 138, 120);
   --ctp-flamingo: rgb(221, 120, 120);
   --ctp-pink: hsl(316, 73%, 69%);
   --ctp-mauve: rgb(136, 57, 239);
@@ -139,62 +137,35 @@
   --ctp-overlay0: rgb(156, 160, 176);
   --ctp-surface2: rgb(172, 176, 190);
   --ctp-surface1: rgb(188, 192, 204);
-  --ctp-surface0: rgb(204, 208, 218);
+  --ctp-surface0: rgb(204, 208, 218); */
   /* --ctp-base: rgb(239, 241, 245); */
-  --ctp-base: hsl(210, 33%, 99%);
+  /* --ctp-base: hsl(210, 33%, 99%);
   --ctp-mantle: hsl(197, 33%, 95%);
-  --ctp-crust: hsl(197, 33%, 90%);
+  --ctp-crust: hsl(197, 33%, 90%); */
 
-  --brand-discord: rgb(88, 101, 242);
-  --brand-discord-faded1: rgba(88, 101, 242, 0.2);
-  --brand-discord-faded2: rgba(88, 101, 242, 0.3);
-  --brand-github: rgb(27, 31, 35);
-  --brand-github-faded1: rgba(27, 31, 35, 0.2);
-  --brand-github-faded2: rgba(27, 31, 35, 0.3);
-  --brand-youtube: rgb(255, 0, 0);
-  --brand-youtube-faded1: rgba(255, 0, 0, 0.2);
-  --brand-youtube-faded2: rgba(255, 0, 0, 0.3);
-  --brand-itchio: rgb(250, 92, 92);
-  --brand-itchio-faded1: rgba(250, 92, 92, 0.95);
-  --brand-itchio-faded2: rgba(250, 92, 92, 1);
-  --brand-apple: rgb(255, 255, 255);
-  --brand-apple-faded1: rgba(255, 255, 255, 0.2);
-  --brand-apple-faded2: rgba(255, 255, 255, 0.3);
-  --brand-mastodon: rgb(99, 100, 255);
-  --brand-mastodon-faded1: rgba(99, 100, 255, 0.2);
-  --brand-mastodon-faded2: rgba(99, 100, 255, 0.3);
+  --color-brand-discord: rgb(88, 101, 242);
+  --color-brand-discord-faded1: rgba(88, 101, 242, 0.2);
+  --color-brand-discord-faded2: rgba(88, 101, 242, 0.3);
+  --color-brand-github: rgb(27, 31, 35);
+  --color-brand-github-faded1: rgba(27, 31, 35, 0.2);
+  --color-brand-github-faded2: rgba(27, 31, 35, 0.3);
+  --color-brand-youtube: rgb(255, 0, 0);
+  --color-brand-youtube-faded1: rgba(255, 0, 0, 0.2);
+  --color-brand-youtube-faded2: rgba(255, 0, 0, 0.3);
+  --color-brand-itchio: rgb(250, 92, 92);
+  --color-brand-itchio-faded1: rgba(250, 92, 92, 0.95);
+  --color-brand-itchio-faded2: rgba(250, 92, 92, 1);
+  --color-brand-apple: rgb(255, 255, 255);
+  --color-brand-apple-faded1: rgba(255, 255, 255, 0.2);
+  --color-brand-apple-faded2: rgba(255, 255, 255, 0.3);
+  --color-brand-mastodon: rgb(99, 100, 255);
+  --color-brand-mastodon-faded1: rgba(99, 100, 255, 0.2);
+  --color-brand-mastodon-faded2: rgba(99, 100, 255, 0.3);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ctp-rosewater: rgb(245, 224, 220);
-    --ctp-flamingo: rgb(242, 205, 205);
-    --ctp-pink: rgb(245, 194, 231);
-    --ctp-mauve: rgb(203, 166, 247);
-    --ctp-red: rgb(243, 139, 168);
-    --ctp-maroon: rgb(235, 160, 172);
-    --ctp-peach: rgb(250, 179, 135);
-    --ctp-yellow: rgb(249, 226, 175);
-    --ctp-green: rgb(166, 227, 161);
-    --ctp-teal: rgb(148, 226, 213);
-    --ctp-sky: rgb(137, 220, 235);
-    --ctp-sapphire: rgb(116, 199, 236);
-    --ctp-blue: rgb(137, 180, 250);
-    --ctp-lavender: rgb(180, 190, 254);
-    --ctp-text: rgb(205, 214, 244);
-    --ctp-subtext1: rgb(186, 194, 222);
-    --ctp-subtext0: rgb(166, 173, 200);
-    --ctp-overlay2: rgb(147, 153, 178);
-    --ctp-overlay1: rgb(127, 132, 156);
-    --ctp-overlay0: rgb(108, 112, 134);
-    --ctp-surface2: rgb(88, 91, 112);
-    --ctp-surface1: rgb(69, 71, 90);
-    --ctp-surface0: rgb(49, 50, 68);
-    --ctp-base: rgb(30, 30, 46);
-    --ctp-mantle: rgb(24, 24, 37);
-    --ctp-crust: rgb(17, 17, 27);
-
-    --brand-github: #adbac7;
+    --color-brand-github: #adbac7;
   }
 }
 

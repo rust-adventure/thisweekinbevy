@@ -1,15 +1,24 @@
-use async_trait::async_trait;
 use axum::http::header::{AUTHORIZATION, USER_AGENT};
 use axum_login::{AuthUser, AuthnBackend, UserId};
 use oauth2::{
     basic::{BasicClient, BasicRequestTokenError},
-    reqwest::{async_http_client, AsyncHttpClientError},
     url::Url,
-    AuthorizationCode, CsrfToken, TokenResponse,
+    AuthorizationCode, CsrfToken, EndpointNotSet,
+    EndpointSet, TokenResponse,
 };
+// reqwest::{async_http_client,
+// AsyncHttpClientError},
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, MySqlPool};
 use tracing::{error, instrument};
+
+pub type BasicClientSet = BasicClient<
+    EndpointSet,
+    EndpointNotSet,
+    EndpointNotSet,
+    EndpointNotSet,
+    EndpointSet,
+>;
 
 #[derive(Clone, Serialize, Deserialize, FromRow)]
 pub struct User {
@@ -67,19 +76,40 @@ pub enum BackendError {
     Reqwest(reqwest::Error),
 
     #[error(transparent)]
-    OAuth2(BasicRequestTokenError<AsyncHttpClientError>),
+    OAuth2(
+        BasicRequestTokenError<
+            <reqwest::Client as oauth2::AsyncHttpClient<
+                'static,
+            >>::Error,
+        >,
+    ),
 }
 
 #[derive(Debug, Clone)]
 pub struct Backend {
     db: MySqlPool,
-    client: BasicClient,
+    client: BasicClientSet,
+    http_client: reqwest::Client,
 }
 
 impl Backend {
     #[instrument(skip(db, client))]
-    pub fn new(db: MySqlPool, client: BasicClient) -> Self {
-        Self { db, client }
+    pub fn new(
+        db: MySqlPool,
+        client: BasicClientSet,
+    ) -> Self {
+        let http_client: reqwest::Client =
+            reqwest::ClientBuilder::new()
+                // Following redirects opens the client up
+                // to SSRF vulnerabilities.
+                .redirect(reqwest::redirect::Policy::none())
+                .build()
+                .expect("Client should build");
+        Self {
+            db,
+            client,
+            http_client,
+        }
     }
     #[instrument(skip(self))]
     pub fn authorize_url(&self) -> (Url, CsrfToken) {
@@ -89,7 +119,6 @@ impl Backend {
     }
 }
 
-#[async_trait]
 impl AuthnBackend for Backend {
     type User = User;
     type Credentials = Credentials;
@@ -115,7 +144,7 @@ impl AuthnBackend for Backend {
             .exchange_code(AuthorizationCode::new(
                 creds.code,
             ))
-            .request_async(async_http_client)
+            .request_async(&self.http_client)
             .await
             .inspect_err(|v| {
                 error!(?v);
