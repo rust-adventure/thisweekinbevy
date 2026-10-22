@@ -47,10 +47,10 @@ pub fn CrateRelease() -> impl IntoView {
     );
 
     view! {
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 mt-5">
             <ActionForm attr:class="isolate -space-y-px rounded-md shadow-sm" action=add_crate_release>
-                <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="title" class="block text-xs font-medium text-gray-900">
+                <div class="relative rounded-md rounded-b-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset bg-slate-800 focus-within:z-10 focus-within:ring-2 focus-within:ring-sky-600">
+                    <label for="title" class="block text-xs font-medium text-slate-50">
                         Title
                     </label>
                     <input
@@ -58,12 +58,12 @@ pub fn CrateRelease() -> impl IntoView {
                         type="text"
                         name="title"
                         id="title"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        class="block w-full border-0 p-0 text-slate-50 placeholder:text-gray-400 focus:outline-none sm:text-sm sm:leading-6"
                         placeholder="Hexagon procedural generation"
                     />
                 </div>
-                <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="url" class="block text-xs font-medium text-gray-900">
+                <div class="relative px-3 pb-1.5 pt-2.5 ring-1 ring-inset bg-slate-800 focus-within:z-10 focus-within:ring-2 focus-within:ring-sky-600">
+                    <label for="url" class="block text-xs font-medium text-slate-50">
                         URL
                     </label>
                     <input
@@ -71,34 +71,37 @@ pub fn CrateRelease() -> impl IntoView {
                         type="text"
                         name="url"
                         id="url"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        class="block w-full border-0 p-0 text-slate-50 placeholder:text-gray-400 focus:outline-none sm:text-sm sm:leading-6"
                         placeholder="https"
                     />
                 </div>
-                <div class="relative rounded-md rounded-t-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
-                    <label for="discord_url" class="block text-xs font-medium text-gray-900">
+                <div class="relative rounded-md rounded-t-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset bg-slate-800 focus-within:z-10 focus-within:ring-2 focus-within:ring-sky-600">
+                    <label for="discord_url" class="block text-xs font-medium text-slate-50">
                         Discord URL
                     </label>
                     <input
                         type="text"
                         name="discord_url"
                         id="discord_url"
-                        class="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        class="block w-full border-0 p-0 text-slate-50 placeholder:text-gray-400 focus:outline-none sm:text-sm sm:leading-6"
                         placeholder="https"
                     />
                 </div>
                 <label
                     for="posted_date"
-                    class="block text-sm font-medium leading-6 text-gray-900"
+                    class="block text-sm font-medium leading-6 text-slate-50 mt-5"
                 >
                     Posted At
                 </label>
                 <div class="mt-2">
-                    <input type="date" required id="posted_date" name="posted_date" min="2024-01-01"/>
+                    <input
+                    class="text-white bg-slate-800 p-5 rounded focus:ring-2 focus:ring-inset focus:ring-sky-600 focus:outline-none"
+                        type="date" required id="posted_date" name="posted_date" min="2024-01-01"
+                    />
                 </div>
                 <label
                     for="description"
-                    class="block text-sm font-medium leading-6 text-gray-900"
+                    class="block text-sm font-medium leading-6 text-slate-50 mt-5"
                 >
                     Add your description (markdown compatible)
                 </label>
@@ -108,12 +111,12 @@ pub fn CrateRelease() -> impl IntoView {
                         rows="4"
                         name="description"
                         id="description"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        class="p-5 block w-full rounded-md border-0 text-slate-50 shadow-sm ring-0 ring-inset bg-slate-800 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6 focus:outline-none"
                     ></textarea>
                 </div>
                 <button
                     type="submit"
-                    class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    class="mt-3 rounded-md bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                 >
                     Add CrateRelease
                 </button>
@@ -178,7 +181,7 @@ fn AddCrateReleaseToIssueForm(
         <li class="flex items-center justify-between gap-x-6 py-5">
             <div class="min-w-0">
                 <div class="flex items-start gap-x-3">
-                    <p class="text-sm font-semibold leading-6 text-gray-900">
+                    <p class="text-sm font-semibold leading-6 text-slate-50">
                         {crate_release.title}
                     </p>
                 </div>
@@ -212,7 +215,7 @@ fn AddCrateReleaseToIssueForm(
                                 <input type="hidden" value=issue_id name="issue_id"/>
                                 <button
                                     type="submit"
-                                    class="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
+                                    class="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-slate-50 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
                                 >
                                     Add to current draft
                                 </button>

@@ -1,13 +1,77 @@
 use super::PROSE;
-use crate::app::issue::ImgDataTransformed;
+use crate::app::{
+    issue::ImgDataTransformed,
+    routes::issue::cards::new_displays::{
+        SingleImage, ThreePlusImage, TwoImage, ZeroImage,
+    },
+};
 use leptos::{
     either::{Either, EitherOf8},
     prelude::*,
 };
 use std::ops::Not;
 
+mod new_displays;
+
 #[component]
 pub fn SideBySide(
+    title: String,
+    type_name: String,
+    images: Vec<ImgDataTransformed>,
+    description: String,
+    primary_url: String,
+    discord_url: String,
+    posted_date: Option<String>,
+    #[prop(optional)] video_url: String,
+) -> impl IntoView {
+    let image_count = images.len();
+    match image_count {
+        0 => view! {
+            <ZeroImage
+                title
+                type_name
+                description
+                posted_date
+            />
+        }
+        .into_any(),
+        1 => view! {
+            <SingleImage
+                title
+                type_name
+                image=images[0].clone()
+                description
+                posted_date
+            />
+        }
+        .into_any(),
+        2 => view! {
+            <TwoImage
+                title
+                type_name
+                images=images
+                description
+                posted_date
+            />
+        }
+        .into_any(),
+        _ => view! {
+        <ThreePlusImage
+            title
+            type_name
+            images=images
+            description
+            posted_date
+        />
+        }
+        .into_any(),
+    }
+
+    // let heading_image = images[0];
+}
+
+#[component]
+pub fn SideBySideOriginal(
     title: String,
     type_name: String,
     images: Vec<ImgDataTransformed>,

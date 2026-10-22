@@ -3,7 +3,10 @@ use crate::app::components::{
     DividerWithDescription,
 };
 use itertools::Itertools;
-use leptos::{either::{Either, EitherOf4}, prelude::*};
+use leptos::{
+    either::{Either, EitherOf4},
+    prelude::*,
+};
 use leptos_meta::*;
 use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
@@ -13,7 +16,14 @@ use std::ops::Not;
 mod cards;
 use cards::*;
 
-pub const PROSE: &str = r#"prose text-ctp-text dark:prose-strong:text-white prose-code:text-ctp-text prose-a:text-ctp-sky hover:prose-a:text-ctp-blue prose-blockquote:text-ctp-text [&>h2]:leading-7 [&>h2]:text-ctp-text [&>h3]:text-ctp-text [&>h2]:pl-4 [&>ul]:mt-6 [&>ul]:list-['⮡\20'] [&>ul]:pl-5"#;
+pub const PROSE: &str = concat!(
+    "prose text-slate-200 dark:prose-strong:text-white",
+    " prose-code:text-slate-200",
+    " prose-a:text-sky-400 hover:prose-a:text-sky-500",
+    " prose-blockquote:text-slate-200",
+    " prose-img:rounded prose-img:shadow prose-img:border prose-img:border-slate-600",
+    " prose-h2:leading-7 prose-h2:text-slate-200 [&>h3]:text-slate-200 prose-h2:pl-4 [&>ul]:mt-6 [&>ul]:pl-5"
+);
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Issue {
@@ -290,14 +300,12 @@ struct ShowcaseData {
 #[cfg(feature = "ssr")]
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 struct ImgData {
-    id: String,
     description: String,
     cloudinary_public_id: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct ImgDataTransformed {
-    id: String,
     description: String,
     url: String,
 }
@@ -315,9 +323,23 @@ async fn fetch_issue(
 
     let pool = crate::sql::pool()?;
 
+    //     let explain = sqlx::query_file!(
+    //     "src/app/routes/issue__showcase_explain.
+    // sql",     date
+    // )
+    // .fetch_optional(&pool)
+    // .await.inspect_err(|e| {
+    //     tracing::error!(?e);
+    // })?;
+    // tracing::info!(?explain);
+
     let showcase_issue = sqlx::query_file_as!(
         SqlIssue,
         "src/app/routes/issue__showcase.sql",
+        date,
+        date,
+        date,
+        date,
         date
     )
     .fetch_optional(&pool)
@@ -328,198 +350,326 @@ async fn fetch_issue(
     })?;
 
     Ok(showcase_issue.map(|issue| {
-        
-        let showcases = issue.showcases
-.map(|json| json.0)
-.unwrap_or_default()
-.into_iter().map(|showcase_data_2| {
-    Showcase {
-        title: showcase_data_2.title,
-        url: showcase_data_2.url,
-        discord_url: showcase_data_2.discord_url,
-        description: compile(&showcase_data_2.description),
-        images: showcase_data_2.images.unwrap_or_default().into_iter()
-        .map(|img_data| {
- 
-            
-            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
-            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
-            .expect(
-                "expect valid ids from the database",
-            );
-            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
-                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
-            ImgDataTransformed {
-                id: img_ulid.to_string(),
-                description: img_data.description,
-                url: image.to_string()
-            }
-        })
-        .collect()
-    }
-}).collect::<Vec<Showcase>>();
+        let showcases = issue
+            .showcases
+            .map(|json| json.0)
+            .unwrap_or_default()
+            .into_iter()
+            .map(|showcase_data_2| {
+                Showcase {
+                    title: showcase_data_2.title,
+                    url: showcase_data_2.url,
+                    discord_url: showcase_data_2
+                        .discord_url,
+                    description: compile(
+                        &showcase_data_2.description,
+                    ),
+                    images: showcase_data_2
+                        .images
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|img_data| {
+                            // let base_id =
+                            // BASE64.decode(img_data.id.
+                            // as_bytes()).expect("a valid
+                            // id in base64 format");
+                            // let img_ulid =
+                            // rusty_ulid::Ulid::try_from(base_id.
+                            // as_slice())
+                            // .expect(
+                            //     "expect valid ids from
+                            // the database",
+                            // );
+                            let image = CImage::new(
+                                "dilgcuzda".into(),
+                                img_data
+                                    .cloudinary_public_id
+                                    .into(),
+                            )
+                            .add_transformation(Resize(
+                                ScaleByWidth {
+                                    width: 800,
+                                    ar: None,
+                                    liquid: None,
+                                },
+                            ));
+                            ImgDataTransformed {
+                                // id: img_ulid.to_string(),
+                                description: img_data
+                                    .description,
+                                url: image.to_string(),
+                            }
+                        })
+                        .collect(),
+                }
+            })
+            .collect::<Vec<Showcase>>();
 
-let crate_releases = issue.crate_releases
-.map(|json| json.0)
-.unwrap_or_default()
-.into_iter().map(|value| {
-    CrateRelease {
-        title: value.title,
-        url: value.url,
-        discord_url: value.discord_url,
-        description: compile(&value.description),
-        posted_date: value.posted_date,
-        images: value.images.unwrap_or_default().into_iter()
-        .map(|img_data| {
-            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
-            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
-            .expect(
-                "expect valid ids from the database",
-            );
-            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
-                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
-            ImgDataTransformed {
-                id: img_ulid.to_string(),
-                description: img_data.description,
-                url: image.to_string()
-            }
-        })
-        .collect()
-    }
-}).collect::<Vec<CrateRelease>>();
+        let crate_releases = issue
+            .crate_releases
+            .map(|json| json.0)
+            .unwrap_or_default()
+            .into_iter()
+            .map(|value| {
+                CrateRelease {
+                    title: value.title,
+                    url: value.url,
+                    discord_url: value.discord_url,
+                    description: compile(
+                        &value.description,
+                    ),
+                    posted_date: value.posted_date,
+                    images: value
+                        .images
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|img_data| {
+                            // let base_id =
+                            // BASE64.decode(img_data.id.
+                            // as_bytes()).expect("a valid
+                            // id in base64 format");
+                            // let img_ulid =
+                            // rusty_ulid::Ulid::try_from(base_id.
+                            // as_slice())
+                            // .expect(
+                            //     "expect valid ids from
+                            // the database",
+                            // );
+                            let image = CImage::new(
+                                "dilgcuzda".into(),
+                                img_data
+                                    .cloudinary_public_id
+                                    .into(),
+                            )
+                            .add_transformation(Resize(
+                                ScaleByWidth {
+                                    width: 600,
+                                    ar: None,
+                                    liquid: None,
+                                },
+                            ));
+                            ImgDataTransformed {
+                                // id: img_ulid.to_string(),
+                                description: img_data
+                                    .description,
+                                url: image.to_string(),
+                            }
+                        })
+                        .collect(),
+                }
+            })
+            .collect::<Vec<CrateRelease>>();
 
-let devlogs = issue.devlogs
-.map(|json| json.0)
-.unwrap_or_default()
-.into_iter().map(|value| {
-    Devlog {
-        title: value.title,
-        post_url: value.post_url,
-        video_url: value.video_url,
-        discord_url: value.discord_url,
-        description: compile(&value.description),
-        images: value.images.unwrap_or_default().into_iter()
-        .map(|img_data| {
-            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
-            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
-            .expect(
-                "expect valid ids from the database",
-            );
-            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
-                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
-            ImgDataTransformed {
-                id: img_ulid.to_string(),
-                description: img_data.description,
-                url: image.to_string()
-            }
-        })
-        .collect()
-    }
-}).collect::<Vec<Devlog>>();
+        let devlogs = issue
+            .devlogs
+            .map(|json| json.0)
+            .unwrap_or_default()
+            .into_iter()
+            .map(|value| {
+                Devlog {
+                    title: value.title,
+                    post_url: value.post_url,
+                    video_url: value.video_url,
+                    discord_url: value.discord_url,
+                    description: compile(
+                        &value.description,
+                    ),
+                    images: value
+                        .images
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|img_data| {
+                            // let base_id =
+                            // BASE64.decode(img_data.id.
+                            // as_bytes()).expect("a valid
+                            // id in base64 format");
+                            // let img_ulid =
+                            // rusty_ulid::Ulid::try_from(base_id.
+                            // as_slice())
+                            // .expect(
+                            //     "expect valid ids from
+                            // the database",
+                            // );
+                            let image = CImage::new(
+                                "dilgcuzda".into(),
+                                img_data
+                                    .cloudinary_public_id
+                                    .into(),
+                            )
+                            .add_transformation(Resize(
+                                ScaleByWidth {
+                                    width: 600,
+                                    ar: None,
+                                    liquid: None,
+                                },
+                            ));
+                            ImgDataTransformed {
+                                // id: img_ulid.to_string(),
+                                description: img_data
+                                    .description,
+                                url: image.to_string(),
+                            }
+                        })
+                        .collect(),
+                }
+            })
+            .collect::<Vec<Devlog>>();
 
-let educationals = issue.educationals
-.map(|json| json.0)
-.unwrap_or_default()
-.into_iter().map(|value| {
-    Educational {
-        title: value.title,
-        post_url: value.post_url,
-        video_url: value.video_url,
-        discord_url: value.discord_url,
-        description: compile(&value.description),
-        images: value.images.unwrap_or_default().into_iter()
-        .map(|img_data| {
-            let base_id = BASE64.decode(img_data.id.as_bytes()).expect("a valid id in base64 format");
-            let img_ulid = rusty_ulid::Ulid::try_from(base_id.as_slice())
-            .expect(
-                "expect valid ids from the database",
-            );
-            let image = CImage::new("dilgcuzda".into(), img_data.cloudinary_public_id.into())
-                .add_transformation(Resize(ScaleByWidth{ width:600, ar: None, liquid:None }));
-            ImgDataTransformed {
-                id: img_ulid.to_string(),
-                description: img_data.description,
-                url: image.to_string()
-            }
-        })
-        .collect()
-    }
-}).collect::<Vec<Educational>>();
+        let educationals = issue
+            .educationals
+            .map(|json| json.0)
+            .unwrap_or_default()
+            .into_iter()
+            .map(|value| {
+                Educational {
+                    title: value.title,
+                    post_url: value.post_url,
+                    video_url: value.video_url,
+                    discord_url: value.discord_url,
+                    description: compile(
+                        &value.description,
+                    ),
+                    images: value
+                        .images
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|img_data| {
+                            // let base_id =
+                            // BASE64.decode(img_data.id.
+                            // as_bytes()).expect("a valid
+                            // id in base64 format");
+                            // let img_ulid =
+                            // rusty_ulid::Ulid::try_from(base_id.
+                            // as_slice())
+                            // .expect(
+                            //     "expect valid ids from
+                            // the database",
+                            // );
+                            let image = CImage::new(
+                                "dilgcuzda".into(),
+                                img_data
+                                    .cloudinary_public_id
+                                    .into(),
+                            )
+                            .add_transformation(Resize(
+                                ScaleByWidth {
+                                    width: 600,
+                                    ar: None,
+                                    liquid: None,
+                                },
+                            ));
+                            ImgDataTransformed {
+                                // id: img_ulid.to_string(),
+                                description: img_data
+                                    .description,
+                                url: image.to_string(),
+                            }
+                        })
+                        .collect(),
+                }
+            })
+            .collect::<Vec<Educational>>();
 
-let new_github_issues = issue.new_github_issues
-.map(|json| json.0)
-.unwrap_or_default()
-.into_iter().map(|SqlNewGhIssue{
-    title,
-    url,
-    gh_created_at,
-    author,
-    author_url}| NewIssue{
-title,
-url,
-github_created_at: gh_created_at,
-author,
-author_url
+        let new_github_issues = issue
+            .new_github_issues
+            .map(|json| json.0)
+            .unwrap_or_default()
+            .into_iter()
+            .map(
+                |SqlNewGhIssue {
+                     title,
+                     url,
+                     gh_created_at,
+                     author,
+                     author_url,
+                 }| NewIssue {
+                    title,
+                    url,
+                    github_created_at: gh_created_at,
+                    author,
+                    author_url,
+                },
+            )
+            .collect();
 
-}).collect();
+        let new_pull_requests: Vec<NewPullRequest> = issue
+            .new_pull_requests
+            .map(|json| json.0)
+            .unwrap_or_default()
+            .into_iter()
+            .map(
+                |SqlNewPr {
+                     github_id,
+                     title,
+                     url,
+                     gh_created_at,
+                     author,
+                     author_url,
+                 }| NewPullRequest {
+                    github_id,
+                    title,
+                    url,
+                    gh_created_at,
+                    author,
+                    author_url,
+                },
+            )
+            .collect();
 
-let new_pull_requests: Vec<NewPullRequest> = issue.new_pull_requests
-.map(|json| json.0)
-.unwrap_or_default()
-.into_iter().map(|SqlNewPr{
-    github_id,
-    title,
-    url,
-    gh_created_at,
-    author,
-    author_url}| NewPullRequest{
-        github_id,
-title,
-url,
-gh_created_at,
-author,
-author_url
+        let merged_pull_requests: Vec<MergedPullRequest> =
+            issue
+                .merged_pull_requests
+                .map(|json| json.0)
+                .unwrap_or_default()
+                .into_iter()
+                .map(
+                    |SqlMergedPullRequest {
+                         github_id,
+                         title,
+                         url,
+                         merged_at_date,
+                         author,
+                         author_url,
+                     }| {
+                        MergedPullRequest {
+                            github_id,
+                            title,
+                            url,
+                            merged_at_date,
+                            author,
+                            author_url,
+                        }
+                    },
+                )
+                .collect();
 
-}).collect();
-
-let merged_pull_requests: Vec<MergedPullRequest> = issue.merged_pull_requests
-.map(|json| json.0)
-.unwrap_or_default()
-.into_iter().map(|SqlMergedPullRequest{
-    github_id,
-    title,
-    url,
-    merged_at_date,
-    author,
-    author_url}| MergedPullRequest{
-        github_id,
-title,
-url,
-merged_at_date,
-author,
-author_url
-
-}).collect();
-
-let opengraph_image = CImage::new("dilgcuzda".into(), (*issue.cloudinary_public_id).into());
-let header_image = CImage::new("dilgcuzda".into(), issue.cloudinary_public_id.into());
+        let opengraph_image = CImage::new(
+            "dilgcuzda".into(),
+            (*issue.cloudinary_public_id).into(),
+        );
+        let header_image = CImage::new(
+            "dilgcuzda".into(),
+            issue.cloudinary_public_id.into(),
+        );
 
         Issue {
-        title: issue.display_name,
-        issue_date: issue.issue_date,
-        slug: issue.slug,
-        youtube_id: issue.youtube_id,
-        opengraph_image: opengraph_image.to_string().replace(".avif", ".png"),
-        header_image: header_image.to_string(),
-        description: compile(&issue.description),
-        showcases,
-        crate_releases,
-        devlogs,
-        merged_pull_requests,
-        contributors: vec![],
-        educationals,
-        new_pull_requests,
-        new_github_issues,
+            title: issue.display_name,
+            issue_date: issue.issue_date,
+            slug: issue.slug,
+            youtube_id: issue.youtube_id,
+            opengraph_image: opengraph_image
+                .to_string()
+                .replace(".avif", ".png"),
+            header_image: header_image.to_string(),
+            description: compile(&issue.description),
+            showcases,
+            crate_releases,
+            devlogs,
+            merged_pull_requests,
+            contributors: vec![],
+            educationals,
+            new_pull_requests,
+            new_github_issues,
         }
     }))
 }
@@ -607,15 +757,15 @@ pub fn Issue() -> impl IntoView {
                                         // }
                                         // />
                                         <div class="flex flex-col">
-                                            <h1 class="mt-2 text-4xl font-bold text-ctp-text">
+                                            <h1 class="mt-2 text-4xl font-bold text-slate-50">
                                                 {issue.title.clone()}
                                             </h1>
-                                            <p class="order-first font-mono text-sm leading-7 text-ctp-text">
+                                            <p class="order-first font-mono text-sm leading-7 text-slate-50">
                                                 {issue.issue_date.to_string()}
                                             </p>
                                         </div>
                                     </div>
-                                    // <p class="ml-24 mt-3 text-lg font-medium leading-8 text-ctp-text">
+                                    // <p class="ml-24 mt-3 text-lg font-medium leading-8 text-slate-50">
                                     // {issue.as_ref().unwrap().description.clone()}
                                     // </p>
                                     <div
@@ -631,8 +781,8 @@ pub fn Issue() -> impl IntoView {
                                 description="Bevy work from the #showcase channel in Discord and around the internet. Use hashtag #bevyengine."
                             />
                             // image=issue.showcases.iter().last().map(|i|i.images.)
-                            // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Showcase</h2>
-                            <div class="divide-y-8 divide-ctp-pink">
+                            // <h2 class="mt-2 text-2xl font-bold text-slate-50">Showcase</h2>
+                            <div class="divide-y divide-slate-800">
                                 {issue
                                     .showcases
                                     .into_iter()
@@ -651,7 +801,7 @@ pub fn Issue() -> impl IntoView {
                                     })
                                     .collect_view()}
                             </div>
-                            // // <h2 class="mt-2 text-2xl font-bold text-ctp-text">Crates</h2>
+                            // // <h2 class="mt-2 text-2xl font-bold text-slate-50">Crates</h2>
                             // // <Divider title="Crates"/>
                             <DividerWithDescription
                                 color=DescriptionColor::Lavender
@@ -659,7 +809,7 @@ pub fn Issue() -> impl IntoView {
                                 description="New releases to crates.io and substantial updates to existing projects"
                             />
 
-                            <div class="divide-y-8 divide-ctp-lavender">
+                            <div>
                                 {issue
                                     .crate_releases
                                     .into_iter()
@@ -683,7 +833,7 @@ pub fn Issue() -> impl IntoView {
 
                             {if issue.devlogs.is_empty() {
                                 Either::Left(view! {
-                                    <div class="border-y-8 border-y-ctp-teal text-center text-ctp-text">
+                                    <div class="border-y-8 border-y-ctp-teal text-center text-slate-50">
                                         No devlogs this week
                                     </div>
                                 })
@@ -697,7 +847,7 @@ pub fn Issue() -> impl IntoView {
                                 })
                             }}
 
-                            <div class="divide-y-8 divide-ctp-teal">
+                            <div>
 
                                 {issue
                                     .devlogs
@@ -722,7 +872,7 @@ pub fn Issue() -> impl IntoView {
 
                             {if issue.educationals.is_empty() {
                                 Either::Left(view! {
-                                    <div class="border-y-8 border-y-ctp-blue text-center text-ctp-text">
+                                    <div class="border-y-8 border-y-sky-500 text-center text-slate-50">
                                         No Educational this week
                                     </div>
                                 })
@@ -757,7 +907,7 @@ pub fn Issue() -> impl IntoView {
 
                             <Container center=true>
                                 <Divider title="Pull Requests Merged This Week"/>
-                                <ul role="list" class="space-y-6 mt-6">
+                                <ul role="list" class="mt-6">
                                     {issue
                                         .merged_pull_requests
                                         .iter()
@@ -792,10 +942,8 @@ pub fn Issue() -> impl IntoView {
                                         </a>
                                     </p>
                                 </CalloutInfo>
-                                <h2 class="mt-6 text-2xl font-bold text-ctp-text">
-                                    Pull Requests Opened this week
-                                </h2>
-                                <ul role="list" class="space-y-6 mt-6">
+                                <Divider title="Pull Requests Opened This Week"/>
+                                <ul role="list" class="mt-6">
 
                                     {
                                         let merged_prs = issue
@@ -825,10 +973,8 @@ pub fn Issue() -> impl IntoView {
                                     }
 
                                 </ul>
-                                <h2 class="mt-6 text-2xl font-bold text-ctp-text">
-                                    Issues Opened this week
-                                </h2>
-                                <ul role="list" class="space-y-6 mt-6">
+                                <Divider title="Issues Opened this week"/>
+                                <ul role="list" class="mt-6">
                                     {issue
                                         .new_github_issues
                                         .iter()
@@ -870,64 +1016,108 @@ fn ActivityListItem(
     #[prop(into)] url: String,
     #[prop(into)] title: String,
     #[prop(into)] author: String,
-    #[prop(default=ActivityListIcon::Default)]
-    icon: ActivityListIcon,
 ) -> impl IntoView {
     let is_dependabot = author.starts_with("dependabot");
+    let is_actions_bot =
+        author.starts_with("github-actions[bot]");
     view! {
-        <li class="relative flex gap-x-4">
-            <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
-                <div class="w-px bg-ctp-overlay1"></div>
+         <li class="relative py-5 hover:bg-sky-950 border border-transparent hover:border-sky-400 rounded">
+            <div class="px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto flex max-w-4xl justify-between gap-x-6">
+                <div class="flex min-w-0 gap-x-4">
+                // <img src="maybe author avatar?" alt="" class="size-12 flex-none rounded-full bg-gray-50 dark:bg-gray-800 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
+                <div class="min-w-0 flex-auto">
+                    <p class="text-sm/6 font-semibold text-gray-900 dark:text-white">
+                    <a href={url}>
+                        <span class="absolute inset-x-0 -top-px bottom-0"></span>
+                        {title}
+                    </a>
+                    </p>
+                    <p class="mt-1 flex text-xs/5 text-gray-500 dark:text-gray-400">
+                    <a href="mailto:leslie.alexander@example.com" class="relative truncate hover:underline">{author}</a>
+                    </p>
+                </div>
+                </div>
+                <div class="flex shrink-0 items-center gap-x-4">
+                <div class="hidden sm:flex sm:flex-col sm:items-end">
+                    // <p class="text-sm/6 text-gray-900 dark:text-white">Co-Founder / CEO</p>
+                    // <p class="mt-1 text-xs/5 text-gray-500 dark:text-gray-400">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p>
+                </div>
+                <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="size-5 flex-none text-gray-400 dark:text-gray-500">
+                    <path d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+                </div>
             </div>
-            <div class="relative flex h-6 w-6 flex-none items-center justify-center bg-ctp-base">
-
-                {match icon {
-                    ActivityListIcon::Default => {
-                        Either::Left(view! {
-                            <>
-                                <div class="h-1.5 w-1.5 rounded-full bg-ctp-overlay1 ring-1 ring-ctp-overlay-2"></div>
-                            </>
-                        })
-                    }
-                    ActivityListIcon::Check => {
-                        Either::Right(view! {
-                            <>
-                                <svg
-                                    class="h-6 w-6 text-green-600"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        fill-rule="evenodd"
-                                        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                                        clip-rule="evenodd"
-                                    ></path>
-                                </svg>
-                            </>
-                        })
-                    }
-                }}
-
             </div>
-            <p class=format!(
-                "flex-auto py-0.5 text-xs leading-5 {}",
-                if is_dependabot { "text-ctp-overlay1" } else { "text-ctp-text" },
-            )>
-                <a href=url class="font-medium">
-                    {title}
-                </a>
-                " authored by "
-                <span class="font-medium">{author}</span>
-            </p>
-            <time
-                datetime=date.to_string()
-                class="flex-none py-0.5 text-xs leading-5 text-ctp-text"
-            >
-                {date.to_string()}
-            </time>
         </li>
     }
+    // view! {
+    //     <li class="relative flex gap-x-4">
+    //         <div class="absolute left-0 top-0
+    // flex w-6 justify-center -bottom-6">
+    //             <div class="w-px
+    // bg-ctp-overlay1"></div>         </div>
+    //         <div class="relative flex h-6 w-6
+    // flex-none items-center justify-center
+    // bg-ctp-base">
+
+    //             {match icon {
+    //                 ActivityListIcon::Default
+    // => {
+    // Either::Left(view! {
+    // <>                             <div
+    // class="h-1.5 w-1.5 rounded-full
+    // bg-ctp-overlay1 ring-1
+    // ring-ctp-overlay-2"></div>
+    // </>                     })
+    //                 }
+    //                 ActivityListIcon::Check =>
+    // {
+    // Either::Right(view! {
+    // <>                             <svg
+    //                                 class="h-6
+    // w-6 text-green-600"
+    // viewBox="0 0 24 24"
+    // fill="currentColor"
+    // aria-hidden="true"
+    // > <path
+    //
+    // fill-rule="evenodd"
+    // d="M2.25 12c0-5.385 4.365-9.75
+    // 9.75-9.75s9.75 4.365 9.75 9.75-4.365
+    // 9.75-9.75 9.75S2.25 17.385 2.25
+    // 12zm13.36-1.814a.75.75 0
+    // 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75
+    // 0 00-1.06 1.06l2.25 2.25a.75.75 0
+    // 001.14-.094l3.75-5.25z"
+    // clip-rule="evenodd"
+    // ></path>
+    // </svg>                         </>
+    //                     })
+    //                 }
+    //             }}
+
+    //         </div>
+    //         <p class=format!(
+    //             "flex-auto py-0.5 text-xs
+    // leading-5 {}",             if
+    // is_dependabot { "text-ctp-overlay1" } else
+    // { "text-slate-50" },         )>
+    //             <a href=url
+    // class="font-medium">
+    // {title}             </a>
+    //             " authored by "
+    //             <span
+    // class="font-medium">{author}</span>
+    //         </p>
+    //         <time
+    //             datetime=date.to_string()
+    //             class="flex-none py-0.5 text-xs
+    // leading-5 text-slate-50"         >
+    //             {date.to_string()}
+    //         </time>
+    //     </li>
+    // }
 }
 
 #[component]
@@ -958,15 +1148,15 @@ fn ActivityListComment(
             />
             <div class="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200">
                 <div class="flex justify-between gap-x-4">
-                    <div class="py-0.5 text-xs leading-5 text-ctp-text">
-                        <span class="font-medium text-ctp-text">{author}</span>
+                    <div class="py-0.5 text-xs leading-5 text-slate-50">
+                        <span class="font-medium text-slate-50">{author}</span>
                         commented
                     </div>
-                    <time datetime=time class="flex-none py-0.5 text-xs leading-5 text-ctp-text">
+                    <time datetime=time class="flex-none py-0.5 text-xs leading-5 text-slate-50">
                         3d ago
                     </time>
                 </div>
-                <p class="text-sm leading-6 text-ctp-text">{comment}</p>
+                <p class="text-sm leading-6 text-slate-50">{comment}</p>
             </div>
         </li>
     }
@@ -1018,7 +1208,7 @@ fn DevlogView(devlog: Devlog) -> impl IntoView {
 
         </ul>
         <div class="flex justify-between">
-            <h3 class="mt-2 text-xl font-bold text-ctp-text">{devlog.title}</h3>
+            <h3 class="mt-2 text-xl font-bold text-slate-50">{devlog.title}</h3>
             <div class="flex space-x-4">
 
                 {devlog
@@ -1094,7 +1284,7 @@ fn EducationalView(
 
         </ul>
         <div class="flex justify-between">
-            <h3 class="mt-2 text-xl font-bold text-ctp-text">{educational.title}</h3>
+            <h3 class="mt-2 text-xl font-bold text-slate-50">{educational.title}</h3>
             <div class="flex space-x-4">
 
                 {educational
@@ -1170,7 +1360,7 @@ fn ShowcaseView(showcase: Showcase) -> impl IntoView {
                     .collect::<Vec<_>>()}
 
             </ul> <div class="flex justify-between">
-                <h3 class="mt-2 text-xl font-bold text-ctp-text">{showcase.title}</h3>
+                <h3 class="mt-2 text-xl font-bold text-slate-50">{showcase.title}</h3>
 
                 {showcase
                     .discord_url
@@ -1215,7 +1405,7 @@ fn VideoLink(url: String) -> impl IntoView {
     view! {
         <a
             href=url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-sky-400 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
         >
             Video
             <svg
@@ -1239,7 +1429,7 @@ fn PostLink(url: String) -> impl IntoView {
     view! {
         <a
             href=url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-sky-400 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
         >
             Post
             <svg
@@ -1266,7 +1456,7 @@ fn URLLink(url: String) -> impl IntoView {
     view! {
         <a
             href=url
-            class="inline-flex items-center gap-x-1.5 rounded-md bg-ctp-sky px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-sky"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-sky-400 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
         >
             URL
             <svg
@@ -1299,7 +1489,7 @@ impl CalloutType {
     fn bg(&self) -> &str {
         match self {
             CalloutType::Info => {
-                "bg-blue-50 dark:bg-blue-950"
+                "bg-sky-50 dark:bg-sky-950"
             }
             CalloutType::Caution => {
                 "bg-yellow-50 dark:bg-yellow-950"
@@ -1314,7 +1504,7 @@ impl CalloutType {
     }
     fn icon(&self) -> &str {
         match self {
-            CalloutType::Info => "text-ctp-blue",
+            CalloutType::Info => "text-sky-500",
             CalloutType::Caution => "text-ctp-yellow",
             CalloutType::Warning => "text-ctp-red",
             CalloutType::Success => "text-ctp-green",
@@ -1380,9 +1570,17 @@ impl CalloutType {
             }),
         }
     }
+    fn border(&self) -> &str {
+        match self {
+            CalloutType::Info => "border-sky-400",
+            CalloutType::Caution => "border-ctp-yellow",
+            CalloutType::Warning => "border-ctp-red",
+            CalloutType::Success => "border-ctp-green",
+        }
+    }
     fn title(&self) -> &str {
         match self {
-            CalloutType::Info => "text-ctp-blue",
+            CalloutType::Info => "text-sky-50",
             CalloutType::Caution => "text-ctp-yellow",
             CalloutType::Warning => "text-ctp-red",
             CalloutType::Success => "text-ctp-green",
@@ -1390,7 +1588,7 @@ impl CalloutType {
     }
     fn content(&self) -> &str {
         match self {
-            CalloutType::Info => "text-ctp-blue",
+            CalloutType::Info => "text-sky-400",
             CalloutType::Caution => "text-ctp-yellow",
             CalloutType::Warning => "text-ctp-red",
             CalloutType::Success => "text-ctp-green",
@@ -1398,7 +1596,7 @@ impl CalloutType {
     }
     fn child_links(&self) -> &str {
         match self {
-            CalloutType::Info => "[&_a]:font-medium [&_a]:text-blue-700 [&_a]:underline [&_a]:hover:text-blue-600",
+            CalloutType::Info => "[&_a]:font-medium [&_a]:text-blue-400 [&_a]:underline [&_a]:hover:text-blue-500",
             CalloutType::Caution => "[&_a]:font-medium [&_a]:text-yellow-700 [&_a]:underline [&_a]:hover:text-yellow-600",
             CalloutType::Warning => "[&_a]:font-medium [&_a]:text-red-700 [&_a]:underline [&_a]:hover:text-red-600",
             CalloutType::Success => "[&_a]:font-medium [&_a]:text-green-700 [&_a]:underline [&_a]:hover:text-green-600",
@@ -1423,7 +1621,7 @@ fn CalloutInfo(
 ) -> impl IntoView {
     let has_link = link.is_none();
     view! {
-        <div class=format!("rounded-md p-4 {}", r#type.bg())>
+        <div class=format!("rounded-md p-4 {} border {}", r#type.bg(), r#type.border())>
             <div class="flex">
                 <div class="flex-shrink-0">
 
@@ -1439,7 +1637,7 @@ fn CalloutInfo(
                         .then_some(
                             view! {
                                 <h3 class=format!(
-                                    "text-sm font-medium {}",
+                                    "text-sm font-medium text-slate-50 {}",
                                     r#type.title(),
                                 )>{title}</h3>
                             },

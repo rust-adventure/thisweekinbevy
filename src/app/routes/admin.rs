@@ -2,12 +2,14 @@ use leptos::prelude::*;
 use leptos_router::components::{Outlet, A};
 
 pub mod crate_release;
+pub mod crates;
 pub mod devlog;
 pub mod educational;
 pub mod github;
 pub mod image;
 pub mod issue;
 pub mod issues;
+pub mod projects;
 pub mod showcase;
 
 #[component]
@@ -170,46 +172,61 @@ pub fn AdminWrapper() -> impl IntoView {
                 <nav class="flex overflow-x-auto border-b border-white/10 py-4">
                     <ul
                         role="list"
-                        class="flex min-w-full flex-none gap-x-6 px-4 text-sm font-semibold leading-6 text-gray-600 sm:px-6 lg:px-8"
+                        class="flex flex-none gap-x-6 px-4 text-sm font-semibold leading-6 text-gray-600 sm:px-6 lg:px-8 border-r-sky-400 border-r"
                     >
                         <li>
-                            <A href="/admin" exact=true attr:class="active:text-blue-600">
+                            <A href="/admin" exact=true attr:class="admin-nav">
                                 Home
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/issue" exact=true attr:class="active:text-blue-600">
+                            <A href="/admin/issue" exact=true attr:class="admin-nav">
                                 Issue
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/showcase" exact=true attr:class="active:text-blue-600">
+                            <A href="/admin/showcase" exact=true attr:class="admin-nav">
                                 Showcase
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/crate_release" exact=true attr:class="active:text-blue-600">
+                            <A href="/admin/crate_release" exact=true attr:class="admin-nav">
                                 Crate Release
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/devlog" exact=true attr:class="active:text-blue-600">
+                            <A href="/admin/devlog" exact=true attr:class="admin-nav">
                                 Devlog
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/educational" attr:class="active:text-blue-600">
+                            <A href="/admin/educational" attr:class="admin-nav">
                                 Educational
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/images" attr:class="active:text-blue-600">
+                            <A href="/admin/images" attr:class="admin-nav">
                                 Images
                             </A>
                         </li>
                         <li>
-                            <A href="/admin/github" attr:class="active:text-blue-600">
+                            <A href="/admin/github" attr:class="admin-nav">
                                 GitHub
+                            </A>
+                        </li>
+                    </ul>
+                    <ul
+                        role="list"
+                        class="flex flex-none gap-x-6 px-4 text-sm font-semibold leading-6 text-gray-600 sm:px-6 lg:px-8"
+                    >
+                        <li>
+                            <A href="/admin/projects" exact=true attr:class="admin-nav">
+                                Projects
+                            </A>
+                        </li>
+                        <li>
+                            <A href="/admin/crates" exact=true attr:class="admin-nav">
+                                Crates
                             </A>
                         </li>
                     </ul>

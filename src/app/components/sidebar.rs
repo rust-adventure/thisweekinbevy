@@ -10,7 +10,7 @@ struct MenuItem<'a> {
     border_color: &'a str,
     icon: Option<Icon>,
 }
-const MENU_ITEMS: [MenuItem; 2] = [
+const MENU_ITEMS: [MenuItem; 3] = [
     MenuItem {
         url: "/projects",
         shortcode: "P",
@@ -23,7 +23,14 @@ const MENU_ITEMS: [MenuItem; 2] = [
         shortcode: "C",
         label: "Crates",
         border_color: "border-[#38bdf8]",
-        icon: None,
+        icon: Some(Icon::CratesIo),
+    },
+    MenuItem {
+        url: "/pull-requests",
+        shortcode: "PR",
+        label: "Pull Requests",
+        border_color: "border-[#ececec]",
+        icon: Some(Icon::PullRequest),
     },
 ];
 
@@ -31,6 +38,8 @@ enum Icon {
     YouTube,
     GitHub,
     Rss,
+    PullRequest,
+    CratesIo,
     // CrateRelease
 }
 impl Icon {
@@ -48,6 +57,25 @@ impl Icon {
                 <RSSIcon class=format!("{} fill-white group-hover:fill-white", class)/>
             }
             .into_any(),
+            Icon::CratesIo => view! {
+                <img
+                    src="/cargo.png"
+                    class=format!("{} fill-white group-hover:fill-white", class)
+                />
+            }
+            .into_any(),
+            Icon::PullRequest => view! {
+                <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    class=format!("{} fill-white group-hover:fill-white", class)
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    display="inline-block"
+                    overflow="visible"
+                    style="vertical-align: text-bottom;"
+                ><path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"></path></svg>
+            }.into_any()
             // Icon::CrateRelease => view! {
             // }.into_any()
         }
@@ -250,7 +278,7 @@ pub fn Sidebar(
                                                 // a function that returns the items we're iterating over; a signal is fine
                                                 each=move || MENU_ITEMS
                                                 // a unique key for each item
-                                                key=|menu_item| menu_item.shortcode.to_string()
+                                                key=|menu_item| menu_item.label.to_string()
                                                 // renders each item to a view
                                                 children=move |item| {
                                                     view! {
@@ -259,12 +287,21 @@ pub fn Sidebar(
                                                                 href=item.url
                                                                 class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-slate-700 dark:text-slate-200 hover:bg-white hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
                                                             >
-                                                                <span class=format!(
-                                                                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-slate-50 dark:bg-slate-800 text-[0.625rem] font-medium text-slate-800 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white {}",
-                                                                    item.border_color
-                                                                )>
-                                                                    {item.shortcode}
-                                                                </span>
+                                                            {
+                                                                match item.icon {
+                                                                    None => view! {
+                                                                        <span class=format!(
+                                                                            "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-slate-50 dark:bg-slate-800 text-[0.625rem] font-medium text-slate-800 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white {}",
+                                                                            item.border_color
+                                                                        )>
+                                                                            {item.shortcode}
+                                                                        </span>
+                                                                    }.into_any(),
+                                                                    Some(icon) => {
+                                                                        icon.to_view("h-6 w-6".to_string()).into_any()
+                                                                    }
+                                                                }
+                                                            }
                                                                 <span class="truncate">{item.label}</span>
                                                             </a>
                                                         </li>
@@ -333,7 +370,7 @@ pub fn Sidebar(
                 </div>
             </div>
 
-            <div class="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
+            <div class="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col border-r border-slate-800">
 
 
                 <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-950/10 px-6 ring-1 ring-white/5">
@@ -462,18 +499,25 @@ pub fn Sidebar(
                                         children=move |item| {
                                             view! {
                                                 <li>
-
-
                                                     <a
                                                         href=item.url
                                                         class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-slate-700 dark:text-slate-200 hover:bg-white hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
                                                     >
-                                                        <span class=format!(
-                                                            "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-slate-50 dark:bg-slate-800 text-[0.625rem] font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white {}",
-                                                            item.border_color
-                                                        )>
-                                                            {item.shortcode}
-                                                        </span>
+                                                    {
+                                                        match item.icon {
+                                                            None => view! {
+                                                                <span class=format!(
+                                                                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-slate-50 dark:bg-slate-800 text-[0.625rem] font-medium text-slate-800 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white {}",
+                                                                    item.border_color
+                                                                )>
+                                                                    {item.shortcode}
+                                                                </span>
+                                                            }.into_any(),
+                                                            Some(icon) => {
+                                                                icon.to_view("h-6 w-6".to_string()).into_any()
+                                                            }
+                                                        }
+                                                    }
                                                         <span class="truncate">{item.label}</span>
                                                     </a>
                                                 </li>

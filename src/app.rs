@@ -6,9 +6,9 @@ use crate::{
         },
         routes::{
             admin::{self, AdminWrapper},
-            custom,
+            crates, custom,
             index::Home,
-            issue,
+            issue, pull_requests,
         },
     },
     error_template::{AppError, ErrorTemplate},
@@ -35,7 +35,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
         <!DOCTYPE html>
         <html
             lang="en"
-            class="h-full bg-slate-950 antialiased"
+            class="h-full bg-slate-900 antialiased"
             >
             <head>
                 <meta charset="utf-8"/>
@@ -44,7 +44,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <style>
                     r#"@font-face {
                     font-family: "PP Neue Montreal";
-                    src: url("https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2")
+                    src: url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap")
                     format("woff2");
                     font-weight: 100 900;
                     font-display: swap;
@@ -56,7 +56,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                     as_="font"
                     type_="font/woff2"
                     crossorigin="anonymous"
-                    href="https://cdn.thisweekinbevy.com/pp-neue-montreal/PPNeueMontreal-Variable.woff2"
+                    href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
                 />
                 <meta name="og:site_name" content="This Week in Bevy"/>
 
@@ -114,6 +114,8 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("") view=Home/>
                     <Route path=path!("/issue/:slug") view=issue::Issue/>
                     <Route path=path!("/custom/:slug") view=custom::Issue/>
+                    <Route path=path!("/pull-requests") view=pull_requests::PullRequests/>
+                    <Route path=path!("/crates") view=crates::Crates/>
                     <Route path=path!("/login") view=Login/>
                     <ProtectedParentRoute
                         path=path!("/admin")
@@ -140,6 +142,8 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/educational/:id") view=admin::educational::id::Educational/>
                         <Route path=path!("/images") view=admin::image::Image/>
                         <Route path=path!("/github") view=admin::github::GitHub/>
+                        <Route path=path!("/projects") view=admin::projects::Projects/>
+                        <Route path=path!("/crates") view=admin::crates::Crates/>
                     </ProtectedParentRoute>
                 </Routes>
             // </Wrapper>

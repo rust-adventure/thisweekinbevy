@@ -1,8 +1,10 @@
 use leptos::prelude::*;
 pub mod admin;
+pub mod crates;
 pub mod custom;
 pub mod index;
 pub mod issue;
+pub mod pull_requests;
 
 #[component]
 fn PauseIcon(

@@ -41,7 +41,7 @@ pub fn Issues() -> impl IntoView {
                 </div>
             </div>
             <Suspense fallback=move || view! { <p>"Loading (Suspense Fallback)..."</p> }>
-                <ul role="list" class="divide-y-4 divide-ctp-mantle">
+                <ul role="list" class="divide-y-4 divide-slate-800">
                     {move || {
                         issues
                             .get()
@@ -67,14 +67,14 @@ pub fn Issues() -> impl IntoView {
                                                         <div class="flex items-baseline justify-between gap-x-4">
                                                             <a
                                                                 href=format!("/admin/issue/{}", &issue.id)
-                                                                class="text-sm font-semibold leading-6 text-gray-900"
+                                                                class="text-sm font-semibold leading-6 text-slate-50"
                                                             >
                                                                 {issue.display_name.clone()}
                                                             </a>
                                                             <time datetime=issue
                                                                 .issue_date
                                                                 .to_string()>{issue.issue_date.to_string()}</time>
-                                                            <p class="flex-none text-xs text-gray-600">
+                                                            <p class="flex-none text-xs text-slate-400">
                                                                 something here
                                                             </p>
                                                         </div>

@@ -1,14 +1,14 @@
 SELECT
-    slug,
-    issue_date,
-    cloudinary_public_id,
-    display_name,
-    description,
-    youtube_id,
-    showcases as "showcases: Json<Vec<ShowcaseData>>",
-    crate_releases as "crate_releases: Json<Vec<SqlCrateRelease>>",
-    devlogs as "devlogs: Json<Vec<SqlDevlog>>",
-    educationals as "educationals: Json<Vec<SqlEducational>>",
+    issue.slug,
+    issue.issue_date,
+    issue.cloudinary_public_id,
+    issue.display_name,
+    issue.description,
+    issue.youtube_id,
+    showcases.showcases as "showcases: Json<Vec<ShowcaseData>>",
+    crate_releases.crate_releases as "crate_releases: Json<Vec<SqlCrateRelease>>",
+    devlogs.devlogs as "devlogs: Json<Vec<SqlDevlog>>",
+    educationals.educationals as "educationals: Json<Vec<SqlEducational>>",
     new_github_issues as "new_github_issues: Json<Vec<SqlNewGhIssue>>",
     new_pull_requests as "new_pull_requests: Json<Vec<SqlNewPr>>",
     merged_pull_requests as "merged_pull_requests: Json<Vec<SqlMergedPullRequest>>"
@@ -16,222 +16,187 @@ FROM
     issue
     LEFT JOIN (
         SELECT
-            issue_id,
+            issue.id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "title",
-                    scase.title,
+                    showcase.title,
                     "url",
-                    scase.url,
+                    showcase.url,
                     "discord_url",
-                    scase.discord_url,
+                    showcase.discord_url,
                     "description",
-                    scase.description,
+                    showcase.description,
                     "images",
-                    scase.images
+                    images.data
                 )
-            ) AS showcases
+            ) as showcases
         FROM
-            issue__showcase
-            LEFT JOIN (
+            issue
+            LEFT JOIN issue__showcase ON issue__showcase.issue_id = issue.id
+            LEFT JOIN showcase on issue__showcase.showcase_id = showcase.id,
+            LATERAL (
                 SELECT
-                    id,
-                    title,
-                    url,
-                    description,
-                    discord_url,
-                    images
-                from
-                    showcase
-                    LEFT JOIN (
-                        SELECT
-                            showcase_id,
-                            JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    "id",
-                                    TO_BASE64(image.id),
-                                    "description",
-                                    description,
-                                    "cloudinary_public_id",
-                                    cloudinary_public_id
-                                )
-                            ) AS images
-                        FROM
-                            showcase__image
-                            LEFT JOIN image ON showcase__image.image_id = image.id
-                        GROUP BY
-                            showcase_id
-                    ) as i on i.showcase_id = showcase.id
-            ) as scase ON scase.id = issue__showcase.showcase_id
+                    json_arrayagg(
+                        json_object(
+                            "cloudinary_public_id",
+                            cloudinary_public_id,
+                            "description",
+                            description
+                        )
+                    ) as data
+                FROM
+                    showcase__image
+                    LEFT JOIN image ON showcase__image.image_id = image.id
+                WHERE
+                    showcase.id = showcase_id
+                GROUP BY
+                    showcase.id
+            ) as images
+        WHERE
+            issue_date = ?
         GROUP BY
-            issue_id
-    ) AS s ON s.issue_id = issue.id
+            issue.id
+    ) as showcases on showcases.id = issue.id
     LEFT JOIN (
         SELECT
-            issue_id,
+            issue.id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "title",
-                    crelease.title,
+                    crate_release.title,
                     "url",
-                    crelease.url,
+                    crate_release.url,
                     "discord_url",
-                    crelease.discord_url,
+                    crate_release.discord_url,
                     "description",
-                    crelease.description,
+                    crate_release.description,
                     "images",
-                    crelease.images
+                    images.data
                 )
             ) AS crate_releases
         FROM
-            issue__crate_release
-            LEFT JOIN (
+            issue
+            LEFT JOIN issue__crate_release ON issue__crate_release.issue_id = issue.id
+            LEFT JOIN crate_release on issue__crate_release.crate_release_id = crate_release.id,
+            LATERAL (
                 SELECT
-                    id,
-                    title,
-                    url,
-                    description,
-                    posted_date,
-                    discord_url,
-                    images
-                from
-                    crate_release
-                    LEFT JOIN (
-                        SELECT
-                            crate_release_id,
-                            JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    "id",
-                                    TO_BASE64(image.id),
-                                    "description",
-                                    description,
-                                    "cloudinary_public_id",
-                                    cloudinary_public_id
-                                )
-                            ) AS images
-                        FROM
-                            crate_release__image
-                            LEFT JOIN image ON crate_release__image.image_id = image.id
-                        GROUP BY
-                            crate_release_id
-                    ) as i on i.crate_release_id = crate_release.id
-            ) as crelease ON crelease.id = issue__crate_release.crate_release_id
+                    json_arrayagg(
+                        json_object(
+                            "cloudinary_public_id",
+                            cloudinary_public_id,
+                            "description",
+                            description
+                        )
+                    ) as data
+                FROM
+                    crate_release__image
+                    LEFT JOIN image ON crate_release__image.image_id = image.id
+                WHERE
+                    crate_release.id = crate_release_id
+                GROUP BY
+                    crate_release.id
+            ) as images
+        WHERE
+            issue_date = ?
         GROUP BY
-            issue_id
-    ) AS cr ON cr.issue_id = issue.id
+            issue.id
+    ) as crate_releases ON crate_releases.id = issue.id
     LEFT JOIN (
         SELECT
-            issue_id,
+            issue.id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "title",
-                    dlog.title,
+                    devlog.title,
                     "post_url",
-                    dlog.post_url,
+                    devlog.post_url,
                     "video_url",
-                    dlog.video_url,
+                    devlog.video_url,
                     "discord_url",
-                    dlog.discord_url,
+                    devlog.discord_url,
                     "description",
-                    dlog.description,
+                    devlog.description,
                     "images",
-                    dlog.images
+                    images.data
                 )
             ) AS devlogs
         FROM
-            issue__devlog
-            LEFT JOIN (
+            issue
+            LEFT JOIN issue__devlog ON issue__devlog.issue_id = issue.id
+            LEFT JOIN devlog on issue__devlog.devlog_id = devlog.id,
+            LATERAL (
                 SELECT
-                    id,
-                    title,
-                    post_url,
-                    video_url,
-                    description,
-                    discord_url,
-                    images
-                from
-                    devlog
-                    LEFT JOIN (
-                        SELECT
-                            devlog_id,
-                            JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    "id",
-                                    TO_BASE64(image.id),
-                                    "description",
-                                    description,
-                                    "cloudinary_public_id",
-                                    cloudinary_public_id
-                                )
-                            ) AS images
-                        FROM
-                            devlog__image
-                            LEFT JOIN image ON devlog__image.image_id = image.id
-                        GROUP BY
-                            devlog_id
-                    ) as i on i.devlog_id = devlog.id
-            ) as dlog ON dlog.id = issue__devlog.devlog_id
+                    json_arrayagg(
+                        json_object(
+                            "cloudinary_public_id",
+                            cloudinary_public_id,
+                            "description",
+                            description
+                        )
+                    ) as data
+                FROM
+                    devlog__image
+                    LEFT JOIN image ON devlog__image.image_id = image.id
+                WHERE
+                    devlog.id = devlog_id
+                GROUP BY
+                    devlog.id
+            ) as images
+        WHERE
+            issue_date = ?
         GROUP BY
-            issue_id
-    ) AS d ON d.issue_id = issue.id
+            issue.id
+    ) as devlogs ON devlogs.id = issue.id
     LEFT JOIN (
         SELECT
-            issue_id,
+            issue.id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "title",
-                    edu.title,
+                    educational.title,
                     "post_url",
-                    edu.post_url,
+                    educational.post_url,
                     "video_url",
-                    edu.video_url,
+                    educational.video_url,
                     "discord_url",
-                    edu.discord_url,
+                    educational.discord_url,
                     "description",
-                    edu.description,
+                    educational.description,
                     "images",
-                    edu.images
+                    images.data
                 )
             ) AS educationals
         FROM
-            issue__educational
-            LEFT JOIN (
+            issue
+            LEFT JOIN issue__educational ON issue__educational.issue_id = issue.id
+            LEFT JOIN educational on issue__educational.educational_id = educational.id,
+            LATERAL (
                 SELECT
-                    id,
-                    title,
-                    post_url,
-                    video_url,
-                    description,
-                    discord_url,
-                    images
-                from
-                    educational
-                    LEFT JOIN (
-                        SELECT
-                            educational_id,
-                            JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    "id",
-                                    TO_BASE64(image.id),
-                                    "description",
-                                    description,
-                                    "cloudinary_public_id",
-                                    cloudinary_public_id
-                                )
-                            ) AS images
-                        FROM
-                            educational__image
-                            LEFT JOIN image ON educational__image.image_id = image.id
-                        GROUP BY
-                            educational_id
-                    ) as i on i.educational_id = educational.id
-            ) as edu ON edu.id = issue__educational.educational_id
+                    json_arrayagg(
+                        json_object(
+                            "cloudinary_public_id",
+                            cloudinary_public_id,
+                            "description",
+                            description
+                        )
+                    ) as data
+                FROM
+                    educational__image
+                    LEFT JOIN image ON educational__image.image_id = image.id
+                WHERE
+                    educational.id = educational_id
+                GROUP BY
+                    educational.id
+            ) as images
+        WHERE
+            issue_date = ?
         GROUP BY
-            issue_id
-    ) AS e ON e.issue_id = issue.id
-    LEFT JOIN (
+            issue.id
+    ) as educationals ON educationals.id = issue.id,
+    # git prs and issues
+    LATERAL (
         SELECT
-            issue_id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "title",
@@ -249,12 +214,13 @@ FROM
         FROM
             issue__new_github_issue
             LEFT JOIN new_github_issue ON new_github_issue.id = issue__new_github_issue.github_issue_id
+        WHERE
+            issue.id = issue__new_github_issue.issue_id
         GROUP BY
             issue_id
-    ) AS ngis ON ngis.issue_id = issue.id
-    LEFT JOIN (
+    ) as new_github_issues,
+    LATERAL (
         SELECT
-            issue_id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "github_id",
@@ -274,12 +240,13 @@ FROM
         FROM
             issue__new_pull_request
             LEFT JOIN new_pull_request ON new_pull_request.id = issue__new_pull_request.pull_request_id
+        WHERE
+            issue.id = issue__new_pull_request.issue_id
         GROUP BY
             issue_id
-    ) AS new_prs ON new_prs.issue_id = issue.id
-    LEFT JOIN (
+    ) as new_pull_requests,
+    LATERAL (
         SELECT
-            issue_id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "github_id",
@@ -299,8 +266,10 @@ FROM
         FROM
             issue__merged_pull_request
             LEFT JOIN merged_pull_request ON merged_pull_request.id = issue__merged_pull_request.merged_pull_request_id
+        WHERE
+            issue.id = issue__merged_pull_request.issue_id
         GROUP BY
             issue_id
-    ) AS merged_prs ON merged_prs.issue_id = issue.id
+    ) as merged_pull_requests
 WHERE
     issue_date = ?;
